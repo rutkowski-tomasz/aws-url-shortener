@@ -16,7 +16,7 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Develop a basic logic for shorten-url-lambda.
     - Elaborate the purpose and scope of this repository in the README.md.
     - Update the initial project architecture diagram to reflect the latest design decisions.
-2. Initial CI/CD & AWS Integration
+2. ✅ Initial CI/CD & AWS Integration
     - Configure access tokens for CI/CD within GitHub Secrets.
     - Establish GitHub Actions workflows for continuous integration and deployment, triggered on every push to the main branch.
     - Automate the packaging of shorten-url-lambda into a zip file within GitHub Actions.
