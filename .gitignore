@@ -16,3 +16,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# node lambdas
+node_modules
