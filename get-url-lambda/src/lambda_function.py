@@ -9,13 +9,12 @@ def lambda_handler(event, context):
         code = event.get('code', '')
         
         response = table.get_item(Key={'code': code})
-        item = response.get('Item', None)
         
-        if item:
+        if 'Item' in response:
             return {
                 'statusCode': 302,
                 'headers': {
-                    'Location': item['longUrl']
+                    'Location': response['Item']['longUrl']
                 }
             }
         else:
