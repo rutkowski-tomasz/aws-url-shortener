@@ -37,7 +37,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 7. ✅ Local deployment
     - Package source code
     - Update lambda code without changing configuration
-8. Unit Testing
+8. ✅ Unit Testing
     - Develop unit tests for the shorten-url-lambda business logic.
     - Integrate unit testing into the CI/CD pipeline, requiring all tests to pass before deployment.
 9. Implement get-url-lambda
