@@ -6,22 +6,27 @@ const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
+    const shortenedUrl = {
+        'code': generateCode(),
+        'longUrl': event.longUrl,
+        'createdAt': new Date().toUTCString(),
+    };
+
     try {
         const command = new PutCommand({
             TableName: 'ShortenedUrls',
-            Item: {
-                'code': generateCode(),
-                'longUrl': event.longUrl,
-                'createdAt': new Date().toUTCString(),
-            }
+            Item: shortenedUrl
         });
-        console.log('Command: ', command);
 
         const result = await client.send(command);
-        return buildResponse(200, result);
+        if (result['$metadata'].httpStatusCode == 200)
+            return buildResponse(true, shortenedUrl);
+
+        console.error('Result: ', result);
+        return buildResponse(false, result);
     } catch (err) {
         console.error('Error: ', err);
-        return buildResponse(400, err.message);
+        return buildResponse(false, err);
     }
 };
 
@@ -37,9 +42,13 @@ const generateCode = (length = 8) => {
     return code;
 };
   
-const buildResponse = (statusCode, body) => ({
-    statusCode,
-    body: JSON.stringify(body),
+const buildResponse = (isSuccess, content) => ({
+    statusCode: isSuccess ? 200 : 400,
+    body: JSON.stringify({
+        isSuccess,
+        error: !isSuccess ? content : null,
+        result: isSuccess ? content : null
+    }),
     headers: {
         'Content-Type': 'application/json',
     },

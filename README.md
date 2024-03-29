@@ -5,6 +5,7 @@ A serverless URL shortener built on AWS. This project aims to demonstrate a prac
 # 🏙️ Architecture
 
 ![Architecture Diagram](assets/link-shortener.phase1.drawio.svg)
+
 Phase 1. As basic as it gets
 
 # 🛣️ Roadmap
@@ -36,7 +37,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 7. ✅ Local deployment
     - Package source code
     - Update lambda code without changing configuration
-8. Unit Testing
+8. ✅ Unit Testing
     - Develop unit tests for the shorten-url-lambda business logic.
     - Integrate unit testing into the CI/CD pipeline, requiring all tests to pass before deployment.
 9. Implement get-url-lambda
@@ -50,4 +51,9 @@ The development of this solution is iterative, with the roadmap subject to chang
 12. Infrastructure tear-down
     - Create manually dispatched workflow in GitHub Actions
     - Perform terrafrom destroy of all resources
-13. Utilize more AWS services...
+13. Describe structure of repo
+    - Add tree overview
+    - Describe each folder and it's purpose
+14. Define common prefix for resources 'us-' for UrlShortener
+    - Adjust IAM policies to allow access to prefixed resources
+15. Utilize more AWS services...
