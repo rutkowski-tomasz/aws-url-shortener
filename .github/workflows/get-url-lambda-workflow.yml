@@ -1,0 +1,88 @@
+name: get-url-lambda pipeline
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'get-url-lambda/**'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'get-url-lambda/**'
+
+jobs:
+  test:
+    name: Unit testing
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: get-url-lambda
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+      
+      - name: Run tests
+        run: pytest tests/
+      
+  terraform_checks:
+    name: Terraform checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: get-url-lambda/terraform
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform validate
+        run: terraform validate
+      
+      - name: Terraform plan
+        run: terraform plan
+
+  deploy:
+    name: Deployment
+    if: github.ref == 'refs/heads/main'
+    needs: [test, terraform_checks] 
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: get-url-lambda/terraform
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Package Lambda function
+        working-directory: get-url-lambda/src
+        run: zip -r ../terraform/deployment-package.zip .
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve

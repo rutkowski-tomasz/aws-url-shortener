@@ -40,7 +40,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 8. ✅ Unit Testing
     - Develop unit tests for the shorten-url-lambda business logic.
     - Integrate unit testing into the CI/CD pipeline, requiring all tests to pass before deployment.
-9. Implement get-url-lambda
+9. ✅ Implement get-url-lambda
     - Develop the lambda function to retrieve URLs from DynamoDB based on the shortcode.
     - Implement HTTP redirection to the original URL based on the retrieved mapping.
 10. Integration Testing
