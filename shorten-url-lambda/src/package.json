@@ -1,0 +1,12 @@
+{
+  "name": "shorten-url-lambda",
+  "version": "1.0.0",
+  "description": "Lambda processing URL shortening request",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "zip -r deployment-package.zip . && aws lambda update-function-code --function-name shorten-url-lambda --zip-file fileb://deployment-package.zip && rm deployment-package.zip"
+  },
+  "author": "",
+  "license": "ISC"
+}
