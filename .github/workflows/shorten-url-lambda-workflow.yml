@@ -21,85 +21,29 @@ jobs:
 
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform fmt
-        id: fmt
-        run: |
-          cd shorten-url-lambda/terraform
-          terraform fmt -check
-        continue-on-error: true
-
-      - name: Terraform Init
-        id: init
-        run: |
-          cd shorten-url-lambda/terraform
-          terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: |
-          cd shorten-url-lambda/terraform
-          terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: |
-          cd shorten-url-lambda/terraform
-          terraform plan -no-color
-        continue-on-error: true
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'eu-central-1'
-
-      - uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            <details><summary>Validation Output</summary>
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-            \`\`\`\n
-            ${{ steps.validate.outputs.stdout }}
-            \`\`\`
+      - name: Copy shared terraform scripts
+        run: cp -R terraform/shared/* shorten-url-lambda/terraform
 
-            </details>
+      - name: Terraform init
+        working-directory: shorten-url-lambda/terraform
+        run: terraform init
 
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-            <details><summary>Show Plan</summary>
-
-            \`\`\`\n
-            ${process.env.PLAN}
-            \`\`\`
-
-            </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+      - name: Terraform validate
+        working-directory: shorten-url-lambda/terraform
+        run: terraform validate
+      
+      - name: Terraform plan
+        working-directory: shorten-url-lambda/terraform
+        run: terraform plan
 
       - name: Package Lambda function
-        run: |
-          cd shorten-url-lambda/src
-          zip -r ../terraform/deployment-package.zip .
+        working-directory: shorten-url-lambda/src
+        run: zip -r ../terraform/deployment-package.zip .
 
-      - name: Terraform Apply
+      - name: Terraform apply
         if: github.ref == 'refs/heads/main'
-        run: |
-          cd shorten-url-lambda/terraform
-          terraform apply -auto-approve
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'eu-central-1'
+        working-directory: shorten-url-lambda/terraform
+        run: terraform apply
