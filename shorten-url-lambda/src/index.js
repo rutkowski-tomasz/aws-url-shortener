@@ -1,15 +1,19 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { PutCommand, DynamoDBDocumentClient } = require("@aws-sdk/lib-dynamodb");
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-export const handler = async (event) => {
+exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
     try {
         const command = new PutCommand({
             TableName: 'ShortenedUrls',
-            Item: createShortenUrlObject(event)
+            Item: {
+                'code': generateCode(),
+                'longUrl': event.longUrl,
+                'createdAt': new Date().toUTCString(),
+            }
         });
         console.log('Command: ', command);
 
@@ -20,13 +24,6 @@ export const handler = async (event) => {
         return buildResponse(400, err.message);
     }
 };
-
-const createShortenUrlObject = (event) => ({
-    'id': crypto.randomUUID(),
-    'code': generateCode(),
-    'longUrl': event.longUrl,
-    'createdAt': new Date().toUTCString(),
-});
 
 const generateCode = (length = 8) => {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";

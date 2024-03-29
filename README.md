@@ -33,18 +33,21 @@ The development of this solution is iterative, with the roadmap subject to chang
 6. ✅ Business Logic for shorten-url-lambda
     - Implement the logic for generating a unique shortcode for each URL.
     - Integrate DynamoDB to persist shortcode-URL mappings.
-7. Unit Testing
+7. ✅ Local deployment
+    - Package source code
+    - Update lambda code without changing configuration
+8. Unit Testing
     - Develop unit tests for the shorten-url-lambda business logic.
     - Integrate unit testing into the CI/CD pipeline, requiring all tests to pass before deployment.
-8. Implement get-url-lambda
+9. Implement get-url-lambda
     - Develop the lambda function to retrieve URLs from DynamoDB based on the shortcode.
     - Implement HTTP redirection to the original URL based on the retrieved mapping.
-9. Integration Testing
+10. Integration Testing
     - Conduct post-deployment tests to ensure the URL shortening and retrieval functionalities work as expected in the live environment.
-10. Environment Differentiation
+11. Environment Differentiation
     - Set up distinct environments for development and production to enable safe testing and stable deployment.
     - Modify GitHub Actions workflows to support manual triggers for production deployments, allowing controlled updates.
-11. Infrastructure tear-down
+12. Infrastructure tear-down
     - Create manually dispatched workflow in GitHub Actions
     - Perform terrafrom destroy of all resources
-12. Utilize more AWS services...
+13. Utilize more AWS services...

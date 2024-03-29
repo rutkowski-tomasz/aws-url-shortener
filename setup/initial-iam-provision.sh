@@ -19,6 +19,7 @@ cat > ${policy_document} << EOF
         "lambda:List*",
         "lambda:Describe*",
         "lambda:CreateFunction",
+        "lambda:DeleteFunction",
         "lambda:UpdateFunctionCode",
         "lambda:TagResource"
       ],
@@ -39,7 +40,8 @@ cat > ${policy_document} << EOF
         "iam:TagPolicy",
         "iam:TagRole",
         "iam:AttachRolePolicy",
-        "iam:PassRole"
+        "iam:PassRole",
+        "iam:UpdateAssumeRolePolicy"
       ],
       "Resource": [
         "arn:aws:iam::${account_id}:policy/*",
