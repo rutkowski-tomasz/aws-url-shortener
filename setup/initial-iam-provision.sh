@@ -26,7 +26,8 @@ cat > ${policy_document} << EOF
       "Sid": "IamManagement",
       "Effect": "Allow",
       "Action": [
-        "iam:CreatePolicy"
+        "iam:CreatePolicy",
+        "iam:GetPolicy"
       ],
       "Resource": [
         "arn:aws:iam::${account_id}:policy/*"
@@ -36,18 +37,23 @@ cat > ${policy_document} << EOF
 }
 EOF
 
-# Check if the policy exists
 policy_arn=$(aws iam list-policies --scope Local --query "Policies[?PolicyName==\`${policy_name}\`].Arn" --output text)
+policy_versions_json=$(aws iam list-policy-versions --policy-arn ${policy_arn})
+versions_count=$(echo "$policy_versions_json" | jq '.Versions | length')
 
-if [ -n "$policy_arn" ]; then
-  echo "Policy exists. Updating policy..."
-  # Update the policy
-  aws iam create-policy-version --policy-arn ${policy_arn} --policy-document file://${policy_document} --set-as-default
-else
-  echo "Policy does not exist. Creating policy..."
-  # Create the policy
-  aws iam create-policy --policy-name ${policy_name} --policy-document file://${policy_document}
+if [ "$versions_count" -eq 5 ]; then
+  oldest_version=$(echo "$policy_versions_json" | jq -r '[.Versions[] | select(.IsDefaultVersion == false) | .VersionId][0]')
+
+  if [ -n "$oldest_version" ] && [ "$oldest_version" != "null" ]; then
+    echo "Maximum number of policy versions reached. Deleting oldest non-default version (${oldest_version})..."
+    aws iam delete-policy-version --policy-arn ${policy_arn} --version-id ${oldest_version}
+  else
+    echo "Error: No non-default versions available to delete."
+    exit 1
+  fi
 fi
+
+aws iam create-policy-version --policy-arn ${policy_arn} --policy-document file://${policy_document} --set-as-default
 
 # Cleanup
 rm -f ${policy_document}
