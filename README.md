@@ -28,7 +28,7 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Refine IAM policies and roles to adhere to the principle of least privilege for all access tokens and AWS resources.
 4. ✅ DynamoDB Provisioning
     - Define the DynamoDB table for storing URL mappings in Terraform and provision through GitHub Actions.
-5. Resource Monitoring and Management
+5. ✅ Resource Monitoring and Management
     - Implement tagging strategy for resources provisioned by Terraform for easier identification and management (tags: application name, project, Terraform-managed).
 6. Business Logic for shorten-url-lambda
     - Implement the logic for generating a unique shortcode for each URL.
