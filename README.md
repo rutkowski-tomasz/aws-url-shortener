@@ -21,9 +21,9 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Establish GitHub Actions workflows for continuous integration and deployment, triggered on every push to the main branch.
     - Automate the packaging of shorten-url-lambda into a zip file within GitHub Actions.
     - Automate the update of AWS Lambda code directly from GitHub Actions.
-3. Infrastructure as Code (IaC)
+3. ✅ Infrastructure as Code (IaC)
     - Initialize Terraform for infrastructure management.
-    - Set up Terraform state management using an S3 bucket and DynamoDB for state locking.
+    - Set up Terraform state management using Terraform Cloud.
     - Enable combined code and infrastructure deployment for shorten-url-lambda through GitHub Actions.
 4. Security Enhancements
     - Refine IAM policies and roles to adhere to the principle of least privilege for all access tokens and AWS resources.

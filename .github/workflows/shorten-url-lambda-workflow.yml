@@ -3,7 +3,12 @@ name: CI/CD for Shorten URL Lambda
 on:
   push:
     branches:
-      - main
+      - '**'
+    paths:
+      - 'shorten-url-lambda/**'
+  pull_request:
+    branches:
+      - '**'
     paths:
       - 'shorten-url-lambda/**'
 
@@ -14,15 +19,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Update Lambda function code
-        run: |
-          cd shorten-url-lambda/src
-          zip -r deployment-package.zip .
-          aws lambda update-function-code --function-name shorten-url-lambda --zip-file fileb://deployment-package.zip
+      - name: Copy shared terraform scripts
+        run: cp -R terraform/shared/* shorten-url-lambda/terraform
+
+      - name: Terraform init
+        working-directory: shorten-url-lambda/terraform
+        run: terraform init
+
+      - name: Terraform validate
+        working-directory: shorten-url-lambda/terraform
+        run: terraform validate
+      
+      - name: Terraform plan
+        working-directory: shorten-url-lambda/terraform
+        run: terraform plan
+
+      - name: Package Lambda function
+        working-directory: shorten-url-lambda/src
+        run: zip -r ../terraform/deployment-package.zip .
+
+      - name: Terraform apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: shorten-url-lambda/terraform
+        run: terraform apply
