@@ -26,13 +26,35 @@ cat > ${policy_document} << EOF
       "Sid": "IamManagement",
       "Effect": "Allow",
       "Action": [
+        "iam:Get*",
+        "iam:List*",
         "iam:CreatePolicy",
-        "iam:GetPolicy",
-        "iam:GetPolicyVersion",
-        "iam:ListPolicyVersions"
+        "iam:CreateRole",
+        "iam:DeletePolicy",
+        "iam:DeleteRole",
+        "iam:TagPolicy",
+        "iam:TagRole",
+        "iam:AttachRolePolicy",
+        "iam:PassRole"
       ],
       "Resource": [
-        "arn:aws:iam::${account_id}:policy/*"
+        "arn:aws:iam::${account_id}:policy/*",
+        "arn:aws:iam::${account_id}:role/*"
+      ]
+    },
+    {
+      "Sid": "DynamoDbManagement",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:Get*",
+        "dynamodb:Describe*",
+        "dynamodb:List*",
+        "dynamodb:CreateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:TagResource"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:${region}:${account_id}:table/*"
       ]
     }
   ]
