@@ -46,4 +46,4 @@ jobs:
       - name: Terraform apply
         if: github.ref == 'refs/heads/main'
         working-directory: shorten-url-lambda/terraform
-        run: terraform apply
+        run: terraform apply -auto-approve
