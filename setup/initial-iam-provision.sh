@@ -27,7 +27,9 @@ cat > ${policy_document} << EOF
       "Effect": "Allow",
       "Action": [
         "iam:CreatePolicy",
-        "iam:GetPolicy"
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListPolicyVersions"
       ],
       "Resource": [
         "arn:aws:iam::${account_id}:policy/*"

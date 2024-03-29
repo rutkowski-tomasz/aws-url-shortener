@@ -1,23 +1,23 @@
-name: CI/CD for Shorten URL Lambda
+name: Shared infrastructure provisioning
 
 on:
   push:
     branches:
       - '**'
     paths:
-      - 'shorten-url-lambda/**'
+      - 'shared-infrastructure/**'
   pull_request:
     branches:
       - '**'
     paths:
-      - 'shorten-url-lambda/**'
+      - 'shared-infrastructure/**'
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: shorten-url-lambda/terraform
+        working-directory: shared-infrastructure/terraform
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -35,9 +35,6 @@ jobs:
       
       - name: Terraform plan
         run: terraform plan
-
-      - name: Package Lambda function
-        run: zip -r ./deployment-package.zip ../src
 
       - name: Terraform apply
         if: github.ref == 'refs/heads/main'
