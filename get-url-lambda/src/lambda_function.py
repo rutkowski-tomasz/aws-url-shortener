@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
-dynamodb = boto3.resource('dynamodb')
+dynamodb = boto3.resource('dynamodb', region_name='eu-central-1')
 table = dynamodb.Table('ShortenedUrls')
 
 def lambda_handler(event, context):
