@@ -25,27 +25,26 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Initialize Terraform for infrastructure management.
     - Set up Terraform state management using Terraform Cloud.
     - Enable combined code and infrastructure deployment for shorten-url-lambda through GitHub Actions.
-4. Security Enhancements
     - Refine IAM policies and roles to adhere to the principle of least privilege for all access tokens and AWS resources.
-5. DynamoDB Provisioning
+4. DynamoDB Provisioning
     - Define the DynamoDB table for storing URL mappings in Terraform and provision through GitHub Actions.
-6. Resource Monitoring and Management
+5. Resource Monitoring and Management
     - Implement tagging strategy for resources provisioned by Terraform for easier identification and management (tags: application name, project, Terraform-managed).
-7. Business Logic for shorten-url-lambda
+6. Business Logic for shorten-url-lambda
     - Implement the logic for generating a unique shortcode for each URL.
     - Integrate DynamoDB to persist shortcode-URL mappings.
-8. Unit Testing
+7. Unit Testing
     - Develop unit tests for the shorten-url-lambda business logic.
     - Integrate unit testing into the CI/CD pipeline, requiring all tests to pass before deployment.
-9. Implement get-url-lambda
+8. Implement get-url-lambda
     - Develop the lambda function to retrieve URLs from DynamoDB based on the shortcode.
     - Implement HTTP redirection to the original URL based on the retrieved mapping.
-10. Integration Testing
+9. Integration Testing
     - Conduct post-deployment tests to ensure the URL shortening and retrieval functionalities work as expected in the live environment.
-11. Environment Differentiation
+10. Environment Differentiation
     - Set up distinct environments for development and production to enable safe testing and stable deployment.
     - Modify GitHub Actions workflows to support manual triggers for production deployments, allowing controlled updates.
-12. Infrastructure tear-down
+11. Infrastructure tear-down
     - Create manually dispatched workflow in GitHub Actions
     - Perform terrafrom destroy of all resources
-13. Utilize more AWS services...
+12. Utilize more AWS services...
