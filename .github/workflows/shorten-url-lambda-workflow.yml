@@ -37,7 +37,8 @@ jobs:
         run: terraform plan
 
       - name: Package Lambda function
-        run: zip -r ./deployment-package.zip ../src
+        working-directory: shorten-url-lambda/src
+        run: zip -r ../terraform/deployment-package.zip .
 
       - name: Terraform apply
         if: github.ref == 'refs/heads/main'
