@@ -14,29 +14,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: shared-infrastructure/terraform
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  plan_dev:
+    uses: ./.github/workflows/terraform-plan-workflow.yml
+    with:
+      project: shared-infrastructure
+      env: dev
+    secrets: inherit
 
-      - name: Terraform setup
-        uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+  deploy_dev:
+    needs: [plan_dev]
+    uses: ./.github/workflows/terraform-deploy-workflow.yml
+    with:
+      project: shared-infrastructure
+      env: dev
+    secrets: inherit
 
-      - name: Terraform init
-        run: terraform init
+  plan_prd:
+    needs: [deploy_dev]
+    uses: ./.github/workflows/terraform-plan-workflow.yml
+    with:
+      project: shared-infrastructure
+      env: dev
+    secrets: inherit
 
-      - name: Terraform validate
-        run: terraform validate
-      
-      - name: Terraform plan
-        run: terraform plan -var="environment=dev"
-
-      - name: Terraform apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -var="environment=dev"
+  deploy_prd:
+    needs: [plan_prd]
+    uses: ./.github/workflows/terraform-deploy-workflow.yml
+    with:
+      project: shared-infrastructure
+      env: dev
+      manual_approval: true
+    secrets: inherit
+  

@@ -8,10 +8,6 @@ terraform {
 
   cloud {
     organization = "trutkowski"
-
-    workspaces {
-      name = "get-url-lambda"
-    }
   }
 }
 
