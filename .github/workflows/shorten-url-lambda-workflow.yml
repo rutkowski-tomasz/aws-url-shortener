@@ -35,8 +35,8 @@ jobs:
       - name: Run Jest tests
         run: npm test
   
-  terraform_checks:
-    name: Terraform checks
+  plan_dev:
+    name: Plan deployment to dev
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -52,6 +52,9 @@ jobs:
 
       - name: Terraform init
         run: terraform init
+
+      - name: Terraform workspace selection
+        run: terraform workspace new us-dev-shorten-url-lambda
 
       - name: Terraform validate
         run: terraform validate
@@ -59,10 +62,10 @@ jobs:
       - name: Terraform plan
         run: terraform plan -var="environment=dev"
 
-  deploy:
-    name: Deployment
+  deploy_dev:
+    name: Deploy to dev
     if: github.ref == 'refs/heads/main'
-    needs: [test, terraform_checks] 
+    needs: [test, plan_dev] 
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -79,9 +82,71 @@ jobs:
       - name: Terraform init
         run: terraform init
 
+      - name: Terraform workspace selection
+        run: terraform workspace new us-dev-shorten-url-lambda
+
       - name: Package Lambda function
         working-directory: shorten-url-lambda/src
         run: zip -r ../terraform/deployment-package.zip .
 
       - name: Terraform apply
         run: terraform apply -auto-approve -var="environment=dev"
+
+  plan_prd:
+    name: Plan deployment to prd
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: shorten-url-lambda/terraform
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform workspace selection
+        run: terraform workspace new us-prd-shorten-url-lambda
+
+      - name: Terraform validate
+        run: terraform validate
+      
+      - name: Terraform plan
+        run: terraform plan -var="environment=prd"
+
+  deploy_prd:
+    name: Deploy to prd
+    if: github.ref == 'refs/heads/main'
+    needs: [plan_prd] 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: rutkowski-tomasz
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform workspace selection
+        run: terraform workspace new us-prd-shorten-url-lambda
+
+      - name: Package Lambda function
+        working-directory: shorten-url-lambda/src
+        run: zip -r ../terraform/deployment-package.zip .
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve -var="environment=prd"
