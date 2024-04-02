@@ -1,0 +1,36 @@
+name: Terraform plan workflow
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+
+jobs:
+  plan:
+    name: Plan deployment to ${{ inputs.env }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.project }}/terraform
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform init
+
+      - name: Terraform validate
+        run: terraform validate
+      
+      - name: Terraform plan
+        run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform plan -var="environment=${{ inputs.env }}"
