@@ -9,6 +9,10 @@ on:
       env:
         required: true
         type: string
+      manual_approval:
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   deploy:
@@ -20,6 +24,7 @@ jobs:
         working-directory: ${{ inputs.project }}/terraform
     steps:
       - uses: trstringer/manual-approval@v1
+        if: ${{ inputs.manual_approval }}
         with:
           secret: ${{ github.TOKEN }}
           approvers: rutkowski-tomasz

@@ -43,5 +43,6 @@ jobs:
     with:
       project: shared-infrastructure
       env: dev
+      manual_approval: true
     secrets: inherit
   

@@ -76,4 +76,5 @@ jobs:
     with:
       project: get-url-lambda
       env: prd
+      manual_approval: true
     secrets: inherit
