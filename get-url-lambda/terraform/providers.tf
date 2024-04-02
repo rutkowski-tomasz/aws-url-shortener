@@ -20,10 +20,14 @@ provider "aws" {
 
   default_tags {
     tags = {
-      environment = "dev"
+      environment = var.environment
       application = "aws-url-shortener"
       project     = "get-url-lambda"
       terraform-managed = true
     }
   }
+}
+
+locals {
+  prefix = "us-${var.environment}-"
 }
