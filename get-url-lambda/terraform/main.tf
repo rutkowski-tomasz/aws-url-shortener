@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "get-url-lambda-role"
+  name = "${local.prefix}get-url-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
     
 resource "aws_iam_policy" "lambda_logging" {
-  name = "get-url-lambda-policy"
+  name = "${local.prefix}get-url-lambda-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -35,7 +35,7 @@ resource "aws_iam_policy" "lambda_logging" {
 }
 
 resource "aws_iam_policy" "lambda_dynamodb_access" {
-  name   = "get-url-lambda-dynamodb-access"
+  name   = "${local.prefix}get-url-lambda-dynamodb-access"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access" {
 }
 
 resource "aws_lambda_function" "get_url" {
-  function_name = "get-url-lambda"
+  function_name = "${local.prefix}get-url-lambda"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.12"

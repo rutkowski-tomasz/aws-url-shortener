@@ -35,8 +35,8 @@ jobs:
         run: terraform validate
       
       - name: Terraform plan
-        run: terraform plan
+        run: terraform plan -var="environment=dev"
 
       - name: Terraform apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="environment=dev"

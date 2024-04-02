@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "shorten-url-lambda-role"
+  name = "${local.prefix}shorten-url-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
     
 resource "aws_iam_policy" "lambda_logging" {
-  name = "shorten-url-lambda-policy"
+  name = "${local.prefix}shorten-url-lambda-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -35,7 +35,7 @@ resource "aws_iam_policy" "lambda_logging" {
 }
 
 resource "aws_iam_policy" "lambda_dynamodb_access" {
-  name   = "shorten-url-lambda-dynamodb-access"
+  name   = "${local.prefix}shorten-url-lambda-dynamodb-access"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_access" {
 }
 
 resource "aws_lambda_function" "shorten_url" {
-  function_name = "shorten-url-lambda"
+  function_name = "${local.prefix}shorten-url-lambda"
   handler       = "index.handler"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "nodejs20.x"

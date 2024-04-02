@@ -45,10 +45,10 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Implement HTTP redirection to the original URL based on the retrieved mapping.
 10. Integration Testing
     - Conduct post-deployment tests to ensure the URL shortening and retrieval functionalities work as expected in the live environment.
-11. Environment Differentiation
+11. ✅ Environment Differentiation
     - Set up distinct environments for development and production to enable safe testing and stable deployment.
     - Modify GitHub Actions workflows to support manual triggers for production deployments, allowing controlled updates.
-12. Infrastructure tear-down
+12. ✅ Infrastructure tear-down
     - Create manually dispatched workflow in GitHub Actions
     - Perform terrafrom destroy of all resources
 13. Describe structure of repo
