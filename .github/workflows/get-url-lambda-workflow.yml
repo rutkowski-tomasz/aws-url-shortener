@@ -46,54 +46,34 @@ jobs:
       
       - name: Run tests
         run: python -m unittest discover -v -s ./tests/ -p "*_test.py"
-      
-  terraform_checks:
-    name: Terraform checks
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: get-url-lambda/terraform
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
-      - name: Terraform setup
-        uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+  plan_dev:
+    uses: ./.github/workflows/terraform-plan-workflow.yml
+    with:
+      project: get-url-lambda
+      env: dev
+    secrets: inherit
 
-      - name: Terraform init
-        run: terraform init
+  deploy_dev:
+    needs: [plan_dev]
+    uses: ./.github/workflows/terraform-deploy-workflow.yml
+    with:
+      project: get-url-lambda
+      env: dev
+    secrets: inherit
+  
+  plan_prd:
+    needs: [deploy_dev]
+    uses: ./.github/workflows/terraform-plan-workflow.yml
+    with:
+      project: get-url-lambda
+      env: prd
+    secrets: inherit
 
-      - name: Terraform validate
-        run: terraform validate
-      
-      - name: Terraform plan
-        run: terraform plan -var="environment=dev"
-
-  deploy:
-    name: Deployment
-    if: github.ref == 'refs/heads/main'
-    needs: [test, terraform_checks] 
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: get-url-lambda/terraform
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Terraform setup
-        uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform init
-        run: terraform init
-
-      - name: Package Lambda function
-        working-directory: get-url-lambda/src
-        run: zip -r ../terraform/deployment-package.zip .
-
-      - name: Terraform apply
-        run: terraform apply -auto-approve -var="environment=dev"
+  deploy_prd:
+    needs: [plan_prd]
+    uses: ./.github/workflows/terraform-deploy-workflow.yml
+    with:
+      project: get-url-lambda
+      env: prd
+    secrets: inherit
