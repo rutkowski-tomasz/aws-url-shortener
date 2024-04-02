@@ -11,6 +11,7 @@ on:
       - '**'
     paths:
       - 'shorten-url-lambda/**'
+  workflow_dispatch:
 
 jobs:
   test:

@@ -40,6 +40,7 @@ cat > ${policy_document} << EOF
         "iam:TagPolicy",
         "iam:TagRole",
         "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
         "iam:PassRole",
         "iam:UpdateAssumeRolePolicy"
       ],
