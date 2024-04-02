@@ -10,7 +10,7 @@ terraform {
     organization = "trutkowski"
 
     workspaces {
-      name = "get-url-lambda"
+      name = "us-${var.environment}-get-url-lambda"
     }
   }
 }

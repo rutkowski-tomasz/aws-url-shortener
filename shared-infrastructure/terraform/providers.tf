@@ -10,7 +10,7 @@ terraform {
     organization = "trutkowski"
 
     workspaces {
-      name = "shared-infrastructure"
+      name = "us-${var.environment}-shared-infrastructure"
     }
   }
 }

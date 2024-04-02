@@ -10,7 +10,7 @@ terraform {
     organization = "trutkowski"
 
     workspaces {
-      name = "shorten-url-lambda"
+      name = "us-${var.environment}-shorten-url-lambda"
     }
   }
 }
