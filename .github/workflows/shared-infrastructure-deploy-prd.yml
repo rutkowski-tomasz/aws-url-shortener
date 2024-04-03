@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-shared-infrastructure-prd:
-    uses: ./.github/reusable-workflows/terraform-deploy.yml
+    uses: ./.github/workflows/.terraform-deploy.yml
     with:
       project: shared-infrastructure
       env: prd

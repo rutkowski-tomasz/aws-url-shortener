@@ -9,7 +9,7 @@ on:
 
 jobs:
   plan-shared-infrastructure-dev:
-    uses: ./.github/reusable-workflows/terraform-plan.yml
+    uses: ./.github/workflows/.terraform-plan.yml
     with:
       project: shared-infrastructure
       env: dev

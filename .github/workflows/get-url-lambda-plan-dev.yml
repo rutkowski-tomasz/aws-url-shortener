@@ -9,7 +9,7 @@ on:
 
 jobs:
   plan-get-url-lambda-dev:
-    uses: ./.github/reusable-workflows/terraform-plan.yml
+    uses: ./.github/workflows/.terraform-plan.yml
     with:
       project: get-url-lambda
       env: dev

@@ -9,7 +9,7 @@ on:
 
 jobs:
   plan-shorten-url-lambda-dev:
-    uses: ./.github/reusable-workflows/terraform-plan.yml
+    uses: ./.github/workflows/.terraform-plan.yml
     with:
       project: shorten-url-lambda
       env: dev

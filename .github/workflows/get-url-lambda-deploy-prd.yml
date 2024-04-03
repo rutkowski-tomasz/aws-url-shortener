@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-get-url-lambda-prd:
-    uses: ./.github/reusable-workflows/terraform-deploy.yml
+    uses: ./.github/workflows/.terraform-deploy.yml
     with:
       project: get-url-lambda
       env: prd

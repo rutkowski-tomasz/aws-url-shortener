@@ -9,7 +9,7 @@ on:
 
 jobs:
   get-url-lambda-tests:
-    uses: ./.github/reusable-workflows/python-tests.yml
+    uses: ./.github/workflows/.python-tests.yml
     with:
       working-directory: get-url-lambda
       python-version: 3.12
