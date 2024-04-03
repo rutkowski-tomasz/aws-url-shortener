@@ -12,7 +12,7 @@ on:
 
 jobs:
   plan:
-    name: Plan deployment to ${{ inputs.env }} ${{ inputs.project}}
+    name: Plan deployment
     runs-on: ubuntu-latest
     defaults:
       run:

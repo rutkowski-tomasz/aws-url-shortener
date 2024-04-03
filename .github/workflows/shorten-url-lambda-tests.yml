@@ -1,6 +1,11 @@
 name: shorten-url-lambda tests
 
 on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'get-url-lambda/**'
   push:
     branches:
       - '*'
