@@ -8,6 +8,25 @@ A serverless URL shortener built on AWS. This project aims to demonstrate a prac
 
 Phase 1. As basic as it gets
 
+# Repository structure
+
+```sh
+├── README.md
+├── assets # Image files included in the README file
+├── get-url-lambda # Python lambda project
+│   ├── src
+│   ├── terraform
+│   └── tests
+├── setup # Scripts required for setup
+├── shared-infrastructure # Resources managed outside of projects life-cycle
+├── shorten-url-lambda # Node.js lambda project
+│   ├── src
+│   ├── terraform
+│   └── test
+└── terraform-modules # Shared modules code between projects
+    └── lambda
+```
+
 # 🛣️ Roadmap
 
 The development of this solution is iterative, with the roadmap subject to changes as the project evolves. Here's the planned progression:
@@ -51,7 +70,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 12. ✅ Infrastructure tear-down
     - Create manually dispatched workflow in GitHub Actions
     - Perform terrafrom destroy of all resources
-13. Describe structure of repo
+13. ✅ Describe structure of repo
     - Add tree overview
     - Describe each folder and it's purpose
 14. Define common prefix for resources 'us-' for UrlShortener
