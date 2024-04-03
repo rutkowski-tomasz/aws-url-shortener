@@ -2,6 +2,8 @@ const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const { mockClient } = require("aws-sdk-client-mock");
 const { handler } = require("../src/index");
 
+process.env.environment = "dev";
+
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
 beforeEach(() => {
@@ -29,7 +31,7 @@ test('successfully inserts item into DynamoDB and returns shortened URL', async 
   expect(responseBody.result.longUrl).toEqual(event.longUrl);
   expect(ddbMock.calls(PutCommand)).toHaveLength(1);
   const putCommandCall = ddbMock.calls(PutCommand)[0].args[0];
-  expect(putCommandCall.input.TableName).toEqual('us-dev-shortened-urls');
+  expect(putCommandCall.input.TableName).toEqual(`us-${process.env.environment}-shortened-urls`);
   expect(putCommandCall.input.Item).toHaveProperty('code');
   expect(putCommandCall.input.Item.longUrl).toEqual(event.longUrl);
 });

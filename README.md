@@ -2,6 +2,8 @@
 
 A serverless URL shortener built on AWS. This project aims to demonstrate a practical implementation of a serverless architecture for a URL shortening service. It leverages the power of cloud computing to provide reliable, scalable and lightning-fast API endpoints to shorten any URL.
 
+In real world scenario all the projects would probably be managed as separate repositories. However I wanted to showcase how you can utilize best-for-the-job technology and manage everything from business logic to infrastructure in code.
+
 # 🏙️ Architecture
 
 ![Architecture Diagram](assets/link-shortener.phase1.drawio.svg)
@@ -23,7 +25,7 @@ Phase 1. As basic as it gets
 │   ├── src
 │   ├── terraform
 │   └── tests
-└── terraform-modules # Shared modules code between projects
+└── terraform-modules # Shared modules between projects
     └── lambda
 ```
 
