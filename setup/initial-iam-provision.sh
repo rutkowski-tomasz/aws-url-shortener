@@ -21,6 +21,7 @@ cat > ${policy_document} << EOF
         "lambda:CreateFunction",
         "lambda:DeleteFunction",
         "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
         "lambda:TagResource"
       ],
       "Resource": [
@@ -34,6 +35,7 @@ cat > ${policy_document} << EOF
         "iam:Get*",
         "iam:List*",
         "iam:CreatePolicy",
+        "iam:CreatePolicyVersion",
         "iam:CreateRole",
         "iam:DeletePolicy",
         "iam:DeleteRole",
