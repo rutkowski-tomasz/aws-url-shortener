@@ -31,7 +31,7 @@ resource "aws_iam_policy" "lambda_logging" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ],
-        Resource = "arn:aws:logs:*:log-group:/aws/lambda/${local.prefix}${var.lambda_function_name}",
+        Resource = "arn:aws:logs:*:log-group:/aws/lambda/${local.prefix}${var.lambda_function_name}:*",
         Effect = "Allow",
       },
     ]

@@ -77,4 +77,7 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Describe each folder and it's purpose
 14. ✅ Define common prefix for resources 'us-' for UrlShortener
     - Adjust IAM policies to allow access to prefixed resources
+15. ✅ Add API Gateway
+    - Integrate shorten-url-lambda and get-url-lambda into single API Gateway
+    - Provide it within shared-infrastructure
 15. Utilize more AWS services...

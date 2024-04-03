@@ -12,13 +12,13 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-central-1"
+  region = "eu-central-1"
 
   default_tags {
     tags = {
-      environment = var.environment
-      application = "aws-url-shortener"
-      project     = "shorten-url-lambda"
+      environment       = var.environment
+      application       = "aws-url-shortener"
+      project           = "shorten-url-lambda"
       terraform-managed = true
     }
   }

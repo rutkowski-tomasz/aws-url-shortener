@@ -22,7 +22,8 @@ cat > ${policy_document} << EOF
         "lambda:DeleteFunction",
         "lambda:UpdateFunctionCode",
         "lambda:UpdateFunctionConfiguration",
-        "lambda:TagResource"
+        "lambda:TagResource",
+        "lambda:AddPermission"
       ],
       "Resource": [
         "arn:aws:lambda:${region}:${account_id}:function:us-*"
@@ -65,6 +66,30 @@ cat > ${policy_document} << EOF
       "Resource": [
         "arn:aws:dynamodb:${region}:${account_id}:table/us-*"
       ]
+    },
+    {
+      "Sid": "APIGatewayManagement",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:GET",
+        "apigateway:PUT",
+        "apigateway:PATCH",
+        "apigateway:POST",
+        "apigateway:DELETE"
+      ],
+      "Resource": [
+        "arn:aws:apigateway:eu-central-1::*"
+      ]
+    },
+    {
+      "Sid": "ServiceLinkedRoleManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateServiceLinkedRole",
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ],
+      "Resource": "arn:aws:iam::*:role/aws-service-role/*"
     }
   ]
 }

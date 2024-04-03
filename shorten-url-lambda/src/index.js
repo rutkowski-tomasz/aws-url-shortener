@@ -9,9 +9,12 @@ exports.handler = async (event) => {
     const env = process.env.environment;
     const tableName = `us-${env}-shortened-urls`;
 
+    const body = JSON.parse(event.body);
+    console.debug('Body:', body);
+
     const shortenedUrl = {
         'code': generateCode(),
-        'longUrl': event.longUrl,
+        'longUrl': body.longUrl,
         'createdAt': new Date().toUTCString(),
     };
 
