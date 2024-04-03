@@ -1,0 +1,15 @@
+name: get-url-lambda tests
+
+on:
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'get-url-lambda/**'
+
+jobs:
+  get-url-lambda-tests:
+    uses: ./.github/reusable-workflows/python-tests.yml
+    with:
+      working-directory: get-url-lambda
+      python-version: 3.12

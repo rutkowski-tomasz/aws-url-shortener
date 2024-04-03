@@ -1,0 +1,16 @@
+name: get-url-lambda plan to dev
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'get-url-lambda/**'
+
+jobs:
+  plan-get-url-lambda-dev:
+    uses: ./.github/reusable-workflows/terraform-plan.yml
+    with:
+      project: get-url-lambda
+      env: dev
+    secrets: inherit

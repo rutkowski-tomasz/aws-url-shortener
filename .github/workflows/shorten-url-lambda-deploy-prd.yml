@@ -1,0 +1,16 @@
+name: shorten-url-lambda deploy to prd
+
+on:
+  push:
+    branches:
+      - 'prod'
+    paths:
+      - 'shorten-url-lambda/**'
+
+jobs:
+  deploy-shorten-url-lambda-prd:
+    uses: ./.github/reusable-workflows/terraform-deploy.yml
+    with:
+      project: shorten-url-lambda
+      env: prd
+    secrets: inherit

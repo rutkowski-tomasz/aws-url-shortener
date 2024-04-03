@@ -9,10 +9,6 @@ on:
       env:
         required: true
         type: string
-      manual_approval:
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   deploy:
@@ -23,15 +19,6 @@ jobs:
       run:
         working-directory: ${{ inputs.project }}/terraform
     steps:
-      - uses: trstringer/manual-approval@v1
-        if: ${{ inputs.manual_approval }}
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: rutkowski-tomasz
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3
         with:
@@ -40,9 +27,5 @@ jobs:
       - name: Terraform init
         run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform init
 
-      - name: Package Lambda function
-        working-directory: ${{ inputs.project }}/src
-        run: zip -r ../terraform/deployment-package.zip .
-
       - name: Terraform apply
-        run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform apply -auto-approve -var="environment=${{ inputs.env }}"
+        run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform apply -auto-approve -var="environment=${{ inputs.env }}" -var="project=${{ inputs.project }}"

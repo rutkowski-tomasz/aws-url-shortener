@@ -12,11 +12,13 @@ on:
 
 jobs:
   plan:
-    name: Plan deployment to ${{ inputs.env }}
+    name: Plan deployment to ${{ inputs.env }} ${{ inputs.project}}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ inputs.project }}/terraform
+    env:
+        TF_WORKSPACE: us-${{ inputs.env }}-${{ inputs.project }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -26,11 +28,11 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Terraform init
-        run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform init
+      - name: Copy modules code
+        run: cp -R ../../terraform-modules/ modules/
 
-      - name: Terraform validate
-        run: terraform validate
+      - name: Terraform init
+        run: terraform init
       
       - name: Terraform plan
-        run: TF_WORKSPACE=us-${{ inputs.env }}-${{ inputs.project }} terraform plan -var="environment=${{ inputs.env }}"
+        run: terraform plan -var="environment=${{ inputs.env }}" -var="project=${{ inputs.project }}"

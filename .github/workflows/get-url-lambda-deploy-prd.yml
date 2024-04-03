@@ -1,0 +1,16 @@
+name: get-url-lambda deploy to prd
+
+on:
+  push:
+    branches:
+      - 'prod'
+    paths:
+      - 'get-url-lambda/**'
+
+jobs:
+  deploy-get-url-lambda-prd:
+    uses: ./.github/reusable-workflows/terraform-deploy.yml
+    with:
+      project: get-url-lambda
+      env: prd
+    secrets: inherit

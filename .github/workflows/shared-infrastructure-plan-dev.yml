@@ -1,0 +1,16 @@
+name: shared-infrastructure plan to dev
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'shared-infrastructure/**'
+
+jobs:
+  plan-shared-infrastructure-dev:
+    uses: ./.github/reusable-workflows/terraform-plan.yml
+    with:
+      project: shared-infrastructure
+      env: dev
+    secrets: inherit

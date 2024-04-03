@@ -1,0 +1,16 @@
+name: shorten-url-lambda deploy to dev
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'shorten-url-lambda/**'
+
+jobs:
+  deploy-shorten-url-lambda-dev:
+    uses: ./.github/reusable-workflows/terraform-deploy.yml
+    with:
+      project: shorten-url-lambda
+      env: dev
+    secrets: inherit
