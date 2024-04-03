@@ -6,6 +6,9 @@ const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
+    const env = process.env.environment;
+    const tableName = `us-${env}-shortened-urls`;
+
     const shortenedUrl = {
         'code': generateCode(),
         'longUrl': event.longUrl,
@@ -14,7 +17,7 @@ exports.handler = async (event) => {
 
     try {
         const command = new PutCommand({
-            TableName: 'ShortenedUrls',
+            TableName: tableName,
             Item: shortenedUrl
         });
 
