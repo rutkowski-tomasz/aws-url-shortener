@@ -1,0 +1,14 @@
+name: shared-infrastructure deploy to prd
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-shared-infrastructure-prd:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: shared-infrastructure
+      project-type: terraform
+      env: prd
+    secrets: inherit

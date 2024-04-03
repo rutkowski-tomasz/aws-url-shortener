@@ -7,3 +7,8 @@ variable "environment" {
     error_message = "The environment variable must be one of: dev, prd."
   }
 }
+
+variable "project" {
+  description = "The name of project, used for tagging purposes"
+  type        = string
+}

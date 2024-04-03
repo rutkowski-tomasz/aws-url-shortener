@@ -1,0 +1,17 @@
+name: get-url-lambda deploy to dev
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'get-url-lambda/**'
+
+jobs:
+  deploy-get-url-lambda-dev:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: get-url-lambda
+      project-type: python
+      env: dev
+    secrets: inherit

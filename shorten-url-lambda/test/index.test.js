@@ -1,6 +1,6 @@
 const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const { mockClient } = require("aws-sdk-client-mock");
-const { handler } = require("./index");
+const { handler } = require("../src/index");
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 

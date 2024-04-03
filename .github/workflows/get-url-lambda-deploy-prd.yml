@@ -1,0 +1,14 @@
+name: get-url-lambda deploy to prd
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-get-url-lambda-prd:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: get-url-lambda
+      project-type: python
+      env: prd
+    secrets: inherit

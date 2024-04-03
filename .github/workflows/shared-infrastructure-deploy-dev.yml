@@ -1,0 +1,17 @@
+name: shared-infrastructure deploy to dev
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'shared-infrastructure/**'
+
+jobs:
+  deploy-shared-infrastructure-dev:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: shared-infrastructure
+      project-type: terraform
+      env: dev
+    secrets: inherit

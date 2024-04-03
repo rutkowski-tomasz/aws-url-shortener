@@ -1,0 +1,14 @@
+name: shorten-url-lambda deploy to prd
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-shorten-url-lambda-prd:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: shorten-url-lambda
+      project-type: nodejs
+      env: prd
+    secrets: inherit
