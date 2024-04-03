@@ -49,4 +49,10 @@ resource "aws_lambda_function" "lambda" {
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = var.lambda_runtime
   filename      = var.deployment_package
+
+  environment {
+    variables = {
+      environment = var.environment
+    }
+  }
 }
