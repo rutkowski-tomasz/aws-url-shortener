@@ -24,7 +24,7 @@ cat > ${policy_document} << EOF
         "lambda:TagResource"
       ],
       "Resource": [
-        "arn:aws:lambda:${region}:${account_id}:function:*"
+        "arn:aws:lambda:${region}:${account_id}:function:us-*"
       ]
     },
     {
@@ -45,8 +45,8 @@ cat > ${policy_document} << EOF
         "iam:UpdateAssumeRolePolicy"
       ],
       "Resource": [
-        "arn:aws:iam::${account_id}:policy/*",
-        "arn:aws:iam::${account_id}:role/*"
+        "arn:aws:iam::${account_id}:policy/us-*",
+        "arn:aws:iam::${account_id}:role/us-*"
       ]
     },
     {
@@ -61,7 +61,7 @@ cat > ${policy_document} << EOF
         "dynamodb:TagResource"
       ],
       "Resource": [
-        "arn:aws:dynamodb:${region}:${account_id}:table/*"
+        "arn:aws:dynamodb:${region}:${account_id}:table/us-*"
       ]
     }
   ]
