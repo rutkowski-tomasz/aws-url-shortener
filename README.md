@@ -22,7 +22,7 @@ Phase 1. As basic as it gets
 ├── shorten-url-lambda # Node.js lambda project
 │   ├── src
 │   ├── terraform
-│   └── test
+│   └── tests
 └── terraform-modules # Shared modules code between projects
     └── lambda
 ```
@@ -73,6 +73,6 @@ The development of this solution is iterative, with the roadmap subject to chang
 13. ✅ Describe structure of repo
     - Add tree overview
     - Describe each folder and it's purpose
-14. Define common prefix for resources 'us-' for UrlShortener
+14. ✅ Define common prefix for resources 'us-' for UrlShortener
     - Adjust IAM policies to allow access to prefixed resources
 15. Utilize more AWS services...
