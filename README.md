@@ -6,9 +6,7 @@ In real world scenario all the projects would probably be managed as separate re
 
 # 🏙️ Architecture
 
-![Architecture Diagram](assets/link-shortener.phase1.drawio.svg)
-
-Phase 1. As basic as it gets
+![Architecture Diagram](assets/link-shortener.phase2.drawio.svg)
 
 # Repository structure
 
