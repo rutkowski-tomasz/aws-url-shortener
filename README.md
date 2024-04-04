@@ -25,6 +25,7 @@ Phase 1. As basic as it gets
 │   ├── src
 │   ├── terraform
 │   └── tests
+├── system-tests # Tests veryfing if the application works all together
 └── terraform-modules # Shared modules between projects
     └── lambda
 ```
