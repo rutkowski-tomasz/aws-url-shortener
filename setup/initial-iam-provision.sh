@@ -23,7 +23,8 @@ cat > ${policy_document} << EOF
         "lambda:UpdateFunctionCode",
         "lambda:UpdateFunctionConfiguration",
         "lambda:TagResource",
-        "lambda:AddPermission"
+        "lambda:AddPermission",
+        "lambda:RemovePermission"
       ],
       "Resource": [
         "arn:aws:lambda:${region}:${account_id}:function:us-*"
@@ -37,6 +38,7 @@ cat > ${policy_document} << EOF
         "iam:List*",
         "iam:CreatePolicy",
         "iam:CreatePolicyVersion",
+        "iam:DeletePolicyVersion",
         "iam:CreateRole",
         "iam:DeletePolicy",
         "iam:DeleteRole",
