@@ -1,0 +1,38 @@
+name: Application Destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy-shared-infrastructure:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-destroy.yml
+    with:
+      project: shared-infrastructure
+      env: ${{ matrix.env }}
+      project-type: terraform
+    secrets: inherit
+
+  destroy-get-url-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-destroy.yml
+    with:
+      project: get-url-lambda
+      env: ${{ matrix.env }}
+      project-type: python
+    secrets: inherit
+
+  destroy-shorten-url-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-destroy.yml
+    with:
+      project: shorten-url-lambda
+      env: ${{ matrix.env }}
+      project-type: nodejs
+    secrets: inherit
