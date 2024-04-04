@@ -64,7 +64,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 9. ✅ Implement get-url-lambda
     - Develop the lambda function to retrieve URLs from DynamoDB based on the shortcode.
     - Implement HTTP redirection to the original URL based on the retrieved mapping.
-10. Integration Testing
+10. ✅ Integration Testing
     - Conduct post-deployment tests to ensure the URL shortening and retrieval functionalities work as expected in the live environment.
 11. ✅ Environment Differentiation
     - Set up distinct environments for development and production to enable safe testing and stable deployment.
