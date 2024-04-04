@@ -1,0 +1,38 @@
+name: Application Create
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-shared-infrastructure:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: shared-infrastructure
+      env: ${{ matrix.env }}
+      project-type: terraform
+    secrets: inherit
+
+  deploy-get-url-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: get-url-lambda
+      env: ${{ matrix.env }}
+      project-type: python
+    secrets: inherit
+
+  deploy-shorten-url-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: shorten-url-lambda
+      env: ${{ matrix.env }}
+      project-type: nodejs
+    secrets: inherit
