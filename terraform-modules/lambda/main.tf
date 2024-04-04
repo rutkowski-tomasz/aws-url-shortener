@@ -32,7 +32,7 @@ resource "aws_iam_policy" "lambda_logging" {
           "logs:PutLogEvents",
         ],
         Resource = "arn:aws:logs:*:log-group:/aws/lambda/${local.prefix}${var.lambda_function_name}:*",
-        Effect = "Allow",
+        Effect   = "Allow",
       },
     ]
   })
@@ -44,11 +44,12 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 }
 
 resource "aws_lambda_function" "lambda" {
-  function_name = "${local.prefix}${var.lambda_function_name}"
-  handler       = var.lambda_handler
-  role          = aws_iam_role.lambda_execution_role.arn
-  runtime       = var.lambda_runtime
-  filename      = var.deployment_package
+  function_name    = "${local.prefix}${var.lambda_function_name}"
+  handler          = var.lambda_handler
+  role             = aws_iam_role.lambda_execution_role.arn
+  runtime          = var.lambda_runtime
+  filename         = var.deployment_package
+  source_code_hash = filebase64sha256(var.deployment_package)
 
   environment {
     variables = {
