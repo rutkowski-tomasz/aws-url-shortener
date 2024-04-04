@@ -1,0 +1,17 @@
+{
+  "name": "system-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "system-tests.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
