@@ -1,5 +1,5 @@
 locals {
-  lambda_name = "get-url-lambda"
+  lambda_name = "shorten-url-lambda"
 }
 
 module "lambda" {
