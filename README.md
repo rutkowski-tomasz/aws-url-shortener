@@ -8,7 +8,7 @@ In real world scenario all the projects would probably be managed as separate re
 
 ![Architecture Diagram](assets/link-shortener.phase2.drawio.svg)
 
-# Repository structure
+# 🌳 Repository structure
 
 ```sh
 ├── README.md
@@ -79,4 +79,72 @@ The development of this solution is iterative, with the roadmap subject to chang
 15. ✅ Add API Gateway
     - Integrate shorten-url-lambda and get-url-lambda into single API Gateway
     - Provide it within shared-infrastructure
-15. Utilize more AWS services...
+16. ✅ Cognito SignUp, Login, RefreshToken flows
+17. Utilize more AWS services...
+
+# 👨🏻‍💻 Development
+
+## CI/CD user permissions update
+```sh
+../../setup/initial-iam-provision.sh 
+```
+
+## Local apply terraform
+
+```sh
+cd shared-infrastructure/terraform 
+TF_WORKSPACE=us-dev-shared-infrastructure terraform apply -auto-approve
+```
+
+# 🔐 Authentication docs
+
+Assuming you are using `eu-central-1` as AWS region
+
+```
+POST https://cognito-idp.eu-central-1.amazonaws.com/
+Headers:
+- Content-Type: application/x-amz-json-1.1
+
+# Register
+Header X-Amz-Target: AWSCognitoIdentityProviderService.SignUp
+{
+  "ClientId": "yourClientId",
+  "Username": "yourEmail@gmail.com",
+  "Password": "SecurePassword123!",
+  "UserAttributes": [
+    {
+      "Name": "email",
+      "Value": "yourEmail@gmail.com"
+    }
+  ]
+}
+
+# Confirm SignUp
+Header: X-Amz-Target: AWSCognitoIdentityProviderService.ConfirmSignUp
+{
+  "ClientId": "4np6oaiu11oom6khgturukdfus",
+  "Username": "rutkowski.tomasz.3@gmail.com",
+  "ConfirmationCode": "684124"
+}
+
+# Login
+Header:X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+{
+  "AuthFlow": "USER_PASSWORD_AUTH",
+  "ClientId": "yourClientId",
+  "AuthParameters": {
+    "USERNAME": "yourEmail@gmail.com",
+    "PASSWORD": "SecurePassword123!"
+  }
+}
+
+# Refresh token
+Header: X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+{
+  "AuthFlow": "REFRESH_TOKEN_AUTH",
+  "ClientId": "4np6oaiu11oom6khgturukdfus",
+  "AuthParameters": {
+    "REFRESH_TOKEN": "{{RefreshToken}}"
+  }
+}
+```

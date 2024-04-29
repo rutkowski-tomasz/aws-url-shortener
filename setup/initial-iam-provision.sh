@@ -62,6 +62,7 @@ cat > ${policy_document} << EOF
         "dynamodb:Describe*",
         "dynamodb:List*",
         "dynamodb:CreateTable",
+        "dynamodb:UpdateTable",
         "dynamodb:DeleteTable",
         "dynamodb:TagResource"
       ],
@@ -92,6 +93,21 @@ cat > ${policy_document} << EOF
         "iam:GetServiceLinkedRoleDeletionStatus"
       ],
       "Resource": "arn:aws:iam::*:role/aws-service-role/*"
+    },
+    {
+      "Sid": "CognitoManagement",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:Get*",
+        "cognito-idp:Describe*",
+        "cognito-idp:CreateUserPool",
+        "cognito-idp:UpdateUserPool",
+        "cognito-idp:CreateUserPoolClient",
+        "cognito-idp:UpdateUserPoolClient",
+        "cognito-idp:DeleteUserPool",
+        "cognito-idp:TagResource"
+      ],
+      "Resource": "arn:aws:cognito-idp:${region}:${account_id}:userpool/*"
     }
   ]
 }

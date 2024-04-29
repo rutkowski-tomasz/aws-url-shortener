@@ -18,7 +18,7 @@ provider "aws" {
     tags = {
       environment       = var.environment
       application       = "aws-url-shortener"
-      project           = "shorten-url-lambda"
+      project           = "shared-infrastructure"
       terraform-managed = true
     }
   }
@@ -27,3 +27,4 @@ provider "aws" {
 locals {
   prefix = "us-${var.environment}-"
 }
+

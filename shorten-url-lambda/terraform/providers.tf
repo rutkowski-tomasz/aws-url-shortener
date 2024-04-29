@@ -18,7 +18,7 @@ provider "aws" {
     tags = {
       environment = var.environment
       application = "aws-url-shortener"
-      project     = var.project
+      project     = "shorten-url-lambda"
       terraform-managed = true
     }
   }
