@@ -21,3 +21,5 @@ data "terraform_remote_state" "get_url_lambda_state" {
     }
   }
 }
+
+data "aws_region" "current" {}

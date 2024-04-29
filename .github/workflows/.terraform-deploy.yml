@@ -52,4 +52,4 @@ jobs:
         run: terraform init
 
       - name: Terraform apply
-        run: terraform apply -auto-approve -var="environment=${{ inputs.env }}" -var="project=${{ inputs.project }}"
+        run: terraform apply -auto-approve -var="environment=${{ inputs.env }}"

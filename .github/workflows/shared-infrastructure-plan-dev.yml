@@ -13,4 +13,5 @@ jobs:
     with:
       project: shared-infrastructure
       env: dev
+      project-type: terraform
     secrets: inherit

@@ -1,14 +1,18 @@
+locals {
+  lambda_name = "get-url-lambda"
+}
+
 module "lambda" {
   source               = "./modules/lambda"
   environment          = var.environment
-  lambda_function_name = var.project
+  lambda_function_name = local.lambda_name
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
   deployment_package   = "deployment-package.zip"
 }
 
 resource "aws_iam_policy" "custom_policy" {
-  name   = "${local.prefix}-${var.project}-custom-policy"
+  name   = "${local.prefix}${local.lambda_name}-custom-policy"
   policy = jsonencode({
     Version   = "2012-10-17"
     Statement = [

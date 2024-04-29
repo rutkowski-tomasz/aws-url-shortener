@@ -13,4 +13,5 @@ jobs:
     with:
       project: shorten-url-lambda
       env: dev
+      project-type: nodejs
     secrets: inherit

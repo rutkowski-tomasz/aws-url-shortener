@@ -13,4 +13,5 @@ jobs:
     with:
       project: get-url-lambda
       env: dev
+      project-type: python
     secrets: inherit
