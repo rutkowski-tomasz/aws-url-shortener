@@ -18,6 +18,23 @@ const sampleEvent = {
   "stageVariables": null,
   "requestContext": {
       "resourceId": "nq5ycs",
+      "authorizer": {
+          "claims": {
+              "sub": "77766666-f0a1-7003-c2b9-b33fe4125f0d",
+              "email_verified": "true",
+              "iss": "https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_mxbE0ja3h",
+              "cognito:username": "myEmail@gmail.com",
+              "origin_jti": "b2b287c3-c5e0-4d7a-b3b4-ba749c80c8b5",
+              "aud": "4np6oaiu11oom6khgturukdfus",
+              "event_id": "b7cd4971-b683-4d48-aed9-27fb5ca1afce",
+              "token_use": "id",
+              "auth_time": "1714565422",
+              "exp": "Wed May 01 13:10:22 UTC 2024",
+              "iat": "Wed May 01 12:10:22 UTC 2024",
+              "jti": "12a93356-c2bd-4551-b09e-dc7a137378fe",
+              "email": "myEmail@gmail.com"
+          }
+      },
       "resourcePath": "/shorten-url",
       "httpMethod": "POST",
       "extendedRequestId": "Vsi9cHCGliAFS4w=",
