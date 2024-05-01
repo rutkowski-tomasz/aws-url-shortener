@@ -9,13 +9,17 @@ exports.handler = async (event) => {
     const env = process.env.environment;
     const tableName = `us-${env}-shortened-urls`;
 
+    const userId = event.requestContext.authorizer.claims.sub;
+    console.debug('UserId:', userId);
+
     const body = JSON.parse(event.body);
     console.debug('Body:', body);
 
     const shortenedUrl = {
         'code': generateCode(),
         'longUrl': body.longUrl,
-        'createdAt': new Date().toUTCString(),
+        'userId': userId,
+        'createdAt': new Date().getTime(),
     };
 
     try {

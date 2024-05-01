@@ -2,6 +2,8 @@
 .secrets
 deployment-package.zip
 .DS_Store
+get-url-lambda/terraform/modules
+shorten-url-lambda/terraform/modules
 
 # Terraform
 **/.terraform/*
