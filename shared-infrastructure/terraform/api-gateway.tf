@@ -14,6 +14,9 @@ resource "aws_api_gateway_deployment" "deployment" {
     aws_api_gateway_authorizer.cognito_user_pool_authorizer
   ]
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+
+  stage_name  = var.environment
+  description = "Deployed on ${timestamp()}"
 }
 
 resource "aws_iam_role" "api_gateway_cloudwatch_role" {
