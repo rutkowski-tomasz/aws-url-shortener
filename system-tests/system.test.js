@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const urlShortenerBaseUrl = 'https://5fx9tfed9e.execute-api.eu-central-1.amazonaws.com/dev';
+const urlShortenerBaseUrl = 'https://d0ghygtws1.execute-api.eu-central-1.amazonaws.com/dev';
 
 describe('Lambda function integration', () => {
   let code;
