@@ -6,7 +6,7 @@ In real world scenario all the projects would probably be managed as separate re
 
 # 🏙️ Architecture
 
-![Architecture Diagram](assets/link-shortener.phase3.drawio.svg)
+![Architecture Diagram](assets/link-shortener.phase4.drawio.svg)
 
 # 🌳 Repository structure
 
@@ -80,6 +80,7 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Integrate shorten-url-lambda and get-url-lambda into single API Gateway
     - Provide it within shared-infrastructure
 16. ✅ Cognito SignUp, Login, RefreshToken flows
+17. Link preview generation
 17. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
