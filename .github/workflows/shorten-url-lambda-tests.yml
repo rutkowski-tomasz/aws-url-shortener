@@ -5,7 +5,7 @@ on:
     branches:
       - '*'
     paths:
-      - 'get-url-lambda/**'
+      - 'shorten-url-lambda/**'
   push:
     branches:
       - '*'
