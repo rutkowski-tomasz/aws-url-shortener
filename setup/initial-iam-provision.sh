@@ -22,6 +22,16 @@ cat > ${policy_document} << EOF
       ]
     },
     {
+      "Sid": "LambdaEventSourceManagement",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetEventSourceMapping",
+        "lambda:CreateEventSourceMapping",
+        "lambda:DeleteEventSourceMapping"
+      ],
+      "Resource": "*"
+    },
+    {
       "Sid": "LambdaManagement",
       "Effect": "Allow",
       "Action": [

@@ -15,3 +15,9 @@ resource "aws_dynamodb_table" "url_shortener" {
 resource "aws_sns_topic" "dynamodb_stream_topic" {
   name = "${local.prefix}url-created"
 }
+
+resource "aws_lambda_event_source_mapping" "dynamodb_trigger" {
+  event_source_arn  = aws_dynamodb_table.url_shortener.stream_arn
+  function_name     = data.terraform_remote_state.dynamodb_stream_lambda_state.outputs.lambda_function_arn
+  starting_position = "LATEST"
+}

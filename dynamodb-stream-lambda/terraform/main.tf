@@ -20,10 +20,21 @@ resource "aws_iam_policy" "custom_policy" {
         Effect   = "Allow"
         Action   = "sns:Publish"
         Resource = "arn:aws:sns:eu-central-1:024853653660:us-${var.environment}-url-created"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
+        ]
+        Resource = "arn:aws:dynamodb:eu-central-1:024853653660:table/us-${var.environment}-shortened-urls/stream/*"
       }
     ]
   })
 }
+
 resource "aws_iam_role_policy_attachment" "custom_policy_attachment" {
   role       = module.lambda.lambda_role_name
   policy_arn = aws_iam_policy.custom_policy.arn
