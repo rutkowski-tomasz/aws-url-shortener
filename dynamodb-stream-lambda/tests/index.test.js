@@ -1,43 +1,60 @@
-const AWS = require('aws-sdk');
+process.env.environment = "dev";
+
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const { mockClient } = require("aws-sdk-client-mock");
-const { handler } = require("../src/index"); // Assuming your Lambda handler is correctly exported from index.js
+const { handler } = require("../src/index");
 
-const s3Mock = mockClient(AWS.S3);
-
-const sampleSQSEvent = {
-    Records: [
-        {
-            body: JSON.stringify({
-                Message: JSON.stringify({
-                    url: "https://example.com/",
-                    code: "uniqueCode123"
-                })
-            })
-        }
-    ]
-};
+const snsMock = mockClient(SNSClient);
 
 beforeEach(() => {
-    s3Mock.reset();
+    snsMock.reset();
 });
 
-test('successfully generates previews and uploads to S3', async () => {
-    s3Mock.on(AWS.S3.prototype.upload).resolves({
-        Location: "https://example-bucket.s3.amazonaws.com/uniqueCode123/desktop.png",
-        Bucket: "us-dev-previews",
-        Key: "uniqueCode123/desktop.png"
+describe('Lambda Function Tests', () => {
+    const sampleDynamoDBEvent = {
+        Records: [
+            {
+                eventName: 'INSERT',
+                dynamodb: {
+                    NewImage: {
+                        code: { S: 'abcd1234' },
+                        longUrl: { S: 'https://example.com' },
+                        userId: { S: 'user-001' },
+                        createdAt: { N: '1234567890' }
+                    }
+                }
+            }
+        ]
+    };
+
+    test('successfully publishes to SNS when processing INSERT event', async () => {
+        // Setup SNS mock to simulate a successful publish
+        snsMock.on(PublishCommand).resolves({
+            MessageId: "12345"
+        });
+
+        const response = await handler(sampleDynamoDBEvent);
+
+        const responseBody = JSON.parse(response.body);
+        expect(response.statusCode).toEqual(200);
+        expect(responseBody.isSuccess).toBeTruthy();
+        expect(snsMock.calls(PublishCommand)).toHaveLength(1);
+        expect(snsMock.calls(PublishCommand)[0].args[0].input).toMatchObject({
+            TopicArn: expect.stringContaining("us-dev-url-created"),
+            Message: expect.stringContaining('https://example.com')
+        });
     });
 
-    const response = await handler(sampleSQSEvent);
+    test('handles errors during message publication to SNS', async () => {
+        // Simulate an error in publishing to SNS
+        snsMock.on(PublishCommand).rejects(new Error("Network failure"));
 
-    expect(response.statusCode).toEqual(200);
-    expect(JSON.parse(response.body).isSuccess).toBeTruthy();
-    expect(s3Mock.calls(AWS.S3.prototype.upload)).toHaveLength(2); // Expecting two uploads: one for desktop and one for mobile
-    const desktopUploadArgs = s3Mock.calls(AWS.S3.prototype.upload)[0].args[0];
-    const mobileUploadArgs = s3Mock.calls(AWS.S3.prototype.upload)[1].args[0];
-    
-    expect(desktopUploadArgs.Bucket).toEqual("us-dev-previews");
-    expect(desktopUploadArgs.Key).toEqual("uniqueCode123/desktop.png");
-    expect(mobileUploadArgs.Bucket).toEqual("us-dev-previews");
-    expect(mobileUploadArgs.Key).toEqual("uniqueCode123/mobile.png");
+        const response = await handler(sampleDynamoDBEvent);
+
+        const responseBody = JSON.parse(response.body);
+        expect(response.statusCode).toEqual(400);
+        expect(responseBody.isSuccess).toBeFalsy();
+        expect(responseBody.error).toContain("Network failure");
+        expect(snsMock.calls(PublishCommand)).toHaveLength(1);
+    });
 });

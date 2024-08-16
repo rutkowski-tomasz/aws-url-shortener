@@ -1,12 +1,12 @@
-const AWS = require('aws-sdk');
-const sns = new AWS.SNS();
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
+const snsClient = new SNSClient({});
 
+const env = process.env.environment;
+const topicArn = `arn:aws:sns:eu-central-1:024853653660:us-${env}-url-created`;
 
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
-
-    const env = process.env.environment;
-    const topicArn = `arn:aws:sns:eu-central-1:024853653660:us-${env}-url-created`;
     console.debug('Publishing to topic:', topicArn);
 
     try {
@@ -15,14 +15,14 @@ exports.handler = async (event) => {
             console.log('Record: ', JSON.stringify(record, null, 2));
             
             if (record.eventName === 'INSERT') {
-                const newItem = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+                const newItem = unmarshall(record.dynamodb.NewImage);
                 const message = {
                     Message: JSON.stringify(newItem),
                     TopicArn: topicArn
                 };
 
                 try {
-                    const publishResult = await sns.publish(message).promise();
+                    const publishResult = await snsClient.send(new PublishCommand(message));
                     console.log("Message sent to the topic", publishResult);
                 } catch (error) {
                     console.error("Error sending message: ", error);

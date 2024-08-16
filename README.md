@@ -13,6 +13,14 @@ In real world scenario all the projects would probably be managed as separate re
 ```sh
 ├── README.md
 ├── assets # Image files included in the README file
+├── dynamodb-stream-lamda # Lambda handling streams from DynamoDB, dispatching to SNS topics
+│   ├── src
+│   ├── terraform
+│   └── tests
+├── generate-preview-lamda # Lambda handling generation of URL preview
+│   ├── src
+│   ├── terraform
+│   └── tests
 ├── get-url-lambda # Python lambda project
 │   ├── src
 │   ├── terraform
