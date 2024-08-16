@@ -1,0 +1,17 @@
+name: dynamodb-stream-lambda deploy to dev
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'dynamodb-stream-lambda/**'
+
+jobs:
+  deploy-dynamodb-stream-lambda-dev:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: dynamodb-stream-lambda
+      project-type: nodejs
+      env: dev
+    secrets: inherit
