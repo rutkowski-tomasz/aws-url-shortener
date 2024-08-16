@@ -22,10 +22,29 @@ cat > ${policy_document} << EOF
       ]
     },
     {
+      "Sid": "LambdaEventSourceManagement",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetEventSourceMapping",
+        "lambda:CreateEventSourceMapping",
+        "lambda:DeleteEventSourceMapping"
+      ],
+      "Resource": "*"
+    },
+    {
       "Sid": "LambdaManagement",
       "Effect": "Allow",
       "Action": [
-        "lambda:*"
+        "lambda:Get*",
+        "lambda:List*",
+        "lambda:Describe*",
+        "lambda:CreateFunction",
+        "lambda:DeleteFunction",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:TagResource",
+        "lambda:AddPermission",
+        "lambda:RemovePermission"
       ],
       "Resource": [
         "arn:aws:lambda:${region}:${account_id}:function:us-*"
