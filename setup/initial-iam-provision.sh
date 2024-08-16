@@ -12,6 +12,16 @@ cat > ${policy_document} << EOF
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "SnsManagement",
+      "Effect": "Allow",
+      "Action": [
+        "sns:*"
+      ],
+      "Resource": [
+        "arn:aws:sns:${region}:${account_id}:us-*"
+      ]
+    },
+    {
       "Sid": "LambdaManagement",
       "Effect": "Allow",
       "Action": [

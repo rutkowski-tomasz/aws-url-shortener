@@ -7,4 +7,11 @@ resource "aws_dynamodb_table" "url_shortener" {
     name = "code"
     type = "S"
   }
+
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
+}
+
+resource "aws_sns_topic" "dynamodb_stream_topic" {
+  name = "${local.prefix}url-created"
 }
