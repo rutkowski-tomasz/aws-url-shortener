@@ -12,13 +12,27 @@ cat > ${policy_document} << EOF
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "SnsManagement",
+      "Sid": "SnsGlobalManagement",
       "Effect": "Allow",
       "Action": [
-        "sns:*"
+        "sns:ListTopics"
       ],
       "Resource": [
-        "arn:aws:sns:${region}:${account_id}:us-*"
+        "arn:aws:sns:${region}:${account_id}:*"
+      ]
+    },
+    {
+      "Sid": "ResourceManagement",
+      "Effect": "Allow",
+      "Action": [
+        "sns:*",
+        "sqs:*",
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:sns:${region}:${account_id}:us-*",
+        "arn:aws:sqs:${region}:${account_id}:us-*",
+        "arn:aws:s3:::us-*"
       ]
     },
     {
@@ -27,7 +41,8 @@ cat > ${policy_document} << EOF
       "Action": [
         "lambda:GetEventSourceMapping",
         "lambda:CreateEventSourceMapping",
-        "lambda:DeleteEventSourceMapping"
+        "lambda:DeleteEventSourceMapping",
+        "s3:CreateBucket"
       ],
       "Resource": "*"
     },

@@ -1,0 +1,20 @@
+{
+  "name": "generate-preview-lambda",
+  "version": "1.0.0",
+  "description": "Lambda generating URL preview",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "deploy": "cd src && zip -r ../deployment-package.zip . && cd - && aws lambda update-function-code --function-name us-dev-generate-preview-lambda --zip-file fileb://deployment-package.zip && rm deployment-package.zip"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sdk-client-mock": "^4.0.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.632.0",
+    "chrome-aws-lambda": "^10.1.0"
+  }
+}
