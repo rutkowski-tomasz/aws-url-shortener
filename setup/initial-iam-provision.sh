@@ -25,16 +25,7 @@ cat > ${policy_document} << EOF
       "Sid": "LambdaManagement",
       "Effect": "Allow",
       "Action": [
-        "lambda:Get*",
-        "lambda:List*",
-        "lambda:Describe*",
-        "lambda:CreateFunction",
-        "lambda:DeleteFunction",
-        "lambda:UpdateFunctionCode",
-        "lambda:UpdateFunctionConfiguration",
-        "lambda:TagResource",
-        "lambda:AddPermission",
-        "lambda:RemovePermission"
+        "lambda:*"
       ],
       "Resource": [
         "arn:aws:lambda:${region}:${account_id}:function:us-*"
