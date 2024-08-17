@@ -1,0 +1,95 @@
+# @name signUp
+POST {{cognitoUrl}}
+X-Amz-Target: AWSCognitoIdentityProviderService.SignUp
+Content-Type: application/x-amz-json-1.1
+
+{
+    "ClientId": "{{cognitoClientId}}",
+    "Username": "system-tests@example.com",
+    "Password": "SecurePassword123!",
+    "UserAttributes": [
+        {
+            "Name": "email",
+            "Value": "system-tests@example.com"
+        }
+    ]
+}
+
+###
+
+# @name confirmSignUp
+POST {{cognitoUrl}}
+X-Amz-Target: AWSCognitoIdentityProviderService.ConfirmSignUp
+Content-Type: application/x-amz-json-1.1
+
+{
+    "ClientId": "{{cognitoClientId}}",
+    "Username": "system-tests@example.com",
+    "ConfirmationCode": "123456"
+}
+
+
+###
+
+# @name login
+POST {{cognitoUrl}}
+X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+Content-Type: application/x-amz-json-1.1
+
+{
+    "ClientId": "{{cognitoClientId}}",
+    "AuthFlow": "USER_PASSWORD_AUTH",
+    "AuthParameters": {
+        "USERNAME": "system-tests@example.com",
+        "PASSWORD": "Password123!"
+    }
+}
+
+### 
+
+# @name changePassword
+POST {{cognitoUrl}}
+X-Amz-Target: AWSCognitoIdentityProviderService.RespondToAuthChallenge
+Content-Type: application/x-amz-json-1.1
+
+{
+    "ClientId": "{{cognitoClientId}}",
+    "ChallengeName": "NEW_PASSWORD_REQUIRED",
+    "Session": "AYABeOFCD4u_GhAThwdEAiZ0YJgAHQABAAdTZXJ2aWNlABBDb2duaXRvVXNlclBvb2xzAAEAB2F3cy1rbXMATmFybjphd3M6a21zOmV1LWNlbnRyYWwtMTo1OTA0OTA4MDk4NTg6a2V5LzRkMmU1YTdmLTFjZDctNDljOS04ZmFjLTJkOWRjYjVjZWY5ZgC4AQIBAHhKQAoXAvz_-IkJpO_9S8oXPTdmr1hCCizB3KQHYdT5uAFijvEwRe81yNwm35HNe7j4AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMs5AOEuEHy7eMQ5-uAgEQgDs90WbBr6G5NVrYZQRCyVyKhKN3PMzYUtjLJrRg_XMtS9Nge6Wgsz7dISGk2qtAlvLCYMBiSFwW2NeVzAIAAAAADAAAEAAAAAAAAAAAAAAAAAAMNdYKmrjufDE_Aw3OvImy_____wAAAAEAAAAAAAAAAAAAAAEAAADJu8JRUMVEgaFqBWyuIam-bPwh0OB80UsAMb0s_HxlyBGxCnymxMrxZT3FJ8haPtk_NhHPqNd40RpIcjqkE6VZH0sJrYM62xm5ZIFvNsBZZ9vKtlwLNnv6CuuYVXhudMXuTxMwkCFN5t06jcV4SkeJtZK6o5q-LttY5tk4oQbSkeUWFir2U9irXrwYeHEGjqADbQitKs4eTdRhAhXSIUq3kRQtt2DJSzD-ayOj2AmPQs7d95ggBzv6Msg5b2g9a__OPrGb4BMn9DoANRQMLQQDGJkkwOg1LMdqKw",
+    "ChallengeResponses": {
+        "USERNAME": "system-tests@example.com",
+        "NEW_PASSWORD": "Password123!"
+    }
+}
+
+###
+
+# @name refreshToken
+POST {{cognitoUrl}}
+X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+Content-Type: application/x-amz-json-1.1
+
+{
+    "ClientId": "{{cognitoClientId}}",
+    "AuthFlow": "REFRESH_TOKEN_AUTH",
+    "AuthParameters": {
+        "REFRESH_TOKEN": "{{login.response.body.AuthenticationResult.RefreshToken}}"
+    }
+}
+
+###
+
+# @name shortenUrl
+POST {{baseUrl}}/shorten-url
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
+
+{
+    "longUrl": "https://youtube.com/"
+}
+
+###
+
+# @name getUrl
+GET {{baseUrl}}/get-url?code={{shortenUrl.response.body.result.code}}
+Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
