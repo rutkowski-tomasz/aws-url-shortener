@@ -1,0 +1,15 @@
+{
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "cognitoUrl": "https://cognito-idp.eu-central-1.amazonaws.com"
+        },
+        "dev": {
+            "baseUrl": "https://d0ghygtws1.execute-api.eu-central-1.amazonaws.com/dev",
+            "cognitoClientId": "4np6oaiu11oom6khgturukdfus"
+        },
+        "prod": {
+            "baseUrl": "https://qwhu76v9pd.execute-api.eu-central-1.amazonaws.com/prd"
+        }
+    }
+}
+
