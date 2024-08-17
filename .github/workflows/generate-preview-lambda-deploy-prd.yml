@@ -1,0 +1,14 @@
+name: generate-preview-lambda deploy to prd
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-generate-preview-lambda-prd:
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: generate-preview-lambda
+      project-type: nodejs
+      env: prd
+    secrets: inherit

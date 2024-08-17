@@ -1,10 +1,10 @@
-process.env.environment = "dev";
-
 const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const { mockClient } = require("aws-sdk-client-mock");
 const { handler } = require("../src/index");
 
 const snsMock = mockClient(SNSClient);
+
+process.env.environment = "dev";
 
 beforeEach(() => {
     snsMock.reset();

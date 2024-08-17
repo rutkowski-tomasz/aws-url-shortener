@@ -2,11 +2,11 @@ const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const { unmarshall } = require("@aws-sdk/util-dynamodb");
 const snsClient = new SNSClient({});
 
-const env = process.env.environment;
-const topicArn = `arn:aws:sns:eu-central-1:024853653660:us-${env}-url-created`;
-
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
+
+    const env = process.env.environment;
+    const topicArn = `arn:aws:sns:eu-central-1:024853653660:us-${env}-url-created`;
     console.debug('Publishing to topic:', topicArn);
 
     try {
