@@ -36,3 +36,25 @@ jobs:
       env: ${{ matrix.env }}
       project-type: nodejs
     secrets: inherit
+
+  deploy-dynamodb-stream-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: dynamodb-stream-lambda
+      env: ${{ matrix.env }}
+      project-type: nodejs
+    secrets: inherit
+
+  deploy-generate-preview-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-deploy.yml
+    with:
+      project: generate-preview-lambda
+      env: ${{ matrix.env }}
+      project-type: nodejs
+    secrets: inherit

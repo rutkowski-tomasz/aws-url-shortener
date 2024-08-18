@@ -12,18 +12,17 @@ exports.handler = async (event) => {
     console.debug('Publishing to bucket:', bucketName);
 
     try {
-        const promises = [];
         for (const record of event.Records) {
             console.log('Record: ', JSON.stringify(record, null, 2));
             const body = JSON.parse(record.body);
             const newItem = JSON.parse(body.Message);
+            console.log('NewItem:', newItem);
             const { url, code } = newItem;
 
-            promises.push(generateAndStorePreview(url, code, bucketName, 'desktop'));
-            promises.push(generateAndStorePreview(url, code, bucketName, 'mobile'));
+            await generateAndStorePreview(url, code, bucketName, 'desktop');
+            await generateAndStorePreview(url, code, bucketName, 'mobile');
         }
 
-        await Promise.all(promises);
         return buildResponse(true, 'Previews generated and stored successfully');
     } catch (error) {
         console.error('Error processing event:', error);
@@ -32,11 +31,14 @@ exports.handler = async (event) => {
 };
 
 async function generateAndStorePreview(url, code, bucketName, type) {
+
     const browser = await chromium.puppeteer.launch({
         args: chromium.args,
+        ignoreDefaultArgs: ['--disable-extensions'],
         defaultViewport: type === 'desktop' ? { width: 1280, height: 720 } : { width: 375, height: 667 },
         executablePath: await chromium.executablePath,
         headless: chromium.headless,
+        ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
