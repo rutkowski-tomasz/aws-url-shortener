@@ -7,11 +7,20 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Run generate-preview-lambda",
+            "name": "generate-preview-lambda",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/generate-preview-lambda/tests-integration/run.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "dynamodb-stream-lambda",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/dynamodb-stream-lambda/tests-integration/run.js"
         }
     ]
 }
