@@ -30,6 +30,13 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/shorten-url-lambda/tests-integration/run.js"
+        },
+        {
+            "name": "get-url-lambda",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/get-url-lambda/tests-integration/run.py",
+            "console": "integratedTerminal"
         }
     ]
 }
