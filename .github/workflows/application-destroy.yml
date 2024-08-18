@@ -36,3 +36,25 @@ jobs:
       env: ${{ matrix.env }}
       project-type: nodejs
     secrets: inherit
+
+  destroy-dynamodb-stream-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-destroy.yml
+    with:
+      project: dynamodb-stream-lambda
+      env: ${{ matrix.env }}
+      project-type: nodejs
+    secrets: inherit
+
+  destroy-generate-preview-lambda:
+    strategy:
+      matrix:
+        env: [dev, prd]
+    uses: ./.github/workflows/.terraform-destroy.yml
+    with:
+      project: generate-preview-lambda
+      env: ${{ matrix.env }}
+      project-type: nodejs
+    secrets: inherit
