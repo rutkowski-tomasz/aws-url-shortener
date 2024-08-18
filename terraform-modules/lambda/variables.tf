@@ -27,3 +27,15 @@ variable "deployment_package" {
   description = "The path to the function's deployment package within the local filesystem."
   type        = string
 }
+
+variable "lambda_memory_size" {
+  description = "Amount of memory assigned to lambda at runtime (MB)."
+  type        = number
+  default     = 128
+}
+
+variable "lambda_timeout" {
+  description = "Amount of time lambda has to run (s)."
+  type        = number
+  default     = 3
+}
