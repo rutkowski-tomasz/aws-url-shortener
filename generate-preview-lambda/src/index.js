@@ -1,5 +1,9 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const chromium = require('chrome-aws-lambda');
+const puppeteer = require("puppeteer-core");
+const chromium = require('@sparticuz/chromium');
+
+chromium.setHeadlessMode = true;
+chromium.setGraphicsMode = false;
 
 const s3Client = new S3Client({});
 
@@ -32,13 +36,11 @@ exports.handler = async (event) => {
 
 async function generateAndStorePreview(url, code, bucketName, type) {
 
-    const browser = await chromium.puppeteer.launch({
+    const browser = await puppeteer.launch({
         args: chromium.args,
-        ignoreDefaultArgs: ['--disable-extensions'],
         defaultViewport: type === 'desktop' ? { width: 1280, height: 720 } : { width: 375, height: 667 },
-        executablePath: await chromium.executablePath,
+        executablePath: await chromium.executablePath(),
         headless: chromium.headless,
-        ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
