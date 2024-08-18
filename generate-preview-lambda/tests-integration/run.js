@@ -9,7 +9,7 @@ process.env.environment = "dev";
             body: JSON.stringify({
                 Message: JSON.stringify({
                     url: "https://example.com",
-                    code: "123abc"
+                    code: "123abcd"
                 })
             })
         }]

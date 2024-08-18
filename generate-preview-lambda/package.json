@@ -5,7 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "deploy": "cd src && zip -r ../deployment-package.zip . && cd - && aws lambda update-function-code --function-name us-dev-generate-preview-lambda --zip-file fileb://deployment-package.zip && rm deployment-package.zip"
+    "deploy": "npm run deploy:create-package && npm run deploy:upload-package && npm run deploy:deploy-package && npm run deploy:remove-package",
+    "deploy:create-package": "npm install && cd src && zip -r ../deployment-package.zip . && cd - && zip -r deployment-package.zip node_modules/",
+    "deploy:upload-package": "aws s3 cp deployment-package.zip s3://us-cicd/generate-preview-lambda/deployment-package.zip",
+    "deploy:deploy-package": "aws lambda update-function-code --function-name us-dev-generate-preview-lambda --s3-bucket us-cicd --s3-key generate-preview-lambda/deployment-package.zip",
+    "deploy:remove-package": "rm deployment-package.zip"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.632.0",
-    "chrome-aws-lambda": "^10.1.0"
+    "@sparticuz/chromium": "^126.0.0",
+    "puppeteer-core": "^23.1.0"
   }
 }
