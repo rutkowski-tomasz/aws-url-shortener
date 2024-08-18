@@ -21,6 +21,15 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/dynamodb-stream-lambda/tests-integration/run.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "shorten-url-lambda",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/shorten-url-lambda/tests-integration/run.js"
         }
     ]
 }
