@@ -42,6 +42,8 @@ module "lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
   deployment_package   = "deployment-package.zip"
+  lambda_memory_size   = 1024
+  lambda_timeout       = 30 
 }
 
 resource "aws_iam_policy" "custom_policy" {

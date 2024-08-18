@@ -50,6 +50,8 @@ resource "aws_lambda_function" "lambda" {
   runtime          = var.lambda_runtime
   filename         = var.deployment_package
   source_code_hash = filebase64sha256(var.deployment_package)
+  memory_size      = var.lambda_memory_size
+  timeout          = var.lambda_timeout
 
   environment {
     variables = {
