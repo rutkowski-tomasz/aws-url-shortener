@@ -16,10 +16,6 @@ on:
         required: true
         type: string
         description: 'Action to perform: plan or apply'
-      project-type:
-        required: false
-        type: string
-        default: 'nodejs'
     secrets:
       TF_API_TOKEN:
         required: true

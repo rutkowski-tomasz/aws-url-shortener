@@ -3,8 +3,8 @@ name: Node.js workflow
 on:
   workflow_call:
     inputs:
-      working-directory:
-        description: 'Working directory'
+      project:
+        description: 'Project name/working-directory'
         required: true
         type: string
       node-version:
@@ -15,14 +15,6 @@ on:
         description: 'Flag whether to install node_modules inside deployment package'
         required: true
         type: boolean
-      tf-workspace-dev:
-        description: 'Terraform workspace for dev environment'
-        required: true
-        type: string
-      tf-workspace-prod:
-        description: 'Terraform workspace for prod environment'
-        required: true
-        type: string
     secrets:
       TF_API_TOKEN:
         required: true
@@ -33,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.project }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -54,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.project }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -64,28 +56,28 @@ jobs:
         run: npm i
 
       - name: Create deployment package
-        working-directory: ${{ inputs.working-directory }}/src
+        working-directory: ${{ inputs.project }}/src
         run: zip -r ../deployment-package.zip .
 
       - name: Pack node_modules
         if: inputs.pack-dependencies
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.project }}
         run: zip -r ./deployment-package.zip node_modules/
 
       - name: Upload deployment package
         uses: actions/upload-artifact@v2
         with:
           name: deployment-package
-          path: ${{ inputs.working-directory }}/deployment-package.zip
+          path: ${{ inputs.project }}/deployment-package.zip
 
   plan:
     needs: [test, create-package]
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.project }}
       environment: dev
-      tf-workspace: ${{ inputs.tf-workspace-dev }}
+      tf-workspace: us-dev-${{ inputs.project }}
       action: plan
       project-type: nodejs
     secrets:
@@ -96,9 +88,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.project }}
       environment: dev
-      tf-workspace: ${{ inputs.tf-workspace-dev }}
+      tf-workspace: us-dev-${{ inputs.project }}
       action: apply
       project-type: nodejs
     secrets:
@@ -109,9 +101,9 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.project }}
       environment: prod
-      tf-workspace: ${{ inputs.tf-workspace-prod }}
+      tf-workspace: us-prd-${{ inputs.project }}
       action: apply
       project-type: nodejs
     secrets:

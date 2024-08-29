@@ -3,8 +3,8 @@ name: Python workflow
 on:
   workflow_call:
     inputs:
-      working-directory:
-        description: 'Working directory'
+      project:
+        description: 'Project name/working-directory'
         required: true
         type: string
       python-version:
@@ -15,14 +15,6 @@ on:
         description: 'Flag whether to include dependencies inside deployment package'
         required: true
         type: boolean
-      tf-workspace-dev:
-        description: 'Terraform workspace for dev environment'
-        required: true
-        type: string
-      tf-workspace-prod:
-        description: 'Terraform workspace for prod environment'
-        required: true
-        type: string
     secrets:
       TF_API_TOKEN:
         required: true
@@ -33,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.project }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -66,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.project }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -75,33 +67,30 @@ jobs:
         if: inputs.pack-dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt -t ./package
 
       - name: Create deployment package
-        working-directory: ${{ inputs.working-directory }}/src
+        working-directory: ${{ inputs.project }}/src
         run: zip -r ../deployment-package.zip .
 
       - name: Pack dependencies
         if: inputs.pack-dependencies
-        working-directory: ${{ inputs.working-directory }}
-        run: zip -r ./deployment-package.zip $(python -m site --user-site)
+        run: cd package && zip -r ../deployment-package.zip .
 
       - name: Upload deployment package
         uses: actions/upload-artifact@v2
         with:
           name: deployment-package
-          path: ${{ inputs.working-directory }}/deployment-package.zip
+          path: ${{ inputs.project }}/deployment-package.zip
 
   plan:
     needs: [test, create-package]
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.project }}
       environment: dev
-      tf-workspace: ${{ inputs.tf-workspace-dev }}
-      action: plan
-      project-type: python
+      tf-workspace: us-dev-${{ inputs.project }}
     secrets:
       TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
@@ -110,9 +99,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.project }}
       environment: dev
-      tf-workspace: ${{ inputs.tf-workspace-dev }}
+      tf-workspace: us-dev-${{ inputs.project }}
       action: apply
       project-type: python
     secrets:
@@ -123,9 +112,9 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ inputs.project }}
       environment: prod
-      tf-workspace: ${{ inputs.tf-workspace-prod }}
+      tf-workspace: us-prd-${{ inputs.project }}
       action: apply
       project-type: python
     secrets:
