@@ -1,0 +1,64 @@
+name: Terraform Workflow
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      tf-workspace:
+        required: true
+        type: string
+      action:
+        required: true
+        type: string
+        description: 'Action to perform: plan or apply'
+      project-type:
+        required: false
+        type: string
+        default: 'nodejs'
+    secrets:
+      TF_API_TOKEN:
+        required: true
+
+jobs:
+  terraform:
+    name: Terraform ${{ inputs.action }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}/terraform
+    env:
+      TF_WORKSPACE: ${{ inputs.tf-workspace }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download deployment package
+        uses: actions/download-artifact@v2
+        with:
+          name: deployment-package
+          path: ${{ inputs.working-directory }}/terraform
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Copy modules code
+        run: cp -R ../../terraform-modules/ modules/
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform plan
+        if: inputs.action == 'plan'
+        run: terraform plan -var="environment=${{ inputs.environment }}"
+
+      - name: Terraform apply
+        if: inputs.action == 'apply'
+        run: terraform apply -auto-approve -var="environment=${{ inputs.environment }}"
