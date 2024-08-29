@@ -1,0 +1,26 @@
+name: shorten-url-lambda CI/CD
+
+on:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "shorten-url-lambda/**"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "shorten-url-lambda/**"
+  release:
+    types: [published]
+
+jobs:
+  node:
+    name: Node
+    uses: ./.github/workflows/workflow-nodejs.yml
+    with:
+      project: shorten-url-lambda
+      node-version: 20.x
+      pack-dependencies: false
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
