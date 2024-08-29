@@ -2,20 +2,21 @@ name: Generate Preview Lambda CI/CD
 
 on:
   push:
-  #   branches:
-  #     - "main"
-  #   paths:
-  #     - "${{ env.PROJECT }}/**"
-  # pull_request:
-  #   branches:
-  #     - "*"
-  #   paths:
-  #     - "${{ env.PROJECT }}/**"
-  # release:
-  #   types: [published]
+    branches:
+      - "*"
+    paths:
+      - "generate-preview-lambda/**"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "generate-preview-lambda/**"
+  release:
+    types: [published]
 
 jobs:
-  ci-cd:
+  node:
+    name: Node
     uses: ./.github/workflows/workflow-nodejs.yml
     with:
       project: generate-preview-lambda

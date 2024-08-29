@@ -72,7 +72,7 @@ jobs:
 
   plan:
     needs: [test, create-package]
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: ${{ inputs.project }}
@@ -84,7 +84,7 @@ jobs:
 
   deploy-dev:
     needs: [test, create-package]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: ${{ inputs.project }}
@@ -96,7 +96,7 @@ jobs:
 
   deploy-prod:
     needs: [test, create-package]
-    if: github.event_name == 'release' && github.event.action == 'published'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: ${{ inputs.project }}
