@@ -9,7 +9,7 @@ jest.mock('chrome-aws-lambda', () => ({
   puppeteer: {
     launch: jest.fn()
   }
-}));
+}), { virtual: true });
 
 const s3Mock = mockClient(S3Client);
 
