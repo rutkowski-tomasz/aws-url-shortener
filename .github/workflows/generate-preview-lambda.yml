@@ -7,17 +7,17 @@ env:
 
 on:
   push:
-    branches:
-      - "main"
-    paths:
-      - "${{ env.PROJECT }}/**"
-  pull_request:
-    branches:
-      - "*"
-    paths:
-      - "${{ env.PROJECT }}/**"
-  release:
-    types: [published]
+  #   branches:
+  #     - "main"
+  #   paths:
+  #     - "${{ env.PROJECT }}/**"
+  # pull_request:
+  #   branches:
+  #     - "*"
+  #   paths:
+  #     - "${{ env.PROJECT }}/**"
+  # release:
+  #   types: [published]
 
 jobs:
   ci-cd:
