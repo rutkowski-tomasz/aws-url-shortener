@@ -84,7 +84,7 @@ jobs:
 
   deploy-dev:
     needs: [test, create-package]
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: ${{ inputs.project }}
@@ -96,7 +96,7 @@ jobs:
 
   deploy-prod:
     needs: [test, create-package]
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: ${{ inputs.project }}

@@ -1,0 +1,54 @@
+name: Shared Infrastructure CI/CD
+
+on:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "shared-infrastructure/**"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "shared-infrastructure/**"
+  release:
+    types: [published]
+
+jobs:
+  plan-dev:
+    name: Terraform Plan (Dev)
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      working-directory: shared-infrastructure
+      environment: dev
+      tf-workspace: us-dev-shared-infrastructure
+      action: plan
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+  apply-dev:
+    name: Terraform Apply (Dev)
+    needs: plan-dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      working-directory: shared-infrastructure
+      environment: dev
+      tf-workspace: us-dev-shared-infrastructure
+      action: apply
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+  apply-prod:
+    name: Terraform Apply (Prod)
+    needs: apply-dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      working-directory: shared-infrastructure
+      environment: prd
+      tf-workspace: us-prd-shared-infrastructure
+      action: apply
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
