@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - "*"
-    paths:
-      - "shorten-url-lambda/**"
+    # paths:
+    #   - "shorten-url-lambda/**"
   pull_request:
     branches:
       - "*"
