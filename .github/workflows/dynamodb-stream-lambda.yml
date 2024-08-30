@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - "*"
-    # paths:
-    #   - "dynamodb-stream-lambda/**"
+    paths:
+      - "dynamodb-stream-lambda/**"
   pull_request:
     branches:
       - "*"
-    # paths:
-    #   - "dynamodb-stream-lambda/**"
+    paths:
+      - "dynamodb-stream-lambda/**"
   release:
     types: [published]
 
