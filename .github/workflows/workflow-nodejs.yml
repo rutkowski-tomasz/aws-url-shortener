@@ -1,0 +1,107 @@
+name: Node.js workflow
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: 'Project name/working-directory'
+        required: true
+        type: string
+      node-version:
+        description: 'Node version'
+        required: true
+        type: string
+      pack-dependencies:
+        description: 'Flag whether to install node_modules inside deployment package'
+        required: true
+        type: boolean
+    secrets:
+      TF_API_TOKEN:
+        required: true
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.project }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  create-package:
+    name: Create Deployment Package
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.project }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install node_modules
+        if: inputs.pack-dependencies
+        run: npm i
+
+      - name: Create deployment package
+        working-directory: ${{ inputs.project }}/src
+        run: zip -r ../deployment-package.zip .
+
+      - name: Pack node_modules
+        if: inputs.pack-dependencies
+        working-directory: ${{ inputs.project }}
+        run: zip -r ./deployment-package.zip node_modules/
+
+      - name: Upload deployment package
+        uses: actions/upload-artifact@v2
+        with:
+          name: deployment-package
+          path: ${{ inputs.project }}/deployment-package.zip
+
+  plan:
+    needs: [test, create-package]
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      working-directory: ${{ inputs.project }}
+      environment: dev
+      tf-workspace: us-dev-${{ inputs.project }}
+      action: plan
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+  deploy-dev:
+    needs: [test, create-package]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      working-directory: ${{ inputs.project }}
+      environment: dev
+      tf-workspace: us-dev-${{ inputs.project }}
+      action: apply
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+  deploy-prod:
+    needs: [test, create-package]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      working-directory: ${{ inputs.project }}
+      environment: prod
+      tf-workspace: us-prd-${{ inputs.project }}
+      action: apply
+    secrets:
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}

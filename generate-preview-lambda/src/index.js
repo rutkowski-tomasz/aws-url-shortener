@@ -7,6 +7,7 @@ chromium.setGraphicsMode = false;
 
 const s3Client = new S3Client({});
 
+
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
