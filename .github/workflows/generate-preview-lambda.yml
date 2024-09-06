@@ -1,4 +1,4 @@
-name: Generate Preview Lambda CI/CD
+name: generate-preview-lambda CI/CD
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Shared Infrastructure CI/CD
+name: shared-infrastructure CI/CD
 
 on:
   push:
