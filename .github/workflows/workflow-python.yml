@@ -101,13 +101,13 @@ jobs:
       pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit
 
-  deploy-prod:
+  deploy-prd:
     needs: [test, create-package]
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
-      environment: prod
+      environment: prd
       action: apply
       pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit

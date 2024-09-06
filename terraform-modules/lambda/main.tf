@@ -48,15 +48,13 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 
 resource "null_resource" "package_deployment" {
   triggers = {
-    always_run: timestamp()
+    always_run : timestamp()
   }
 
   provisioner "local-exec" {
-    command = <<-EOT
-      echo "Packing src folder"
-      cd src
-      zip -qr ../deployment-package.zip .
-      cd ..
+    command     = <<-EOT
+      echo "Packing index.js folder"
+      zip -qr deployment-package.zip index.js
 
       if [ "${var.pack_dependencies}" = "true" ]; then
         echo "Installing node_modules"
@@ -74,20 +72,24 @@ resource "null_resource" "package_deployment" {
 }
 
 resource "aws_lambda_function" "lambda" {
-  depends_on = [null_resource.package_deployment]
-  function_name    = "${local.prefix}${var.lambda_function_name}"
-  handler          = var.lambda_handler
-  role             = aws_iam_role.lambda_execution_role.arn
-  runtime          = var.lambda_runtime
-  memory_size      = var.lambda_memory_size
-  timeout          = var.lambda_timeout
-  layers           = var.lambda_layers
-  s3_bucket        = "us-cicd"
-  s3_key           = "${var.lambda_function_name}/deployment_package.zip"
+  depends_on    = [null_resource.package_deployment]
+  function_name = "${local.prefix}${var.lambda_function_name}"
+  handler       = var.lambda_handler
+  role          = aws_iam_role.lambda_execution_role.arn
+  runtime       = var.lambda_runtime
+  memory_size   = var.lambda_memory_size
+  timeout       = var.lambda_timeout
+  layers        = var.lambda_layers
+  s3_bucket     = "us-cicd"
+  s3_key        = "${var.lambda_function_name}/deployment_package.zip"
 
   environment {
     variables = {
       environment = var.environment
     }
+  }
+
+  lifecycle {
+    replace_triggered_by = [null_resource.package_deployment]
   }
 }

@@ -49,9 +49,9 @@ variable "lambda_layers" {
 variable "custom_policy_statements" {
   description = "List of custom IAM policy statements to be added to the Lambda execution role."
   type = list(object({
-    Effect    = string
-    Action    = string
-    Resource  = string
+    Effect   = string
+    Action   = string
+    Resource = string
   }))
   default = []
 }

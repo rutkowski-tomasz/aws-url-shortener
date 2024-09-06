@@ -36,74 +36,24 @@ jobs:
       - name: Run tests
         run: npm test
 
-  create-package:
-    name: Create Deployment Package
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ inputs.project }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Create deployment package
-        working-directory: ${{ inputs.project }}/src
-        run: zip -r ../deployment-package.zip .
-
-      - name: Pack node_modules
-        if: inputs.pack-dependencies
-        working-directory: ${{ inputs.project }}
-        run: |
-          npm install
-          zip -r ./deployment-package.zip node_modules/
-
-      - name: Configure AWS credentials
-        if: inputs.pack-dependencies
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
-
-      - name: Upload package to S3
-        if: inputs.pack-dependencies
-        run: aws s3 cp deployment-package.zip s3://us-cicd/${{ inputs.project }}/deployment-package.zip
-
-      - name: Upload deployment package
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.project }}-deployment-package
-          path: ${{ inputs.project }}/deployment-package.zip
-
-  plan:
-    needs: [test, create-package]
+  dev:
+    needs: [test]
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
       environment: dev
-      action: plan
+      action: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'apply' || 'plan' }}
       pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit
 
-  deploy-dev:
-    needs: [test, create-package]
+  prd:
+    needs: [dev]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
-      environment: dev
-      action: apply
-      pack-dependencies: ${{ inputs.pack-dependencies }}
-    secrets: inherit
-
-  deploy-prod:
-    needs: [test, create-package]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: ./.github/workflows/workflow-terraform.yml
-    with:
-      project: ${{ inputs.project }}
-      environment: prod
+      environment: prd
       action: apply
       pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit

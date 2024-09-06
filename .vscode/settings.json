@@ -7,7 +7,7 @@
             "baseUrl": "https://d0ghygtws1.execute-api.eu-central-1.amazonaws.com/dev",
             "cognitoClientId": "4np6oaiu11oom6khgturukdfus"
         },
-        "prod": {
+        "prd": {
             "baseUrl": "https://qwhu76v9pd.execute-api.eu-central-1.amazonaws.com/prd"
         }
     }
