@@ -58,3 +58,32 @@ resource "aws_lambda_permission" "api_gateway_permission_shorten_url" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api_gateway.execution_arn}/*/POST/shorten-url"
 }
+
+resource "aws_api_gateway_resource" "get_preview_url" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id
+  path_part   = "get-preview-url"
+}
+
+resource "aws_api_gateway_method" "get_preview_url_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+  resource_id   = aws_api_gateway_resource.get_preview_url.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "get_preview_url_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
+  resource_id             = aws_api_gateway_resource.get_preview_url.id
+  http_method             = aws_api_gateway_method.get_preview_url.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/${data.terraform_remote_state.get_preview_url_lambda_state.outputs.lambda_function_arn}/invocations"
+}
+resource "aws_lambda_permission" "api_gateway_permission_get_preview_url" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = data.terraform_remote_state.get_preview_url_lambda_state.outputs.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api_gateway.execution_arn}/*/GET/get-preview-url"
+}
