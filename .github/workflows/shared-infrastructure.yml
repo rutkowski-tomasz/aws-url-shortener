@@ -20,7 +20,7 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: shared-infrastructure
+      project: shared-infrastructure
       environment: dev
       tf-workspace: us-dev-shared-infrastructure
       action: plan
@@ -33,7 +33,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: shared-infrastructure
+      project: shared-infrastructure
       environment: dev
       tf-workspace: us-dev-shared-infrastructure
       action: apply
@@ -46,7 +46,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: shared-infrastructure
+      project: shared-infrastructure
       environment: prd
       tf-workspace: us-prd-shared-infrastructure
       action: apply

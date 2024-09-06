@@ -75,9 +75,9 @@ jobs:
         run: aws s3 cp deployment-package.zip s3://us-cicd/${{ inputs.project }}/deployment-package.zip
 
       - name: Upload deployment package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: deployment-package
+          name: ${{ inputs.project }}-deployment-package
           path: ${{ inputs.project }}/deployment-package.zip
 
   plan:
@@ -85,7 +85,7 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: dev
       tf-workspace: us-dev-${{ inputs.project }}
       action: plan
@@ -97,7 +97,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: dev
       tf-workspace: us-dev-${{ inputs.project }}
       action: apply
@@ -109,7 +109,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: prod
       tf-workspace: us-prd-${{ inputs.project }}
       action: apply

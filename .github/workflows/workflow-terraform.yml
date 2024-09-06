@@ -3,7 +3,7 @@ name: Terraform Workflow
 on:
   workflow_call:
     inputs:
-      working-directory:
+      project:
         required: true
         type: string
       environment:
@@ -27,7 +27,7 @@ jobs:
     environment: ${{ inputs.environment }}
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}/terraform
+        working-directory: ${{ inputs.project }}/terraform
     env:
       TF_WORKSPACE: ${{ inputs.tf-workspace }}
     steps:
@@ -37,8 +37,8 @@ jobs:
       - name: Download deployment package
         uses: actions/download-artifact@v4.1.7
         with:
-          name: deployment-package
-          path: ${{ inputs.working-directory }}/terraform
+          name: ${{ inputs.project }}-deployment-package
+          path: ${{ inputs.project }}/terraform
 
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3
