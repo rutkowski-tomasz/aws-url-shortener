@@ -16,13 +16,18 @@ exports.handler = async (event) => {
         return buildResponse(false, 'Missing code parameter');
     }
 
-    const desktopPreviewUrl = await generateSignedUrl(bucketName, code, 'desktop');
-    const mobilePreviewUrl = await generateSignedUrl(bucketName, code, 'mobile');
-
-    return buildResponse(true, { 
-        desktopPreview: desktopPreviewUrl, 
-        mobilePreview: mobilePreviewUrl 
-    });
+    try {
+        const desktopPreviewUrl = await generateSignedUrl(bucketName, code, 'desktop');
+        const mobilePreviewUrl = await generateSignedUrl(bucketName, code, 'mobile');
+    
+        return buildResponse(true, { 
+            desktopPreview: desktopPreviewUrl, 
+            mobilePreview: mobilePreviewUrl 
+        });
+    } catch (error) {
+        console.error('Error processing event:', error);
+        return buildResponse(false, error.toString());
+    }
 };
 
 const generateSignedUrl = (bucketName, code, type, expirationSeconds = 60) => {

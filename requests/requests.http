@@ -93,3 +93,10 @@ Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
 # @name getUrl
 GET {{baseUrl}}/get-url?code={{shortenUrl.response.body.result.code}}
 Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
+
+###
+
+# @name getPreviewUrls
+GET {{ baseUrl }}/get-preview-url?code={{shortenUrl.response.body.result.code}}
+Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
+
