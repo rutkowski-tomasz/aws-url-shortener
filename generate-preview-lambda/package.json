@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "deploy": "npm run deploy:create-package && npm run deploy:upload-package && npm run deploy:deploy-package && npm run deploy:remove-package",
-    "deploy:create-package": "npm install && cd src && zip -r ../deployment-package.zip . && cd - && zip -r deployment-package.zip node_modules/",
+    "deploy:create-package": "npm install && cd src && echo 'Creating deployment-package.zip' && zip -qr ../deployment-package.zip . && cd - && zip -qr deployment-package.zip node_modules/",
     "deploy:upload-package": "aws s3 cp deployment-package.zip s3://us-cicd/generate-preview-lambda/deployment-package.zip",
     "deploy:deploy-package": "aws lambda update-function-code --function-name us-dev-generate-preview-lambda --s3-bucket us-cicd --s3-key generate-preview-lambda/deployment-package.zip",
     "deploy:remove-package": "rm deployment-package.zip"
@@ -14,12 +14,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.645.0",
+    "@sparticuz/chromium": "^127.0.0",
     "aws-sdk-client-mock": "^4.0.0",
     "jest": "^29.7.0"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.632.0",
-    "@sparticuz/chromium": "^126.0.0",
     "puppeteer-core": "^23.1.0"
   }
 }

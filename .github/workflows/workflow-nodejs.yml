@@ -1,5 +1,3 @@
-name: Node.js workflow
-
 on:
   workflow_call:
     inputs:
@@ -15,9 +13,6 @@ on:
         description: 'Flag whether to install node_modules inside deployment package'
         required: true
         type: boolean
-    secrets:
-      TF_API_TOKEN:
-        required: true
 
 jobs:
   test:
@@ -51,10 +46,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install node_modules
-        if: inputs.pack-dependencies
-        run: npm i
-
       - name: Create deployment package
         working-directory: ${{ inputs.project }}/src
         run: zip -r ../deployment-package.zip .
@@ -62,12 +53,26 @@ jobs:
       - name: Pack node_modules
         if: inputs.pack-dependencies
         working-directory: ${{ inputs.project }}
-        run: zip -r ./deployment-package.zip node_modules/
+        run: |
+          npm install
+          zip -r ./deployment-package.zip node_modules/
+
+      - name: Configure AWS credentials
+        if: inputs.pack-dependencies
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Upload package to S3
+        if: inputs.pack-dependencies
+        run: aws s3 cp deployment-package.zip s3://us-cicd/${{ inputs.project }}/deployment-package.zip
 
       - name: Upload deployment package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: deployment-package
+          name: ${{ inputs.project }}-deployment-package
           path: ${{ inputs.project }}/deployment-package.zip
 
   plan:
@@ -75,33 +80,30 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: dev
-      tf-workspace: us-dev-${{ inputs.project }}
       action: plan
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: ${{ inputs.pack-dependencies }}
+    secrets: inherit
 
   deploy-dev:
     needs: [test, create-package]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: dev
-      tf-workspace: us-dev-${{ inputs.project }}
       action: apply
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: ${{ inputs.pack-dependencies }}
+    secrets: inherit
 
   deploy-prod:
     needs: [test, create-package]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: prod
-      tf-workspace: us-prd-${{ inputs.project }}
       action: apply
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: ${{ inputs.pack-dependencies }}
+    secrets: inherit

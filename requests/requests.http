@@ -85,7 +85,7 @@ Content-Type: application/json
 Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
 
 {
-    "longUrl": "https://youtube.com/"
+    "longUrl": "https://github.com/rutkowski-tomasz/aws-url-shortener"
 }
 
 ###

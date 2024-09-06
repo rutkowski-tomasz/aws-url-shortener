@@ -39,3 +39,10 @@ variable "lambda_timeout" {
   type        = number
   default     = 3
 }
+
+variable "lambda_layers" {
+  description = "List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function."
+  type        = list(string)
+  default     = []
+}
+

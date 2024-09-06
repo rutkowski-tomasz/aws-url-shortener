@@ -3,22 +3,20 @@ name: Terraform Workflow
 on:
   workflow_call:
     inputs:
-      working-directory:
+      project:
         required: true
         type: string
       environment:
-        required: true
-        type: string
-      tf-workspace:
         required: true
         type: string
       action:
         required: true
         type: string
         description: 'Action to perform: plan or apply'
-    secrets:
-      TF_API_TOKEN:
+      pack-dependencies:
+        description: 'Flag whether to download artifact from S3'
         required: true
+        type: boolean
 
 jobs:
   terraform:
@@ -27,9 +25,9 @@ jobs:
     environment: ${{ inputs.environment }}
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}/terraform
+        working-directory: ${{ inputs.project }}/terraform
     env:
-      TF_WORKSPACE: ${{ inputs.tf-workspace }}
+      TF_WORKSPACE: us-${{ inputs.environment }}-${{ inputs.project }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -37,8 +35,20 @@ jobs:
       - name: Download deployment package
         uses: actions/download-artifact@v4.1.7
         with:
-          name: deployment-package
-          path: ${{ inputs.working-directory }}/terraform
+          name: ${{ inputs.project }}-deployment-package
+          path: ${{ inputs.project }}/terraform
+
+      - name: Configure AWS credentials
+        if: inputs.pack-dependencies
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Upload package to S3
+        if: inputs.pack-dependencies
+        run: aws s3 cp s3://us-cicd/${{ inputs.project }}/deployment-package.zip deployment-package.zip 
 
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3

@@ -22,6 +22,30 @@ resource "aws_sqs_queue" "url_created_generate_preview" {
   })
 }
 
+resource "aws_sqs_queue_policy" "url_created_generate_preview_policy" {
+  queue_url = aws_sqs_queue.url_created_generate_preview.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowSNSToSendMessage"
+        Effect = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action   = "sqs:SendMessage"
+        Resource = aws_sqs_queue.url_created_generate_preview.arn
+        Condition = {
+          ArnEquals = {
+            "aws:SourceArn" = data.aws_sns_topic.dynamodb_url_created_topic.arn
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_sns_topic_subscription" "url_created_subscription" {
   topic_arn = data.aws_sns_topic.dynamodb_url_created_topic.arn
   protocol  = "sqs"
@@ -44,6 +68,8 @@ module "lambda" {
   deployment_package   = "deployment-package.zip"
   lambda_memory_size   = 1024
   lambda_timeout       = 30 
+  # Layer: https://github.com/shelfio/chrome-aws-lambda-layer
+  lambda_layers        = ["arn:aws:lambda:eu-central-1:764866452798:layer:chrome-aws-lambda:47"]
 }
 
 resource "aws_iam_policy" "custom_policy" {

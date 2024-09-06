@@ -15,9 +15,6 @@ on:
         description: 'Flag whether to include dependencies inside deployment package'
         required: true
         type: boolean
-    secrets:
-      TF_API_TOKEN:
-        required: true
 
 jobs:
   test:
@@ -38,7 +35,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python-version }}
-
+  
       - name: Setup Python (ARM)
         if: env.is_aarch64 == 'true'
         uses: deadsnakes/action@v2.1.1
@@ -78,9 +75,9 @@ jobs:
         run: cd package && zip -r ../deployment-package.zip .
 
       - name: Upload deployment package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: deployment-package
+          name: ${{ inputs.project }}-deployment-package
           path: ${{ inputs.project }}/deployment-package.zip
 
   plan:
@@ -88,34 +85,29 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: dev
-      tf-workspace: us-dev-${{ inputs.project }}
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: ${{ inputs.pack-dependencies }}
+    secrets: inherit
 
   deploy-dev:
     needs: [test, create-package]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: dev
-      tf-workspace: us-dev-${{ inputs.project }}
       action: apply
-      project-type: python
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: ${{ inputs.pack-dependencies }}
+    secrets: inherit
 
   deploy-prod:
     needs: [test, create-package]
     if: github.event_name == 'release' && github.event.action == 'published'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: ${{ inputs.project }}
+      project: ${{ inputs.project }}
       environment: prod
-      tf-workspace: us-prd-${{ inputs.project }}
       action: apply
-      project-type: python
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: ${{ inputs.pack-dependencies }}
+    secrets: inherit
