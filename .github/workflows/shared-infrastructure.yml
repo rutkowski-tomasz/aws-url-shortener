@@ -38,8 +38,8 @@ jobs:
       pack-dependencies: false
     secrets: inherit
 
-  apply-prod:
-    name: Terraform Apply (Prod)
+  apply-prd:
+    name: Terraform Apply (Prd)
     needs: apply-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml

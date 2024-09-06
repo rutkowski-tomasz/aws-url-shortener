@@ -1,3 +1,19 @@
+resource "null_resource" "local_commands" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      
+      echo "Current directory:"
+      pwd
+      echo "\nDirectory contents:"
+      ls -la
+      echo "\nZip version:"
+      zip --version
+      echo "\nNPM version:"
+      npm --version
+    EOT
+  }
+}
+
 locals {
   lambda_name = "shorten-url-lambda"
 }

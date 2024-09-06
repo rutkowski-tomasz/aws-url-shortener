@@ -13,10 +13,6 @@ on:
         required: true
         type: string
         description: 'Action to perform: plan or apply'
-      pack-dependencies:
-        description: 'Flag whether to download artifact from S3'
-        required: true
-        type: boolean
 
 jobs:
   terraform:
@@ -32,39 +28,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Download deployment package
-        uses: actions/download-artifact@v4.1.7
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
         with:
-          name: ${{ inputs.project }}-deployment-package
-          path: ${{ inputs.project }}/terraform
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Configure AWS credentials
-        if: inputs.pack-dependencies
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
-      - name: Upload package to S3
-        if: inputs.pack-dependencies
-        run: aws s3 cp s3://us-cicd/${{ inputs.project }}/deployment-package.zip deployment-package.zip 
-
-      - name: Terraform setup
-        uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Copy modules code
-        run: cp -R ../../terraform-modules/ modules/
-
       - name: Terraform init
         run: terraform init
 
+      - name: Terraform select '${{ inputs.environment }}' workspace
+        run: terraform workspace select ${{ inputs.environment }}
+
       - name: Terraform plan
         if: inputs.action == 'plan'
-        run: terraform plan -var="environment=${{ inputs.environment }}"
+        run: terraform plan
 
       - name: Terraform apply
         if: inputs.action == 'apply'
-        run: terraform apply -auto-approve -var="environment=${{ inputs.environment }}"
+        run: terraform apply -auto-approve
