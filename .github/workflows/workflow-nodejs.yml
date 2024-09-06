@@ -82,8 +82,8 @@ jobs:
     with:
       project: ${{ inputs.project }}
       environment: dev
-      tf-workspace: us-dev-${{ inputs.project }}
       action: plan
+      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit
 
   deploy-dev:
@@ -93,8 +93,8 @@ jobs:
     with:
       project: ${{ inputs.project }}
       environment: dev
-      tf-workspace: us-dev-${{ inputs.project }}
       action: apply
+      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit
 
   deploy-prod:
@@ -104,6 +104,6 @@ jobs:
     with:
       project: ${{ inputs.project }}
       environment: prod
-      tf-workspace: us-prd-${{ inputs.project }}
       action: apply
+      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit

@@ -22,10 +22,9 @@ jobs:
     with:
       project: shared-infrastructure
       environment: dev
-      tf-workspace: us-dev-shared-infrastructure
       action: plan
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: false
+    secrets: inherit
 
   apply-dev:
     name: Terraform Apply (Dev)
@@ -35,10 +34,9 @@ jobs:
     with:
       project: shared-infrastructure
       environment: dev
-      tf-workspace: us-dev-shared-infrastructure
       action: apply
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+      pack-dependencies: false
+    secrets: inherit
 
   apply-prod:
     name: Terraform Apply (Prod)
@@ -48,6 +46,6 @@ jobs:
     with:
       project: shared-infrastructure
       environment: prd
-      tf-workspace: us-prd-shared-infrastructure
       action: apply
+      pack-dependencies: false
     secrets: inherit

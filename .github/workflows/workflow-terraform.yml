@@ -9,9 +9,6 @@ on:
       environment:
         required: true
         type: string
-      tf-workspace:
-        required: true
-        type: string
       action:
         required: true
         type: string
@@ -30,7 +27,7 @@ jobs:
       run:
         working-directory: ${{ inputs.project }}/terraform
     env:
-      TF_WORKSPACE: ${{ inputs.tf-workspace }}
+      TF_WORKSPACE: us-${{ inputs.environment }}-${{ inputs.project }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
