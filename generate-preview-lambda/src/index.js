@@ -22,10 +22,10 @@ exports.handler = async (event) => {
             const body = JSON.parse(record.body);
             const newItem = JSON.parse(body.Message);
             console.log('NewItem:', newItem);
-            const { url, code } = newItem;
+            const { longUrl, code } = newItem;
 
-            await generateAndStorePreview(url, code, bucketName, 'desktop');
-            await generateAndStorePreview(url, code, bucketName, 'mobile');
+            await generateAndStorePreview(longUrl, code, bucketName, 'desktop');
+            await generateAndStorePreview(longUrl, code, bucketName, 'mobile');
         }
 
         return buildResponse(true, 'Previews generated and stored successfully');
@@ -55,7 +55,10 @@ async function generateAndStorePreview(url, code, bucketName, type) {
         Body: Buffer.from(screenshot, 'base64'),
         ContentType: 'image/png'
     };
-    await s3Client.send(new PutObjectCommand(params));
+    console.debug('PutObjectCommand Params: ', params);
+
+    const response = await s3Client.send(new PutObjectCommand(params));
+    console.debug('PutObjectCommand Response: ', response);
 }
 
 const buildResponse = (isSuccess, content) => ({
