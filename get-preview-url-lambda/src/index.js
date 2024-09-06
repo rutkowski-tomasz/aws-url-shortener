@@ -11,10 +11,18 @@ exports.handler = async (event) => {
 
     console.debug('Getting from bucket:', bucketName);
 
-    const desktopPreviewUrl = generateSignedUrl(bucketName, code, 'desktop');
-    const mobilePreviewUrl = generateSignedUrl(bucketName, code, 'mobile');
+    const code = event.queryStringParameters?.code;
+    if (!code) {
+        return buildResponse(false, 'Missing code parameter');
+    }
 
-    return buildResponse(true, { previews: [desktopPreviewUrl, mobilePreviewUrl] });
+    const desktopPreviewUrl = await generateSignedUrl(bucketName, code, 'desktop');
+    const mobilePreviewUrl = await generateSignedUrl(bucketName, code, 'mobile');
+
+    return buildResponse(true, { 
+        desktopPreview: desktopPreviewUrl, 
+        mobilePreview: mobilePreviewUrl 
+    });
 };
 
 const generateSignedUrl = (bucketName, code, type, expirationSeconds = 60) => {
