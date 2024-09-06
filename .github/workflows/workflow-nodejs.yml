@@ -13,9 +13,6 @@ on:
         description: 'Flag whether to install node_modules inside deployment package'
         required: true
         type: boolean
-    secrets:
-      TF_API_TOKEN:
-        required: true
 
 jobs:
   test:
@@ -87,8 +84,7 @@ jobs:
       environment: dev
       tf-workspace: us-dev-${{ inputs.project }}
       action: plan
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+    secrets: inherit
 
   deploy-dev:
     needs: [test, create-package]
@@ -99,8 +95,7 @@ jobs:
       environment: dev
       tf-workspace: us-dev-${{ inputs.project }}
       action: apply
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+    secrets: inherit
 
   deploy-prod:
     needs: [test, create-package]
@@ -111,5 +106,4 @@ jobs:
       environment: prod
       tf-workspace: us-prd-${{ inputs.project }}
       action: apply
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+    secrets: inherit
