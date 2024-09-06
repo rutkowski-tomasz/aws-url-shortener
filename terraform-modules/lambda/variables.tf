@@ -23,11 +23,6 @@ variable "lambda_runtime" {
   type        = string
 }
 
-variable "deployment_package" {
-  description = "The path to the function's deployment package within the local filesystem."
-  type        = string
-}
-
 variable "lambda_memory_size" {
   description = "Amount of memory assigned to lambda at runtime (MB)."
   type        = number
@@ -44,5 +39,26 @@ variable "lambda_layers" {
   description = "List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function."
   type        = list(string)
   default     = []
+
+  validation {
+    condition     = length(var.lambda_layers) <= 5
+    error_message = "A maximum of 5 Lambda Layers can be specified."
+  }
+}
+
+variable "custom_policy_statements" {
+  description = "List of custom IAM policy statements to be added to the Lambda execution role."
+  type = list(object({
+    Effect    = string
+    Action    = string
+    Resource  = string
+  }))
+  default = []
+}
+
+variable "pack_dependencies" {
+  description = "Whether to pack dependencies (node_modules) into the deployment package"
+  type        = bool
+  default     = false
 }
 
