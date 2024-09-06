@@ -34,4 +34,16 @@ data "terraform_remote_state" "dynamodb_stream_lambda_state" {
   }
 }
 
+data "terraform_remote_state" "get_preview_url_lambda_state" {
+  backend = "remote"
+
+  config = {
+    organization = "trutkowski"
+
+    workspaces = {
+      name = "us-${var.environment}-get-preview-url-lambda"
+    }
+  }
+}
+
 data "aws_region" "current" {}

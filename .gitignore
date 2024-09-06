@@ -6,6 +6,7 @@ get-url-lambda/terraform/modules
 shorten-url-lambda/terraform/modules
 dynamodb-stream-lambda/terraform/modules
 generate-preview-lambda/terraform/modules
+get-preview-url-lambda/terraform/modules
 
 # Terraform
 **/.terraform/*
