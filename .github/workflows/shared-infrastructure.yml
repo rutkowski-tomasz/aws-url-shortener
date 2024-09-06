@@ -50,5 +50,4 @@ jobs:
       environment: prd
       tf-workspace: us-prd-shared-infrastructure
       action: apply
-    secrets:
-      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+    secrets: inherit
