@@ -21,6 +21,8 @@ exports.handler = async (event) => {
                     TopicArn: topicArn
                 };
 
+                console.debug('Message: ', message);
+
                 try {
                     const publishResult = await snsClient.send(new PublishCommand(message));
                     console.log("Message sent to the topic", publishResult);
