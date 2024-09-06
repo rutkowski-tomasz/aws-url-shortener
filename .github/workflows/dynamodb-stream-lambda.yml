@@ -21,5 +21,4 @@ jobs:
     with:
       project: dynamodb-stream-lambda
       node-version: 20.x
-      pack-dependencies: false
     secrets: inherit

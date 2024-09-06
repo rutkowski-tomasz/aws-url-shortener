@@ -9,10 +9,6 @@ on:
         description: 'Node version'
         required: true
         type: string
-      pack-dependencies:
-        description: 'Flag whether to install node_modules inside deployment package'
-        required: true
-        type: boolean
 
 jobs:
   test:
@@ -44,7 +40,6 @@ jobs:
       project: ${{ inputs.project }}
       environment: dev
       action: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'apply' || 'plan' }}
-      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit
 
   prd:
@@ -55,5 +50,4 @@ jobs:
       project: ${{ inputs.project }}
       environment: prd
       action: apply
-      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit

@@ -11,10 +11,6 @@ on:
         description: 'Python version'
         required: true
         type: string
-      pack-dependencies:
-        description: 'Flag whether to include dependencies inside deployment package'
-        required: true
-        type: boolean
 
 jobs:
   test:
@@ -50,64 +46,31 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -v -s ./tests/ -p "*_test.py"
 
-  create-package:
-    name: Create Deployment Package
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ inputs.project }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        if: inputs.pack-dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -t ./package
-
-      - name: Create deployment package
-        working-directory: ${{ inputs.project }}/src
-        run: zip -r ../deployment-package.zip .
-
-      - name: Pack dependencies
-        if: inputs.pack-dependencies
-        run: cd package && zip -r ../deployment-package.zip .
-
-      - name: Upload deployment package
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.project }}-deployment-package
-          path: ${{ inputs.project }}/deployment-package.zip
-
   plan:
-    needs: [test, create-package]
+    needs: [test]
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
       environment: dev
-      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit
 
-  deploy-dev:
-    needs: [test, create-package]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  dev:
+    needs: [test]
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
       environment: dev
-      action: apply
-      pack-dependencies: ${{ inputs.pack-dependencies }}
+      action: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'apply' || 'plan' }}
     secrets: inherit
 
-  deploy-prd:
-    needs: [test, create-package]
-    if: github.event_name == 'release' && github.event.action == 'published'
+  prd:
+    needs: [dev]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
       environment: prd
       action: apply
-      pack-dependencies: ${{ inputs.pack-dependencies }}
     secrets: inherit

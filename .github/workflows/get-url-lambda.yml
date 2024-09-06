@@ -21,5 +21,4 @@ jobs:
     with:
       project: get-url-lambda
       python-version: 3.12
-      pack-dependencies: false
     secrets: inherit
