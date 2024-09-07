@@ -22,8 +22,6 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.project }}/terraform
-    env:
-      TF_WORKSPACE: us-${{ inputs.environment }}-${{ inputs.project }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
