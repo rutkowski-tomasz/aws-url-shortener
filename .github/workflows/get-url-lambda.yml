@@ -1,4 +1,4 @@
-name: get-url-lambda CI/CD
+name: get-url-lambda
 
 on:
   push:

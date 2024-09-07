@@ -1,4 +1,4 @@
-name: Terraform Workflow
+name: "- Terraform Workflow"
 
 on:
   workflow_call:

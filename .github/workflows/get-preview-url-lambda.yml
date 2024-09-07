@@ -1,4 +1,4 @@
-name: get-preview-url-lambda CI/CD
+name: get-preview-url-lambda
 
 on:
   push:

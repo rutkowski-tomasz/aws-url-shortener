@@ -1,3 +1,5 @@
+name: "- Node workflow"
+
 on:
   workflow_call:
     inputs:

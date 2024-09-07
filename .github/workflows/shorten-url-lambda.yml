@@ -1,4 +1,4 @@
-name: shorten-url-lambda CI/CD
+name: shorten-url-lambda
 
 on:
   push:

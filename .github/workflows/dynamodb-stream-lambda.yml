@@ -1,4 +1,4 @@
-name: dynamodb-stream-lambda CI/CD
+name: dynamodb-stream-lambda
 
 on:
   push:
