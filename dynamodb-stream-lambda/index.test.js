@@ -1,6 +1,6 @@
 const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 const { mockClient } = require("aws-sdk-client-mock");
-const { handler } = require("../src/index");
+const { handler } = require("./index");
 
 const snsMock = mockClient(SNSClient);
 
@@ -10,7 +10,7 @@ beforeEach(() => {
     snsMock.reset();
 });
 
-describe('Lambda Function Tests', () => {
+describe('Unit Tests', () => {
     const sampleDynamoDBEvent = {
         Records: [
             {
@@ -28,7 +28,6 @@ describe('Lambda Function Tests', () => {
     };
 
     test('successfully publishes to SNS when processing INSERT event', async () => {
-        // Setup SNS mock to simulate a successful publish
         snsMock.on(PublishCommand).resolves({
             MessageId: "12345"
         });
@@ -46,7 +45,6 @@ describe('Lambda Function Tests', () => {
     });
 
     test('handles errors during message publication to SNS', async () => {
-        // Simulate an error in publishing to SNS
         snsMock.on(PublishCommand).rejects(new Error("Network failure"));
 
         const response = await handler(sampleDynamoDBEvent);
@@ -56,5 +54,40 @@ describe('Lambda Function Tests', () => {
         expect(responseBody.isSuccess).toBeFalsy();
         expect(responseBody.error).toContain("Network failure");
         expect(snsMock.calls(PublishCommand)).toHaveLength(1);
+    });
+});
+
+describe('Integration Test', () => {
+    beforeAll(() => {
+        snsMock.restore();
+    });
+
+    afterAll(() => {
+        mockClient(SNSClient);
+    });
+
+    test('integration test', async () => {
+        const event = {
+            Records: [
+                {
+                    eventName: 'INSERT',
+                    dynamodb: {
+                        NewImage: {
+                            code: { S: 'abcd1234' },
+                            longUrl: { S: 'https://example.com' },
+                            userId: { S: 'user-001' },
+                            createdAt: { N: '1234567890' }
+                        }
+                    }
+                }
+            ]
+        };
+
+        const result = await handler(event);
+        expect(result.statusCode).toBe(200);
+
+        const body = JSON.parse(result.body);
+        expect(body.isSuccess).toBe(true);
+        expect(body.result).toBe('Stream events sent to SNS topic');
     });
 });

@@ -2,10 +2,12 @@
   "name": "dynamodb-stream-lambda",
   "version": "1.0.0",
   "description": "Lambda handling DynamoDB stream events",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "jest",
-    "deploy": "cd src && zip -r ../deployment-package.zip . && cd - && aws lambda update-function-code --function-name us-dev-dynamodb-stream-lambda --zip-file fileb://deployment-package.zip && rm deployment-package.zip"
+    "deploy": "terraform apply -auto-approve",
+    "test:unit": "jest -t 'Unit Test'",
+    "test:integration": "jest -t 'Integration Test'"
   },
   "author": "",
   "license": "ISC",

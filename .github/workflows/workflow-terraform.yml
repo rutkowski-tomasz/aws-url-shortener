@@ -1,4 +1,4 @@
-name: Terraform Workflow
+name: "- Terraform Workflow"
 
 on:
   workflow_call:
@@ -21,12 +21,17 @@ jobs:
     environment: ${{ inputs.action == 'apply' && inputs.environment || '' }}
     defaults:
       run:
-        working-directory: ${{ inputs.project }}/terraform
-    env:
-      TF_WORKSPACE: us-${{ inputs.environment }}-${{ inputs.project }}
+        working-directory: ${{ inputs.project }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Check environment input
+        run: |
+          if [[ "${{ inputs.environment }}" != "dev" && "${{ inputs.environment }}" != "prd" ]]; then
+            echo "Error: environment must be either 'dev' or 'prd'"
+            exit 1
+          fi
 
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3
@@ -44,7 +49,7 @@ jobs:
         run: terraform init
 
       - name: Terraform select '${{ inputs.environment }}' workspace
-        run: terraform workspace select ${{ inputs.environment }}
+        run: terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
 
       - name: Terraform plan
         if: inputs.action == 'plan'

@@ -1,4 +1,4 @@
-name: shared-infrastructure CI/CD
+name: shared-infrastructure
 
 on:
   push:
@@ -23,7 +23,6 @@ jobs:
       project: shared-infrastructure
       environment: dev
       action: plan
-      pack-dependencies: false
     secrets: inherit
 
   apply-dev:
@@ -35,7 +34,6 @@ jobs:
       project: shared-infrastructure
       environment: dev
       action: apply
-      pack-dependencies: false
     secrets: inherit
 
   apply-prd:
@@ -47,5 +45,4 @@ jobs:
       project: shared-infrastructure
       environment: prd
       action: apply
-      pack-dependencies: false
     secrets: inherit

@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "us-cicd"
-    key    = "terraform/get-preview-url-lambda"
+    key    = "terraform/dynamodb-stream-lambda"
     region = "eu-central-1"
   }
 }
@@ -28,14 +28,10 @@ provider "aws" {
 locals {
   prefix      = "us-${local.environment}-"
   environment = terraform.workspace == "default" ? "dev" : terraform.workspace
-  project     = "get-preview-url-lambda"
+  project     = "dynamodb-stream-lambda"
 }
 
 ###
-
-data "aws_s3_bucket" "url_shortener_preview_storage" {
-  bucket = "${local.prefix}shortened-urls-previews"
-}
 
 module "lambda" {
   source               = "../terraform-modules/lambda"
@@ -43,11 +39,20 @@ module "lambda" {
   lambda_function_name = local.project
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
-  pack_dependencies    = true
+
   custom_policy_statements = [
     {
-      Action   = "s3:GetObject",
-      Resource = "${data.aws_s3_bucket.url_shortener_preview_storage.arn}/*",
+      Action   = ["sns:Publish"],
+      Resource = "arn:aws:sns:eu-central-1:024853653660:us-${local.environment}-url-created"
+    },
+    {
+      Action = [
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:ListStreams"
+      ],
+      Resource = "arn:aws:dynamodb:eu-central-1:024853653660:table/us-${local.environment}-shortened-urls/stream/*"
     }
   ]
 }

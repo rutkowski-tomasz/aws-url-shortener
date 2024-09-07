@@ -8,28 +8,34 @@
             "type": "node",
             "request": "launch",
             "name": "generate-preview-lambda",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/generate-preview-lambda/tests-integration/run.js"
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "test"],
+            "args": ["--", "--runInBand", "--testNamePattern=Integration Test"],
+            "cwd": "${workspaceFolder}/generate-preview-lambda",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "dynamodb-stream-lambda",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/dynamodb-stream-lambda/tests-integration/run.js"
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "test"],
+            "args": ["--", "--runInBand", "--testNamePattern=Integration Test"],
+            "cwd": "${workspaceFolder}/dynamodb-stream-lambda",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "shorten-url-lambda",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/shorten-url-lambda/tests-integration/run.js"
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "test"],
+            "args": ["--", "--runInBand", "--testNamePattern=Integration Test"],
+            "cwd": "${workspaceFolder}/shorten-url-lambda",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "get-url-lambda",

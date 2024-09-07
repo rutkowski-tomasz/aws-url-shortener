@@ -1,19 +1,17 @@
 const { S3Client } = require("@aws-sdk/client-s3");
 const { mockClient } = require("aws-sdk-client-mock");
 
-// Mock the entire module for unit tests
 jest.mock("@aws-sdk/s3-request-presigner", () => ({
   getSignedUrl: jest.fn()
 }));
 
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { handler } = require("index");
+const { handler } = require("./index");
 
 process.env.environment = "dev";
 
 const s3Mock = mockClient(S3Client);
 
-// Unit tests
 describe('Unit Tests', () => {
   beforeEach(() => {
     s3Mock.reset();
@@ -80,15 +78,11 @@ describe('Unit Tests', () => {
   });
 });
 
-// Integration test
 describe('Integration Test', () => {
   beforeAll(() => {
-    // Restore the original module
-    jest.unmock("@aws-sdk/s3-request-presigner");
-    // Re-import the non-mocked module
-    const { getSignedUrl: actualGetSignedUrl } = jest.requireActual("@aws-sdk/s3-request-presigner");
-    // Replace the mocked function with the actual implementation
-    getSignedUrl.mockImplementation(actualGetSignedUrl);
+        jest.unmock("@aws-sdk/s3-request-presigner");
+        const { getSignedUrl: actualGetSignedUrl } = jest.requireActual("@aws-sdk/s3-request-presigner");
+        getSignedUrl.mockImplementation(actualGetSignedUrl);
   });
 
   test('integration test', async () => {
