@@ -49,11 +49,19 @@ variable "lambda_layers" {
 variable "custom_policy_statements" {
   description = "List of custom IAM policy statements to be added to the Lambda execution role."
   type = list(object({
-    Effect   = string
-    Action   = string
+    Effect   = optional(string, "Allow")
+    Action   = any
     Resource = string
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for statement in var.custom_policy_statements :
+      can(tostring(statement.Action)) || can(tolist(statement.Action))
+    ])
+    error_message = "Each Action in custom_policy_statements must be either a string or a list of strings."
+  }
 }
 
 variable "pack_dependencies" {

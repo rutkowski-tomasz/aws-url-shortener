@@ -10,48 +10,48 @@ exports.handler = async (event) => {
     const tableName = `us-${env}-shortened-urls`;
 
     const userId = event.requestContext.authorizer.claims.sub;
-    console.debug('UserId:', userId);
-
     const body = JSON.parse(event.body);
-    console.debug('Body:', body);
 
-    const shortenedUrl = {
-        'code': generateCode(),
-        'longUrl': body.longUrl,
-        'userId': userId,
-        'createdAt': new Date().getTime(),
+    const input = {
+        TableName: tableName,
+        Item: {
+            'code': generateCode(),
+            'longUrl': body.longUrl,
+            'userId': userId,
+            'createdAt': new Date().getTime(),
+        }
     };
+    console.debug('Input: ', input);
+
+    const command = new PutCommand(input);
 
     try {
-        const command = new PutCommand({
-            TableName: tableName,
-            Item: shortenedUrl
-        });
-
         const result = await client.send(command);
-        if (result['$metadata'].httpStatusCode == 200)
-            return buildResponse(true, shortenedUrl);
+        console.debug('Result: ', result);
 
-        console.error('Result: ', result);
-        return buildResponse(false, result);
+        if (result['$metadata'].httpStatusCode !== 200) {
+            throw new Error(`Failed to insert item into DynamoDB: ${JSON.stringify(result)}`);
+        }
+
+        return buildResponse(true, input.Item);
     } catch (err) {
         console.error('Error: ', err);
-        return buildResponse(false, err);
+        return buildResponse(false, err.toString());
     }
 };
 
 const generateCode = (length = 8) => {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
     let code = '';
-  
+
     for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * chars.length);
-      code += chars[randomIndex];
+        const randomIndex = Math.floor(Math.random() * chars.length);
+        code += chars[randomIndex];
     }
-  
+
     return code;
 };
-  
+
 const buildResponse = (isSuccess, content) => ({
     statusCode: isSuccess ? 200 : 400,
     body: JSON.stringify({
