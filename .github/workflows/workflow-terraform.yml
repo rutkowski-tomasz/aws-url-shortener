@@ -21,7 +21,7 @@ jobs:
     environment: ${{ inputs.action == 'apply' && inputs.environment || '' }}
     defaults:
       run:
-        working-directory: ${{ inputs.project }}/terraform
+        working-directory: ${{ inputs.project }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
