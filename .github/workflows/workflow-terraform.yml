@@ -26,6 +26,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check environment input
+        run: |
+          if [[ "${{ inputs.environment }}" != "dev" && "${{ inputs.environment }}" != "prd" ]]; then
+            echo "Error: environment must be either 'dev' or 'prd'"
+            exit 1
+          fi
+
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3
         with:
