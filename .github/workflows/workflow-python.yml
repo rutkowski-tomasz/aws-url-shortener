@@ -46,15 +46,6 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -v -s ./tests/ -p "*_test.py"
 
-  plan:
-    needs: [test]
-    if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/workflow-terraform.yml
-    with:
-      project: ${{ inputs.project }}
-      environment: dev
-    secrets: inherit
-
   dev:
     needs: [test]
     if: github.event_name == 'pull_request' || github.event_name == 'push'
