@@ -3,8 +3,7 @@ from unittest.mock import patch
 import sys
 import os
 
-sys.path.append("./src")
-from lambda_function import lambda_handler
+from handler import handle
 
 sample_event = {
     "resource":"/get-url",
@@ -15,30 +14,30 @@ sample_event = {
 }
 
 class TestLambdaHandler(unittest.TestCase):
-    @patch('lambda_function.table.get_item')
+    @patch('handler.table.get_item')
     def test_item_found(self, mock_get_item):
         mock_get_item.return_value = {
             'Item': {'code': '123', 'longUrl': 'https://example.com'}
         }
 
         context = {}
-        response = lambda_handler(sample_event, context)
+        response = handle(sample_event, context)
         
         self.assertEqual(response['statusCode'], 302)
         self.assertIn('Location', response['headers'])
         self.assertEqual(response['headers']['Location'], 'https://example.com')
 
-    @patch('lambda_function.table.get_item')
+    @patch('handler.table.get_item')
     def test_item_not_found(self, mock_get_item):
         mock_get_item.return_value = {}
 
         context = {}
-        response = lambda_handler(sample_event, context)
+        response = handle(sample_event, context)
         
         self.assertEqual(response['statusCode'], 404)
         self.assertEqual(response['body'], 'URL not found')
 
-    @patch('lambda_function.table.get_item')
+    @patch('handler.table.get_item')
     def test_client_error_exception(self, mock_get_item):
         from botocore.exceptions import ClientError
         mock_get_item.side_effect = ClientError(
@@ -46,7 +45,7 @@ class TestLambdaHandler(unittest.TestCase):
         )
 
         context = {}
-        response = lambda_handler(sample_event, context)
+        response = handle(sample_event, context)
         
         self.assertEqual(response['statusCode'], 500)
         self.assertEqual(response['body'], 'Internal server error')
@@ -55,7 +54,7 @@ class TestLambdaHandlerIntegration(unittest.TestCase):
     @unittest.skipIf('CI' in os.environ, "Skipping integration test in CI environment")
     def test_integration(self):
         context = {}
-        response = lambda_handler(sample_event, context)
+        response = handle(sample_event, context)
         
         self.assertIn(response['statusCode'], [302, 404])
         if response['statusCode'] == 302:

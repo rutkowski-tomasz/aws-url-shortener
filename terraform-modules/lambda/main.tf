@@ -53,18 +53,29 @@ resource "null_resource" "package_deployment" {
 
   provisioner "local-exec" {
     command     = <<-EOT
-      echo "Packing index.js folder"
-      zip -qr deployment-package.zip index.js
+      if [ -f "package.json" ]; then
+        echo "Detected Node.js project"
+        zip -qr deployment-package.zip index.js
+        if [ "${var.pack_dependencies}" = "true" ]; then
+          echo "Installing node_modules"
+          npm i
+          echo "Packing node_modules"
+          zip -qr deployment-package.zip node_modules/
+        fi
+      elif [ -f "requirements.txt" ]; then
+        echo "Detected Python project"
+        zip -qr deployment-package.zip handler.py
 
-      if [ "${var.pack_dependencies}" = "true" ]; then
-        echo "Installing node_modules"
-        npm i
-        echo "Packing node_modules"
-        zip -qr deployment-package.zip node_modules/
+        if [ "${var.pack_dependencies}" = "true" ]; then
+          echo "Installing Python dependencies"
+          pip3 install -r requirements.txt -t ./package
+          echo "Packing Python dependencies"
+          cd package && zip -qr ../deployment-package.zip . && cd ..
+          rm -rf package
+        fi
       fi
 
       aws s3 cp deployment-package.zip s3://us-cicd/${var.lambda_function_name}/deployment_package.zip
-
       rm deployment-package.zip
     EOT
     working_dir = path.root

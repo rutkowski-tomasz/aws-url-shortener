@@ -70,3 +70,20 @@ variable "pack_dependencies" {
   default     = false
 }
 
+variable "api_gateway_resource_path" {
+  description = "The path part for the API Gateway resource"
+  type        = string
+  default     = null
+}
+
+variable "api_gateway_http_method" {
+  description = "The HTTP method for the API Gateway method"
+  type        = string
+  default     = "GET"
+}
+
+variable "api_gateway_requires_authorization" {
+  description = "Whether the API Gateway method requires authorization"
+  type        = bool
+  default     = false
+}
