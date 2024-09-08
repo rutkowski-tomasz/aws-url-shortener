@@ -8,7 +8,7 @@ table_name = f'us-{environment}-shortened-urls'
 dynamodb = boto3.resource('dynamodb', region_name='eu-central-1')
 table = dynamodb.Table(table_name)
 
-def lambda_handler(event, context):
+def handle(event, context):
     print('Received event: ', event)
 
     try:

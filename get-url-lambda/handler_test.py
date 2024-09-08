@@ -4,7 +4,7 @@ import sys
 import os
 
 sys.path.append("./src")
-from lambda_function import lambda_handler
+from handler import handle
 
 sample_event = {
     "resource":"/get-url",

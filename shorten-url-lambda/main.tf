@@ -33,11 +33,14 @@ locals {
 }
 
 module "lambda" {
-  source               = "../terraform-modules/lambda"
-  environment          = local.environment
-  lambda_function_name = local.project
-  lambda_handler       = "index.handler"
-  lambda_runtime       = "nodejs20.x"
+  source                             = "../terraform-modules/lambda"
+  environment                        = local.environment
+  lambda_function_name               = local.project
+  lambda_handler                     = "index.handler"
+  lambda_runtime                     = "nodejs20.x"
+  api_gateway_http_method            = "POST"
+  api_gateway_resource_path          = "shorten-url"
+  api_gateway_requires_authorization = true
   custom_policy_statements = [
     {
       Action   = "dynamodb:PutItem",
