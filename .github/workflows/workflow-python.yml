@@ -28,13 +28,13 @@ jobs:
 
       - name: Setup Python (x86_64)
         if: env.is_aarch64 != 'true'
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
   
       - name: Setup Python (ARM)
         if: env.is_aarch64 == 'true'
-        uses: deadsnakes/action@v2.1.1
+        uses: deadsnakes/action@v3.2.0
         with:
           python-version: ${{ inputs.python-version }}
 
