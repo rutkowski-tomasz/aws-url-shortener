@@ -41,7 +41,7 @@ Content-Type: application/x-amz-json-1.1
     "AuthFlow": "USER_PASSWORD_AUTH",
     "AuthParameters": {
         "USERNAME": "system-tests@example.com",
-        "PASSWORD": "Password123!"
+        "PASSWORD": "SecurePassword123!"
     }
 }
 

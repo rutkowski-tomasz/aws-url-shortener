@@ -87,3 +87,9 @@ variable "api_gateway_requires_authorization" {
   type        = bool
   default     = false
 }
+
+variable "sns_topic_name" {
+  description = "The name of the SNS topic to subscribe to"
+  type        = string
+  default     = null
+}
