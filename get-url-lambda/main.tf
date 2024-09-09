@@ -28,7 +28,7 @@ provider "aws" {
 
 locals {
   prefix      = "us-${local.environment}-"
-  environment = terraform.workspace == "default" ? "dev" : terraform.workspace
+  environment = terraform.workspace == "prd" ? terraform.workspace : "dev"
   project     = "get-url-lambda"
 }
 

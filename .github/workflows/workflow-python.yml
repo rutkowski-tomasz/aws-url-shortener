@@ -53,7 +53,7 @@ jobs:
     with:
       project: ${{ inputs.project }}
       environment: dev
-      action: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'apply' || 'plan' }}
+      action: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release') && 'apply' || 'plan' }}
     secrets: inherit
 
   dev-system-test:

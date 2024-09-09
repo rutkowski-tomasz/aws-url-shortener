@@ -36,6 +36,23 @@ cat > ${policy_document} << EOF
       ]
     },
     {
+      "Sid": "LogGroupWriteAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:DeleteLogGroup"
+      ],
+      "Resource": "arn:aws:logs:${region}:***:log-group:/aws/api-gateway/us-*"
+    },
+    {
+      "Sid": "LogGroupReadAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogGroups",
+        "logs:ListTagsForResource"
+      ],
+      "Resource": "*"
+    },
+    {
       "Sid": "LambdaEventSourceManagement",
       "Effect": "Allow",
       "Action": [
