@@ -17,7 +17,7 @@ on:
 jobs:
   plan-dev:
     name: Terraform Plan (Dev)
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: shared-infrastructure
@@ -28,7 +28,7 @@ jobs:
   apply-dev:
     name: Terraform Apply (Dev)
     needs: plan-dev
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: shared-infrastructure
@@ -39,7 +39,7 @@ jobs:
   apply-prd:
     name: Terraform Apply (Prd)
     needs: apply-dev
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: shared-infrastructure
