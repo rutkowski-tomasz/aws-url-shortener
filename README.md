@@ -6,7 +6,7 @@ In real world scenario all the projects would probably be managed as separate re
 
 # 🏙️ Architecture
 
-![Architecture Diagram](assets/link-shortener.phase6.drawio.svg)
+![Architecture Diagram](assets/link-shortener.phase7.drawio.svg)
 Note: transparent elements are ideas for future development.
 
 # 🌳 Repository structure
@@ -15,25 +15,29 @@ Note: transparent elements are ideas for future development.
 ├── README.md
 ├── assets # Image files included in the README file
 ├── dynamodb-stream-lamda # Lambda handling streams from DynamoDB, dispatching to SNS topics
-│   ├── src
-│   ├── terraform
-│   └── tests
+│   ├── index.js
+│   ├── index.test.js
+│   └── main.tf
 ├── generate-preview-lamda # Lambda handling generation of URL preview
-│   ├── src
-│   ├── terraform
-│   └── tests
-├── get-url-lambda # Python lambda project
-│   ├── src
-│   ├── terraform
-│   └── tests
+│   ├── index.js
+│   ├── index.test.js
+│   └── main.tf
+├── get-preview-url-lamda # Lambda returning generated preview URLs
+│   ├── index.js
+│   ├── index.test.js
+│   └── main.tf
+├── get-url-lambda # Python lambda resolving short url
+│   ├── handler_test.py
+│   ├── handler.py
+│   └── main.tf
 ├── setup # Scripts required for setup
 ├── shared-infrastructure # Resources managed outside of projects life-cycle
-├── shorten-url-lambda # Node.js lambda project
-│   ├── src
-│   ├── terraform
-│   └── tests
+├── shorten-url-lambda # Lambda shortening long url
+│   ├── index.js
+│   ├── index.test.js
+│   └── main.tf
 ├── system-tests # Tests veryfing if the application works all together
-└── terraform-modules # Shared modules between projects
+└── terraform-modules # Shared TF modules between projects
     └── lambda
 ```
 
@@ -89,19 +93,30 @@ The development of this solution is iterative, with the roadmap subject to chang
     - Integrate shorten-url-lambda and get-url-lambda into single API Gateway
     - Provide it within shared-infrastructure
 16. ✅ Cognito SignUp, Login, RefreshToken flows
-17. Link preview generation
+17. ✅ Link preview generation
 17. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
 
 ## CI/CD user permissions update
 ```sh
-../../setup/initial-iam-provision.sh 
+./setup/initial-iam-provision.sh 
 ```
 
 ## Local apply terraform
 
 ```sh
-cd shared-infrastructure/terraform 
-TF_WORKSPACE=us-dev-shared-infrastructure terraform apply -auto-approve
+cd shared-infrastructure
+terraform workspace select dev # 'dev' or 'prd'
+terraform apply -auto-approve
+```
+
+## Run tests
+```sh
+# Node lambdas
+cd shorten-url-lambda
+npm test
+# Python lambdas
+cd get-url-lambda
+python3 -m unittest discover -v -s ./ -p "*_test.py"
 ```
