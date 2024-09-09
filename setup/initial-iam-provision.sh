@@ -42,6 +42,7 @@ cat > ${policy_document} << EOF
         "lambda:GetEventSourceMapping",
         "lambda:CreateEventSourceMapping",
         "lambda:DeleteEventSourceMapping",
+        "lambda:GetLayerVersion",
         "s3:CreateBucket"
       ],
       "Resource": "*"
