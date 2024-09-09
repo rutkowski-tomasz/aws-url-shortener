@@ -36,7 +36,7 @@ jobs:
 
   dev:
     needs: [test]
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
@@ -46,7 +46,7 @@ jobs:
 
   dev-system-test:
     needs: [dev]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     name: Run system-tests
     uses: ./.github/workflows/workflow-system-test.yml
     with:
@@ -54,7 +54,7 @@ jobs:
 
   prd:
     needs: [dev-system-test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       project: ${{ inputs.project }}
@@ -64,7 +64,7 @@ jobs:
 
   prd-system-test:
     needs: [prd]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     name: Run system-tests
     uses: ./.github/workflows/workflow-system-test.yml
     with:
