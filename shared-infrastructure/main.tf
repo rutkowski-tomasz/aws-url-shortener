@@ -30,7 +30,7 @@ data "aws_region" "current" { }
 
 locals {
   prefix      = "us-${local.environment}-"
-  environment = terraform.workspace == "default" ? "dev" : terraform.workspace
+  environment = terraform.workspace == "prd" ? terraform.workspace : "dev"
   project     = "shared-infrastructure"
 }
 
