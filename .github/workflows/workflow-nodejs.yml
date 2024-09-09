@@ -44,8 +44,16 @@ jobs:
       action: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'apply' || 'plan' }}
     secrets: inherit
 
-  prd:
+  dev-system-test:
     needs: [dev]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Run system-tests
+    uses: ./.github/workflows/workflow-system-test.yml
+    with:
+      environment: dev
+
+  prd:
+    needs: [dev-system-test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
@@ -53,3 +61,11 @@ jobs:
       environment: prd
       action: apply
     secrets: inherit
+
+  prd-system-test:
+    needs: [prd]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Run system-tests
+    uses: ./.github/workflows/workflow-system-test.yml
+    with:
+      environment: prd
