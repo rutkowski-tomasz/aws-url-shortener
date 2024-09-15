@@ -5,12 +5,12 @@ on:
     branches:
       - "*"
     paths:
-      - "shorten-url-lambda/**"
+      - "src/shorten-url-lambda/**"
   pull_request:
     branches:
       - "*"
     paths:
-      - "shorten-url-lambda/**"
+      - "src/shorten-url-lambda/**"
   release:
     types: [published]
 

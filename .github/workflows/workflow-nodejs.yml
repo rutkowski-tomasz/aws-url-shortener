@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.project }}
+        working-directory: src/${{ inputs.project }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      project: ${{ inputs.project }}
+      working-directory: src/${{ inputs.project }}
       environment: dev
       action: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release') && 'apply' || 'plan' }}
     secrets: inherit
@@ -57,7 +57,7 @@ jobs:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      project: ${{ inputs.project }}
+      working-directory: src/${{ inputs.project }}
       environment: prd
       action: apply
     secrets: inherit

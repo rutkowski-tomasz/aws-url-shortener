@@ -1,0 +1,16 @@
+{
+  "name": "aws-url-shortener",
+  "private": true,
+  "workspaces": [
+    "src/*"
+  ],
+  "scripts": {
+    "test": "jest",
+    "open:coverage": "open .coverage/lcov-report/index.html"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  }
+}

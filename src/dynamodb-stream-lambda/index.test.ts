@@ -1,17 +1,20 @@
-const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
-const { mockClient } = require("aws-sdk-client-mock");
-const { handler } = require("./index");
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+import { mockClient } from "aws-sdk-client-mock";
+import { beforeEach, describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { DynamoDBStreamEvent, Callback, Context } from "aws-lambda";
 
 const snsMock = mockClient(SNSClient);
 
 process.env.environment = "dev";
+
+import { handler } from "./index";
 
 beforeEach(() => {
     snsMock.reset();
 });
 
 describe('Unit Tests', () => {
-    const sampleDynamoDBEvent = {
+    const getSampleDynamoDBEvent = (): DynamoDBStreamEvent => ({
         Records: [
             {
                 eventName: 'INSERT',
@@ -25,35 +28,43 @@ describe('Unit Tests', () => {
                 }
             }
         ]
-    };
+    });
 
     test('successfully publishes to SNS when processing INSERT event', async () => {
         snsMock.on(PublishCommand).resolves({
             MessageId: "12345"
         });
 
-        const response = await handler(sampleDynamoDBEvent);
+        await handler(getSampleDynamoDBEvent(), {} as Context, {} as Callback);
 
-        const responseBody = JSON.parse(response.body);
-        expect(response.statusCode).toEqual(200);
-        expect(responseBody.isSuccess).toBeTruthy();
-        expect(snsMock.calls(PublishCommand)).toHaveLength(1);
-        expect(snsMock.calls(PublishCommand)[0].args[0].input).toMatchObject({
+        expect(snsMock.commandCalls(PublishCommand)).toHaveLength(1);
+        expect(snsMock.commandCalls(PublishCommand)[0].args[0].input).toMatchObject({
             TopicArn: expect.stringContaining("us-dev-url-created"),
-            Message: expect.stringContaining('https://example.com')
+            Message: JSON.stringify({
+                code: 'abcd1234',
+                longUrl: 'https://example.com',
+                userId: 'user-001',
+                createdAt: 1234567890
+            })
         });
     });
 
     test('handles errors during message publication to SNS', async () => {
         snsMock.on(PublishCommand).rejects(new Error("Network failure"));
 
-        const response = await handler(sampleDynamoDBEvent);
+        const action = handler(getSampleDynamoDBEvent(), {} as Context, {} as Callback);
 
-        const responseBody = JSON.parse(response.body);
-        expect(response.statusCode).toEqual(400);
-        expect(responseBody.isSuccess).toBeFalsy();
-        expect(responseBody.error).toContain("Network failure");
-        expect(snsMock.calls(PublishCommand)).toHaveLength(1);
+        await expect(action).rejects.toThrow("Network failure");
+    });
+
+    test('handles errors during message publication to SNS', async () => {
+
+        const event = getSampleDynamoDBEvent();
+        event.Records[0].eventName = 'REMOVE';
+
+        await handler(event, {} as Context, {} as Callback);
+
+        expect(snsMock.commandCalls(PublishCommand)).toHaveLength(0);
     });
 });
 
@@ -67,7 +78,7 @@ describe('Integration Test', () => {
     });
 
     test('integration test', async () => {
-        const event = {
+        const event: DynamoDBStreamEvent = {
             Records: [
                 {
                     eventName: 'INSERT',
@@ -83,11 +94,6 @@ describe('Integration Test', () => {
             ]
         };
 
-        const result = await handler(event);
-        expect(result.statusCode).toBe(200);
-
-        const body = JSON.parse(result.body);
-        expect(body.isSuccess).toBe(true);
-        expect(body.result).toBe('Stream events sent to SNS topic');
+        await handler(event, {} as Context, {} as Callback);
     });
 });
