@@ -7,8 +7,8 @@
     "build": "tsc",
     "test": "jest --transform='{\"^.+ts$\": \"ts-jest\"}'",
     "deploy": "terraform apply -auto-approve",
-    "test:unit": "jest -t 'Unit Test'",
-    "test:integration": "jest -t 'Integration Test'"
+    "test:unit": "jest -t 'Unit Test' --transform='{\"^.+ts$\": \"ts-jest\"}'",
+    "test:integration": "jest -t 'Integration Test' --transform='{\"^.+ts$\": \"ts-jest\"}'"
   },
   "author": "",
   "license": "ISC",
