@@ -53,7 +53,19 @@ resource "null_resource" "package_deployment" {
 
   provisioner "local-exec" {
     command     = <<-EOT
-      if [ -f "package.json" ]; then
+      if [ -f "tsconfig.json" ]; then
+        echo "Detected TypeScript project"
+        echo "Building TypeScript project"
+        npm run build
+        echo "Packing dist folder"
+        cd dist && zip -qr ../deployment-package.zip . && cd ..
+        if [ "${var.pack_dependencies}" = "true" ]; then
+          echo "Installing node_modules"
+          npm i
+          echo "Packing node_modules"
+          zip -qr deployment-package.zip node_modules/
+        fi
+      elif [ -f "package.json" ]; then
         echo "Detected Node.js project"
         zip -qr deployment-package.zip index.js
         if [ "${var.pack_dependencies}" = "true" ]; then
@@ -65,7 +77,6 @@ resource "null_resource" "package_deployment" {
       elif [ -f "requirements.txt" ]; then
         echo "Detected Python project"
         zip -qr deployment-package.zip handler.py
-
         if [ "${var.pack_dependencies}" = "true" ]; then
           echo "Installing Python dependencies"
           pip3 install -r requirements.txt -t ./package
