@@ -5,7 +5,8 @@
     "src/*"
   ],
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "open:coverage": "open .coverage/lcov-report/index.html"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",

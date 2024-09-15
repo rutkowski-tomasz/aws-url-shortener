@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 describe('Unit Tests', () => {
-    const sampleDynamoDBEvent: DynamoDBStreamEvent = {
+    const getSampleDynamoDBEvent = (): DynamoDBStreamEvent => ({
         Records: [
             {
                 eventName: 'INSERT',
@@ -28,14 +28,14 @@ describe('Unit Tests', () => {
                 }
             }
         ]
-    };
+    });
 
     test('successfully publishes to SNS when processing INSERT event', async () => {
         snsMock.on(PublishCommand).resolves({
             MessageId: "12345"
         });
 
-        await handler(sampleDynamoDBEvent, {} as Context, {} as Callback);
+        await handler(getSampleDynamoDBEvent(), {} as Context, {} as Callback);
 
         expect(snsMock.commandCalls(PublishCommand)).toHaveLength(1);
         expect(snsMock.commandCalls(PublishCommand)[0].args[0].input).toMatchObject({
@@ -52,9 +52,19 @@ describe('Unit Tests', () => {
     test('handles errors during message publication to SNS', async () => {
         snsMock.on(PublishCommand).rejects(new Error("Network failure"));
 
-        const action = handler(sampleDynamoDBEvent, {} as Context, {} as Callback);
+        const action = handler(getSampleDynamoDBEvent(), {} as Context, {} as Callback);
 
         await expect(action).rejects.toThrow("Network failure");
+    });
+
+    test('handles errors during message publication to SNS', async () => {
+
+        const event = getSampleDynamoDBEvent();
+        event.Records[0].eventName = 'REMOVE';
+
+        await handler(event, {} as Context, {} as Callback);
+
+        expect(snsMock.commandCalls(PublishCommand)).toHaveLength(0);
     });
 });
 
