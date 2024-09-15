@@ -38,7 +38,7 @@ data "aws_s3_bucket" "url_shortener_preview_storage" {
 }
 
 module "lambda" {
-  source               = "../terraform-modules/lambda"
+  source               = "../../terraform/modules/lambda"
   environment          = local.environment
   lambda_function_name = local.project
   lambda_handler       = "index.handler"

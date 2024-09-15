@@ -33,7 +33,7 @@ locals {
 }
 
 module "lambda" {
-  source                             = "../terraform-modules/lambda"
+  source                             = "../../terraform/modules/lambda"
   environment                        = local.environment
   lambda_function_name               = local.project
   lambda_handler                     = "index.handler"
