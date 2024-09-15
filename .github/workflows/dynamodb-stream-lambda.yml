@@ -5,12 +5,12 @@ on:
     branches:
       - "*"
     paths:
-      - "dynamodb-stream-lambda/**"
+      - "src/dynamodb-stream-lambda/**"
   pull_request:
     branches:
       - "*"
     paths:
-      - "dynamodb-stream-lambda/**"
+      - "src/dynamodb-stream-lambda/**"
   release:
     types: [published]
 

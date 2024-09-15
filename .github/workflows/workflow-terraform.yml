@@ -3,7 +3,7 @@ name: "- Terraform Workflow"
 on:
   workflow_call:
     inputs:
-      project:
+      working-directory:
         required: true
         type: string
       environment:
@@ -21,7 +21,7 @@ jobs:
     environment: ${{ inputs.action == 'apply' && inputs.environment || '' }}
     defaults:
       run:
-        working-directory: ${{ inputs.project }}
+        working-directory: ${{ inputs.working-directory }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

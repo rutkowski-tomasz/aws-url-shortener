@@ -5,12 +5,12 @@ on:
     branches:
       - "*"
     paths:
-      - "generate-preview-lambda/**"
+      - "src/generate-preview-lambda/**"
   pull_request:
     branches:
       - "*"
     paths:
-      - "generate-preview-lambda/**"
+      - "src/generate-preview-lambda/**"
   release:
     types: [published]
 

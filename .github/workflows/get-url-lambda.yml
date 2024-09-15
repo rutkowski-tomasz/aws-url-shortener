@@ -5,12 +5,12 @@ on:
     branches:
       - "*"
     paths:
-      - "get-url-lambda/**"
+      - "src/get-url-lambda/**"
   pull_request:
     branches:
       - "*"
     paths:
-      - "get-url-lambda/**"
+      - "src/get-url-lambda/**"
   release:
     types: [published]
 

@@ -5,12 +5,12 @@ on:
     branches:
       - "*"
     paths:
-      - "shared-infrastructure/**"
+      - "terraform/shared-infrastructure/**"
   pull_request:
     branches:
       - "*"
     paths:
-      - "shared-infrastructure/**"
+      - "terraform/shared-infrastructure/**"
   release:
     types: [published]
 
@@ -20,7 +20,7 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      project: shared-infrastructure
+      working-directory: terraform/shared-infrastructure
       environment: dev
       action: plan
     secrets: inherit
@@ -31,7 +31,7 @@ jobs:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      project: shared-infrastructure
+      working-directory: terraform/shared-infrastructure
       environment: dev
       action: apply
     secrets: inherit
@@ -42,7 +42,7 @@ jobs:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      project: shared-infrastructure
+      working-directory: terraform/shared-infrastructure
       environment: prd
       action: apply
     secrets: inherit
