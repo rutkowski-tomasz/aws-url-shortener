@@ -26,9 +26,17 @@ provider "aws" {
 }
 
 locals {
-  prefix      = "us-${local.environment}-"
-  environment = terraform.workspace == "prd" ? terraform.workspace : "dev"
-  project     = "dynamodb-stream-lambda"
+  is_valid_workspace = contains(["dev", "prd"], terraform.workspace)
+  prefix             = "us-${local.environment}-"
+  environment        = terraform.workspace
+  project            = "dynamodb-stream-lambda"
+}
+
+resource "null_resource" "validate_workspace" {
+  count = local.is_valid_workspace ? 0 : 1
+  provisioner "local-exec" {
+    command = "echo Invalid workspace: '${terraform.workspace}'. Must be either 'dev' or 'prd'. && exit 1"
+  }
 }
 
 ###

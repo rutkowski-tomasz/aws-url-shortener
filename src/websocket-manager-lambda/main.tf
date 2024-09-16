@@ -26,19 +26,29 @@ provider "aws" {
 }
 
 locals {
-  prefix      = "us-${local.environment}-"
-  environment = terraform.workspace == "prd" ? terraform.workspace : "dev"
-  project     = "websocket-manager-lambda"
+  is_valid_workspace = contains(["dev", "prd"], terraform.workspace)
+  prefix             = "us-${local.environment}-"
+  environment        = terraform.workspace
+  project            = "websocket-manager-lambda"
+}
+
+resource "null_resource" "validate_workspace" {
+  count = local.is_valid_workspace ? 0 : 1
+  provisioner "local-exec" {
+    command = "echo Invalid workspace: '${terraform.workspace}'. Must be either 'dev' or 'prd'. && exit 1"
+  }
 }
 
 ###
 
 module "lambda" {
-  source               = "../../terraform/modules/lambda"
-  environment          = local.environment
-  lambda_function_name = local.project
-  lambda_handler       = "index.handler"
-  lambda_runtime       = "nodejs20.x"
+  source                                = "../../terraform/modules/lambda"
+  environment                           = local.environment
+  lambda_function_name                  = local.project
+  lambda_handler                        = "index.handler"
+  lambda_runtime                        = "nodejs20.x"
+  ws_api_gateway_route                  = "$connect"
+  ws_api_gateway_requires_authorization = true
 
   custom_policy_statements = [
     {
@@ -49,5 +59,5 @@ module "lambda" {
 }
 
 data "aws_dynamodb_table" "websocket_connections" {
-  name         = "${local.prefix}websocket-connections"
+  name = "${local.prefix}websocket-connections"
 }
