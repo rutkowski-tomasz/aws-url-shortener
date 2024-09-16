@@ -5,8 +5,8 @@ import { PutCommand, DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@
 
 const dynamoDbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const { environment } = process.env;
-const TableName = `us-${environment}-websocket-connections`;
+const { ENVIRONMENT } = process.env;
+const TableName = `us-${ENVIRONMENT}-websocket-connections`;
 
 export const handler: APIGatewayProxyHandler = async (event): Promise<APIGatewayProxyResult> => {
     console.log('Event: %j', event);

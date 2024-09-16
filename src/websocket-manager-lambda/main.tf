@@ -52,7 +52,11 @@ module "lambda" {
 
   custom_policy_statements = [
     {
-      Action   = ["dynamodb:PutItem", "dynamodb:DeleteItem"],
+      Action   = [
+        "dynamodb:PutItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem"
+      ],
       Resource = data.aws_dynamodb_table.websocket_connections.arn
     }
   ]

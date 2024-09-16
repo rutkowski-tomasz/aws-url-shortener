@@ -39,3 +39,12 @@ resource "aws_apigatewayv2_deployment" "deployment" {
     create_before_destroy = true
   }
 }
+
+resource "aws_lambda_permission" "allow_api_gateway_invoke_lambda_authorizer" {
+  count  = local.ws_api_gateway_integration_count
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${data.aws_apigatewayv2_api.websocket_api.execution_arn}/*/*"
+}
