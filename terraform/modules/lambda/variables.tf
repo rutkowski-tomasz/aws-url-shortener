@@ -99,3 +99,15 @@ variable "environment_variables" {
   type        = map(string)
   default     = {}
 }
+
+variable "ws_api_gateway_route" {
+  description = "The route for the Websocket API Gateway"
+  type        = string
+  default     = null
+}
+
+variable "ws_api_gateway_requires_authorization" {
+  description = "Whether the Websocket API Gateway route requires authorization"
+  type        = bool
+  default     = false
+}
