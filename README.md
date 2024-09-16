@@ -88,3 +88,9 @@ npm test
 cd get-url-lambda
 python3 -m unittest discover -v -s ./ -p "*_test.py"
 ```
+
+## Connect to WS API Gateway
+```sh
+wscat -c wss://os6c0elcng.execute-api.eu-central-1.amazonaws.com/dev/ \
+-H 'Authorization: Bearer eyJraWQiOiJSWmhsT' 
+```

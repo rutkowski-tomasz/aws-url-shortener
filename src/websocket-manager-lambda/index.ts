@@ -25,7 +25,7 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
     }
 
     try {
-        const userId = event.requestContext.authorizer.claims.sub;
+        const userId = event.requestContext.authorizer.sub;
         const connectionId = event.requestContext.connectionId;
 
         console.debug('userId: %j', userId);
