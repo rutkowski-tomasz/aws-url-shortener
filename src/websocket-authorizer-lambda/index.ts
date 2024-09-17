@@ -46,7 +46,7 @@ const loadPemEncodedPublicKeys = async () => {
         throw new Error(`Unable to fetch JWKS using URL ${jwksUrl}`);
     }
 
-    const json = await response.json();
+    const json = await response.json() as { keys: [{ kid: string, kty: string, n: string, e: string }]};
 
     pemEncodedPublicKeys = {};
     for (const { kid, kty, n, e } of json.keys) {

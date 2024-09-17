@@ -46,7 +46,7 @@ describe('Unit Tests', () => {
     expect(responseBody.result.longUrl).toEqual('https://example.com/');
     expect(ddbMock.calls(PutCommand)).toHaveLength(1);
     const putCommandCall = ddbMock.calls(PutCommand)[0].args[0];
-    expect(putCommandCall.input.TableName).toEqual(`us-${process.env.environment}-shortened-urls`);
+    expect(putCommandCall.input.TableName).toEqual(`us-${process.env.ENVIRONMENT}-shortened-urls`);
     expect(putCommandCall.input.Item).toHaveProperty('code');
     expect(putCommandCall.input.Item.longUrl).toEqual('https://example.com/');
   });
