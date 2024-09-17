@@ -2,7 +2,7 @@ const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const { mockClient } = require("aws-sdk-client-mock");
 const { handler } = require("./index");
 
-process.env.environment = "dev";
+process.env.ENVIRONMENT = "dev";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
