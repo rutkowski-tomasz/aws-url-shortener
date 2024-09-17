@@ -15,3 +15,25 @@ resource "aws_dynamodb_table" "url_shortener" {
   stream_enabled   = true
   stream_view_type = "NEW_IMAGE"
 }
+
+resource "aws_dynamodb_table" "websocket_connections" {
+  name         = "${local.prefix}websocket-connections"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "connectionId"
+
+  attribute {
+    name = "connectionId"
+    type = "S"
+  }
+
+  attribute {
+    name = "userId"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name               = "UserIdIndex"
+    hash_key           = "userId"
+    projection_type    = "ALL"
+  }
+}

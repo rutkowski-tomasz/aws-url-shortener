@@ -4,8 +4,8 @@ import { DynamoDBStreamHandler } from 'aws-lambda';
 
 const snsClient = new SNSClient({});
 
-const { environment } = process.env;
-const topicArn = `arn:aws:sns:eu-central-1:024853653660:us-${environment}-url-created`;
+const { ENVIRONMENT } = process.env;
+const topicArn = `arn:aws:sns:eu-central-1:024853653660:us-${ENVIRONMENT}-url-created`;
 
 export const handler: DynamoDBStreamHandler = async (event) => {
     for (const record of event.Records) {

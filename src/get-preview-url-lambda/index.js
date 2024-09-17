@@ -6,7 +6,7 @@ const s3Client = new S3Client({});
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
-    const env = process.env.environment;
+    const env = process.env.ENVIRONMENT;
     const bucketName = `us-${env}-shortened-urls-previews`;
 
     console.debug('Getting from bucket:', bucketName);
@@ -19,10 +19,10 @@ exports.handler = async (event) => {
     try {
         const desktopPreviewUrl = await generateSignedUrl(bucketName, code, 'desktop');
         const mobilePreviewUrl = await generateSignedUrl(bucketName, code, 'mobile');
-    
-        return buildResponse(true, { 
-            desktopPreview: desktopPreviewUrl, 
-            mobilePreview: mobilePreviewUrl 
+
+        return buildResponse(true, {
+            desktopPreview: desktopPreviewUrl,
+            mobilePreview: mobilePreviewUrl
         });
     } catch (error) {
         console.error('Error processing event:', error);

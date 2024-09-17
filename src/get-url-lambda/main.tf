@@ -27,9 +27,17 @@ provider "aws" {
 }
 
 locals {
-  prefix      = "us-${local.environment}-"
-  environment = terraform.workspace == "prd" ? terraform.workspace : "dev"
-  project     = "get-url-lambda"
+  is_valid_workspace = contains(["dev", "prd"], terraform.workspace)
+  prefix             = "us-${local.environment}-"
+  environment        = terraform.workspace
+  project            = "get-url-lambda"
+}
+
+resource "null_resource" "validate_workspace" {
+  count = local.is_valid_workspace ? 0 : 1
+  provisioner "local-exec" {
+    command = "echo Invalid workspace: '${terraform.workspace}'. Must be either 'dev' or 'prd'. && exit 1"
+  }
 }
 
 module "lambda" {

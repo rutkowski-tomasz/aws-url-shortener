@@ -6,7 +6,7 @@ const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
-    const env = process.env.environment;
+    const env = process.env.ENVIRONMENT;
     const tableName = `us-${env}-shortened-urls`;
 
     const userId = event.requestContext.authorizer.claims.sub;

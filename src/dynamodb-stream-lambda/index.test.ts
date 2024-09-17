@@ -5,7 +5,7 @@ import { DynamoDBStreamEvent, Callback, Context } from "aws-lambda";
 
 const snsMock = mockClient(SNSClient);
 
-process.env.environment = "dev";
+process.env.ENVIRONMENT = "dev";
 
 import { handler } from "./index";
 

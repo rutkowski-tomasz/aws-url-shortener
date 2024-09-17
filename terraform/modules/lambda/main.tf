@@ -59,6 +59,7 @@ resource "null_resource" "package_deployment" {
         npm run build
         echo "Packing dist folder"
         cd dist && zip -qr ../deployment-package.zip . && cd ..
+        rm -rf dist
         if [ "${var.pack_dependencies}" = "true" ]; then
           echo "Installing node_modules"
           npm i
@@ -106,9 +107,12 @@ resource "aws_lambda_function" "lambda" {
   s3_key        = "${var.lambda_function_name}/deployment_package.zip"
 
   environment {
-    variables = {
-      environment = var.environment
-    }
+    variables = merge(
+      {
+        ENVIRONMENT = var.environment
+      },
+      var.environment_variables
+    )
   }
 
   lifecycle {

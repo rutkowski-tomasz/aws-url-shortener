@@ -93,3 +93,9 @@ variable "sns_topic_name" {
   type        = string
   default     = null
 }
+
+variable "environment_variables" {
+  description = "Map of additional environment variables to be added to the Lambda function."
+  type        = map(string)
+  default     = {}
+}

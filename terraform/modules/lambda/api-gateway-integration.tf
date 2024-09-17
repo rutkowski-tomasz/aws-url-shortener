@@ -12,7 +12,7 @@ data "external" "authorizer_id" {
 
 data "aws_api_gateway_authorizer" "cognito_user_pool_authorizer" {
   authorizer_id = data.external.authorizer_id.result.Id
-  rest_api_id = data.aws_api_gateway_rest_api.api_gateway.id
+  rest_api_id   = data.aws_api_gateway_rest_api.api_gateway.id
 }
 
 resource "aws_api_gateway_resource" "lambda_resource" {

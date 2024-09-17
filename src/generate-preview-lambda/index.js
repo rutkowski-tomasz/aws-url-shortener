@@ -11,7 +11,7 @@ const s3Client = new S3Client({});
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
-    const env = process.env.environment;
+    const env = process.env.ENVIRONMENT;
     const bucketName = `us-${env}-shortened-urls-previews`;
 
     console.debug('Publishing to bucket:', bucketName);

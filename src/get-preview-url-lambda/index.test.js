@@ -8,7 +8,7 @@ jest.mock("@aws-sdk/s3-request-presigner", () => ({
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { handler } = require("./index");
 
-process.env.environment = "dev";
+process.env.ENVIRONMENT = "dev";
 
 const s3Mock = mockClient(S3Client);
 
