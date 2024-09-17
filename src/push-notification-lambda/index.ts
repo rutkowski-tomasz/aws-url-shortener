@@ -1,4 +1,4 @@
-import { S3Event, SQSEvent } from "aws-lambda";
+import { SQSEvent, S3Event } from "aws-lambda";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk/client-apigatewaymanagementapi";
@@ -16,49 +16,55 @@ const ShortenedUrlsTableName = `us-${ENVIRONMENT}-shortened-urls`;
 const ConnectionsTableName = `us-${ENVIRONMENT}-websocket-connections`;
 
 export const handler = async (event: SQSEvent) => {
+    try {
+        for (const record of event.Records) {
+            const snsEvent = JSON.parse(record.body) as { Message: string };
+            const s3Event = JSON.parse(snsEvent.Message) as S3Event;
 
-    for (const record of event.Records) {
-        const snsEvent = JSON.parse(record.body) as { Message: string };
-        const s3Event = JSON.parse(snsEvent.Message) as S3Event;
+            for (const s3Record of s3Event.Records) {
+                const objectKey = s3Record.s3.object.key;
+                const [code, file] = objectKey.split('/');
 
-        for (const s3Record of s3Event.Records) {
-            const objectKey = s3Record.s3.object.key;
-            const [code, file] = objectKey.split('/');
+                console.log('Received %s creation of %s', code, file);
 
-            console.log('Received %s creation of %s', code, file);
+                try {
+                    const shortenedUrl = await getShortenedUrl(code);
+                    console.debug('shortenedUrl: %j', shortenedUrl);
 
-            const shortenedUrl = await getShortenedUrl(code);
-            console.debug('shortenedUrl: %j', shortenedUrl);
+                    if (!shortenedUrl) {
+                        continue;
+                    }
 
-            if (!shortenedUrl) {
-                continue;
-            }
+                    const userConnections = await getUserConnections(shortenedUrl.userId);
+                    console.debug('userConnections: %j', userConnections);
 
-            const userConnections = await getUserConnections(shortenedUrl.userId);
-            console.debug('userConnections: %j', userConnections);
+                    if (!userConnections.Items) {
+                        continue;
+                    }
 
-            if (!userConnections.Items) {
-                continue;
-            }
+                    for (const connection of userConnections.Items) {
+                        const data = {
+                            eventType: 'PREVIEW_GENERATED',
+                            code,
+                            file
+                        };
+                        console.debug('data: %j', data);
 
-            for (const connection of userConnections.Items) {
-
-                const data = {
-                    eventType: 'PREVIEW_GENERATED',
-                    code,
-                    file
-                };
-                console.debug('data: %j', data);
-
-                const postResult = await postToConnection(connection.connectionId, data);
-                console.debug('postResult: %j', postResult);
+                        await postToConnection(connection.connectionId, data);
+                    }
+                } catch (error) {
+                    console.error('Error processing S3 record:', error);
+                    // Continue processing other records
+                }
             }
         }
+    } catch (error) {
+        console.error('Error processing SQS event:', error);
+        // Don't throw the error, just log it
     }
 };
 
 const getShortenedUrl = async (code: string) => {
-
     const command = new GetCommand({
         TableName: ShortenedUrlsTableName,
         Key: { code }
@@ -69,7 +75,6 @@ const getShortenedUrl = async (code: string) => {
 };
 
 const getUserConnections = async (userId: string) => {
-
     const command = new QueryCommand({
         TableName: ConnectionsTableName,
         IndexName: "UserIdIndex",
@@ -84,7 +89,6 @@ const getUserConnections = async (userId: string) => {
 };
 
 const postToConnection = async (connectionId: string, data: {}) => {
-
     const command = new PostToConnectionCommand({
         ConnectionId: connectionId,
         Data: JSON.stringify(data),
