@@ -9,6 +9,8 @@ process.env.ENVIRONMENT = "dev";
 
 import { handler } from "./index";
 
+import { handler } from "./index";
+
 beforeEach(() => {
     snsMock.reset();
 });
