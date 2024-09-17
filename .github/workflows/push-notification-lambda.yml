@@ -1,0 +1,24 @@
+name: push-notification-lambda
+
+on:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "src/push-notification-lambda/**"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "src/push-notification-lambda/**"
+  release:
+    types: [published]
+
+jobs:
+  node:
+    name: Node
+    uses: ./.github/workflows/workflow-nodejs.yml
+    with:
+      project: push-notification-lambda
+      node-version: 20.x
+    secrets: inherit
