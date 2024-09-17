@@ -74,7 +74,7 @@ resource "aws_apigatewayv2_authorizer" "websocket_lambda_authorizer" {
   identity_sources = ["route.request.header.Authorization"]
 }
 
-resource "aws_lambda_permission" "allow_api_gateway_invoke_lambda_authorizer" {
+resource "aws_lambda_permission" "permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = module.lambda.lambda_function_name

@@ -108,19 +108,15 @@ resource "aws_apigatewayv2_deployment" "deployment" {
   api_id = data.terraform_remote_state.shared_infrastructure.outputs.ws_api_gateway_api_id
   depends_on = [
     aws_apigatewayv2_route.connect,
-    aws_apigatewayv2_route.disconnect,
+    aws_apigatewayv2_route.disconnect
   ]
 
   triggers = {
     redeployment = timestamp()
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
-resource "aws_lambda_permission" "allow_api_gateway_invoke_lambda_authorizer" {
+resource "aws_lambda_permission" "permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = module.lambda.lambda_function_name
