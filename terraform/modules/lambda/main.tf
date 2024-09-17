@@ -55,25 +55,29 @@ resource "null_resource" "package_deployment" {
     command     = <<-EOT
       if [ -f "tsconfig.json" ]; then
         echo "Detected TypeScript project"
+        mv ../../package.json ../../temp-package-no-workspaces.json
+        echo "Installing node_modules"
+        npm i
         echo "Building TypeScript project"
         npm run build
         echo "Packing dist folder"
         cd dist && zip -qr ../deployment-package.zip . && cd ..
         rm -rf dist
         if [ "${var.pack_dependencies}" = "true" ]; then
-          echo "Installing node_modules"
-          npm i
           echo "Packing node_modules"
           zip -qr deployment-package.zip node_modules/
         fi
+        mv ../../temp-package-no-workspaces.json ../../package.json
       elif [ -f "package.json" ]; then
         echo "Detected Node.js project"
         zip -qr deployment-package.zip index.js
         if [ "${var.pack_dependencies}" = "true" ]; then
           echo "Installing node_modules"
+          mv ../../package.json ../../temp-package-no-workspaces.json
           npm i
           echo "Packing node_modules"
           zip -qr deployment-package.zip node_modules/
+          mv ../../temp-package-no-workspaces.json ../../package.json
         fi
       elif [ -f "requirements.txt" ]; then
         echo "Detected Python project"
