@@ -8,7 +8,7 @@ let config = {
   username: 'system-tests@example.com',
   password: 'SecurePassword123!',
   webSocketApiUrl: 'wss://d7enlocx23.execute-api.eu-central-1.amazonaws.com/dev/',
-  webSocketTimeout: 10000,
+  webSocketTimeout: 30000,
 };
 
 if (process.env.environment == 'prd')
@@ -77,33 +77,35 @@ describe('Lambda function integration', () => {
     expect(response.data.result).toHaveProperty('mobilePreview');
   });
 
-  test('connects to WebSocket and receives PREVIEW_GENERATED event', async () => {
-
-    return new Promise((resolve, reject) => {
+  describe('PREVIEW_GENERATED event is pushed', () => {
+    let ws;
+    beforeAll(() => {
       ws = new WebSocket(config.webSocketApiUrl, {
         headers: {
           'Authorization': `Bearer ${idToken}`
         }
       });
+    });
 
-      const timer = setTimeout(() => {
-        ws.close();
-        reject(new Error('Timeout after 30 seconds'));
-      }, config.webSocketTimeout);
+    test('connects to WebSocket and receives PREVIEW_GENERATED event', async () => {
 
-      ws.on('message', (data) => {
-        const payload = JSON.parse(data);
-        if (payload.eventType === 'PREVIEW_GENERATED') {
-          clearTimeout(timer);
-          ws.close();
-          resolve(payload);
-        }
+      await new Promise((resolve, reject) => {
+        ws.on('message', (data) => {
+          const payload = JSON.parse(data);
+          console.log('Received payload: %j', payload);
+          if (payload.eventType === 'PREVIEW_GENERATED' && payload.code === code) {
+            resolve(payload);
+          }
+        });
+
+        ws.on('error', reject);
       });
 
-      ws.on('error', (error) => {
-        clearTimeout(timer);
-        reject(error);
-      });
+    }, config.webSocketTimeout);
+
+    afterAll(() => {
+      ws.close();
     });
   });
+
 });
