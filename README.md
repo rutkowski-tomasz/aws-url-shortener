@@ -27,7 +27,7 @@ In real world scenario all the projects would probably be managed as separate re
 │   ├── shorten-url-lambda # Shortening long url (JS)
 │   ├── websocket-authorizer-lambda # Authorizing Websocket API connections (TS)
 │   └── websocket-manager-lambda # Managing connect and disconnect Websocket API connections (TS)
-├── system-tests# Tests veryfing if the application works all together
+├── system-tests # Tests veryfing if the application works all together
 └── terraform
     ├── modules # Shared TF modules between projects
     │   └── lambda # Reused by all lambdas
@@ -75,12 +75,10 @@ terraform apply -auto-approve
 
 ## Run tests
 ```sh
-# Node lambdas
-cd shorten-url-lambda
-npm test
+# JS or TS lambdas
+npm test -w shorten-url-lambda
 # Python lambdas
-cd get-url-lambda
-python3 -m unittest discover -v -s ./ -p "*_test.py"
+cd get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
 ```
 
 ## Connect to WS API Gateway
