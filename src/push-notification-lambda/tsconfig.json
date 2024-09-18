@@ -16,7 +16,8 @@
         "incremental": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
-        "typeRoots": ["node_modules/@types"]
+        "typeRoots": ["node_modules/@types"],
+        "types": ["jest", "node"]
     },
     "include": ["**/*.ts"],
     "exclude": ["node_modules", "**/*.test.ts"]
