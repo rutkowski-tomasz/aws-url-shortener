@@ -3,11 +3,11 @@ module.exports = {
       "<rootDir>/src/*",
     ],
     collectCoverageFrom: [
-      "**/*.{ts,tsx,js,jsx}",  // Include both TypeScript and JavaScript
-      "!**/node_modules/**",   // Exclude node_modules
-      "!**/dist/**",           // Exclude built files
-      "!**/__pycache__/**",    // Exclude Python cache files
-      "!**/*.py"               // Exclude Python files
+      "**/*.{ts,tsx,js,jsx}",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/__pycache__/**",
+      "!**/*.py"
     ],
     collectCoverage: true,
     coverageDirectory: "<rootDir>/.coverage",
@@ -16,8 +16,14 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     transform: {
-      '^.+\\.ts$': 'ts-jest',    // Use ts-jest for TypeScript files
-      '^.+\\.js$': 'babel-jest'  // Use Babel for JavaScript files (optional, you can adjust as needed)
+      '^.+\\.ts$': 'ts-jest',
+      '^.+\\.js$': 'babel-jest'
     },
-    roots: ['<rootDir>/src']
+    roots: ['<rootDir>/src'],
+    globals: {
+      'ts-jest': {
+          tsconfig: 'tsconfig.json',
+          diagnostics: false,
+      },
+  },
 };
