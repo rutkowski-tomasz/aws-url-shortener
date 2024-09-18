@@ -1,12 +1,15 @@
 const axios = require('axios');
+const WebSocket = require('ws');
 
 let config = {
   urlShortenerBaseUrl: 'https://09fh8d9q9j.execute-api.eu-central-1.amazonaws.com/dev',
   cognitoUrl: 'https://cognito-idp.eu-central-1.amazonaws.com',
   clientId: '1kirlbqnjpertctpamfatsfolc',
   username: 'system-tests@example.com',
-  password: 'SecurePassword123!'
-}
+  password: 'SecurePassword123!',
+  webSocketApiUrl: 'wss://d7enlocx23.execute-api.eu-central-1.amazonaws.com/dev/',
+  webSocketTimeout: 10000,
+};
 
 if (process.env.environment == 'prd')
 {
@@ -65,12 +68,42 @@ describe('Lambda function integration', () => {
     });
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe(longUrl);
-  });   
+  });
 
   test('get-preview-url-lambda returns preview URLs', async () => {
-    const response = await axios.get(`${config.urlShortenerBaseUrl}/get-preview-url?code=${code}`, );
+    const response = await axios.get(`${config.urlShortenerBaseUrl}/get-preview-url?code=${code}`);
     expect(response.status).toBe(200);
     expect(response.data.result).toHaveProperty('desktopPreview');
     expect(response.data.result).toHaveProperty('mobilePreview');
+  });
+
+  test('connects to WebSocket and receives PREVIEW_GENERATED event', async () => {
+
+    return new Promise((resolve, reject) => {
+      ws = new WebSocket(config.webSocketApiUrl, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+
+      const timer = setTimeout(() => {
+        ws.close();
+        reject(new Error('Timeout after 30 seconds'));
+      }, config.webSocketTimeout);
+
+      ws.on('message', (data) => {
+        const payload = JSON.parse(data);
+        if (payload.eventType === 'PREVIEW_GENERATED') {
+          clearTimeout(timer);
+          ws.close();
+          resolve(payload);
+        }
+      });
+
+      ws.on('error', (error) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
   });
 });
