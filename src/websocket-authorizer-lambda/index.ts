@@ -26,7 +26,7 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
     }
 
     const token = authorizationHeader.substring(7);
-    const claims = await verifyClaims(token);
+    const claims = await verifyClaims(token) as APIGatewayAuthorizerResultContext;
     if (!claims) {
         throw new Error('Unauthorized');
     }
@@ -46,7 +46,7 @@ const loadPemEncodedPublicKeys = async () => {
         throw new Error(`Unable to fetch JWKS using URL ${jwksUrl}`);
     }
 
-    const json = await response.json() as { keys: [{ kid: string, kty: string, n: string, e: string }]};
+    const json = await response.json() as { keys: [{ kid: string, kty: 'RSA', n: string, e: string }]};
 
     pemEncodedPublicKeys = {};
     for (const { kid, kty, n, e } of json.keys) {
@@ -56,7 +56,7 @@ const loadPemEncodedPublicKeys = async () => {
 };
 
 export const verifyClaims = async (token: string) => {
-    var decodedJwt = decode(token, { complete: true });
+    const decodedJwt = decode(token, { complete: true });
 
     if (!decodedJwt || !decodedJwt.header || !decodedJwt.header.kid) {
         return null;
