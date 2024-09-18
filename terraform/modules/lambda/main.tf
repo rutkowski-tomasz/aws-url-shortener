@@ -53,7 +53,7 @@ resource "null_resource" "package_deployment" {
 
   provisioner "local-exec" {
     command     = <<-EOT
-      if [ -f "tsconfig.json" ]; then
+      if [ -f "index.ts" ]; then
         echo "Detected TypeScript project"
         mv ../../package.json ../../temp-package-no-workspaces.json
         echo "Installing node_modules"
