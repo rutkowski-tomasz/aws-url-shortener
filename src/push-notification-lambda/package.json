@@ -1,7 +1,7 @@
 {
-  "name": "websocket-authorizer-lambda",
+  "name": "push-notification-lambda",
   "version": "1.0.0",
-  "description": "Lambda authorizing API Gateway Websocket requests",
+  "description": "Lambda pushing websocket notification to users",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
@@ -13,12 +13,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.651.1",
+    "@aws-sdk/lib-dynamodb": "^3.651.1",
     "@jest/globals": "^29.7.0",
     "@types/aws-lambda": "^8.10.145",
     "@types/aws-sdk": "^2.7.0",
     "@types/jest": "^29.5.13",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/jwk-to-pem": "^2.0.3",
     "@types/node": "^22.5.5",
     "aws-sdk-client-mock": "^4.0.0",
     "jest": "^29.7.0",
@@ -26,7 +26,6 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "jsonwebtoken": "^9.0.2",
-    "jwk-to-pem": "^2.0.6"
+    "@aws-sdk/util-dynamodb": "^3.632.0"
   }
 }

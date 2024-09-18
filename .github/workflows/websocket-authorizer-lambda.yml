@@ -1,0 +1,24 @@
+name: websocket-authorizer-lambda
+
+on:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "src/websocket-authorizer-lambda/**"
+  pull_request:
+    branches:
+      - "*"
+    paths:
+      - "src/websocket-authorizer-lambda/**"
+  release:
+    types: [published]
+
+jobs:
+  node:
+    name: Node
+    uses: ./.github/workflows/workflow-nodejs.yml
+    with:
+      project: websocket-authorizer-lambda
+      node-version: 20.x
+    secrets: inherit

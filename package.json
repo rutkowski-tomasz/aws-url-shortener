@@ -12,5 +12,9 @@
     "@types/jest": "^29.5.13",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5"
+  },
+  "dependencies": {
+    "linked": "^0.2.0",
+    "nested": "^0.0.1-pre2"
   }
 }

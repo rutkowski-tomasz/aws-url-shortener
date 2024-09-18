@@ -1,104 +1,104 @@
-import { APIGatewayRequestAuthorizerEvent, Context, Callback, APIGatewayAuthorizerResult } from 'aws-lambda';
-import { beforeEach, describe, test, expect, jest } from '@jest/globals';
-import jwt from 'jsonwebtoken';
+import { APIGatewayRequestAuthorizerEvent } from 'aws-lambda';
+import { decode, verify } from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 
-process.env.AWS_REGION = 'us-east-1';
-process.env.USER_POOL_ID = 'us-east-1_testpool';
+jest.mock('jwk-to-pem', () => ({
+    __esModule: true,
+    default: jest.fn(),
+}));
 
 jest.mock('jsonwebtoken');
 jest.mock('jwk-to-pem');
 
-import { handler } from './index';
+const mockedDecode = decode as jest.MockedFunction<typeof decode>;
+const mockedVerify = verify as jest.MockedFunction<typeof verify>;
+const mockedJwkToPem = jwkToPem as jest.MockedFunction<typeof jwkToPem>;
 
-global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+process.env.USER_POOL_ID = 'test-user-pool';
+process.env.AWS_REGION = 'us-east-1';
+process.env.ENVIRONMENT = "dev";
+
+import { handler, verifyClaims } from './index';
 
 describe('Unit Tests', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
-        (global.fetch as jest.Mock).mockClear();
+        jest.resetAllMocks();
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({
+                keys: [{ kid: 'testKid', kty: 'RSA', n: 'test', e: 'AQAB' }]
+            })
+        });
     });
 
-//     test('successfully authorizes a valid token', async () => {
-//         const mockToken = 'valid.jwt.token';
-//         const mockClaims = { sub: 'user123', email: 'user@example.com' };
-//         const mockEvent: APIGatewayRequestAuthorizerEvent = {
-//             type: 'REQUEST',
-//             methodArn: 'arn:aws:execute-api:region:account:api-id/stage/method/resource-path',
-//             headers: { Authorization: `Bearer ${mockToken}` },
-//         } as any;
+    describe('handler', () => {
+        it('should throw an error if Authorization header is missing', async () => {
+            const event = { headers: {} } as APIGatewayRequestAuthorizerEvent;
+            await expect(handler(event, {} as any, {} as any)).rejects.toThrow('Missing Authorization header');
+        });
 
-//         (jwkToPem as jest.Mock).mockReturnValue('mock-pem-key');
+        it('should throw an error if Authorization header is not a valid bearer token', async () => {
+            const event = { headers: { Authorization: 'Invalid' } } as any;
+            await expect(handler(event, {} as any, {} as any)).rejects.toThrow('Authorization header must be a valid bearer token');
+        });
 
-//         (jwt.decode as jest.Mock).mockReturnValue({ header: { kid: 'test-kid' } });
-//         (jwt.verify as jest.Mock).mockReturnValue(mockClaims);
+        it('should throw an error if token verification fails', async () => {
+            const event = {
+                headers: { Authorization: 'Bearer invalidToken' },
+                methodArn: 'arn:aws:execute-api:us-east-1:123456789012:api-id/stage/method/resourcepath'
+            } as any;
+            mockedDecode.mockReturnValue({ header: { kid: 'testKid' } } as any);
+            mockedVerify.mockImplementation(() => { throw new Error('Invalid token'); });
+            await expect(handler(event, {} as any, {} as any)).rejects.toThrow('Invalid token');
+        });
 
-//         (global.fetch as jest.Mock).mockResolvedValue({
-//             ok: true,
-//             json: () => Promise.resolve({
-//                 keys: [{ kid: 'test-kid', kty: 'RSA', n: 'test-n', e: 'test-e' }]
-//             }),
-//         } as never);
+        it('should return a valid policy if token verification succeeds', async () => {
+            const event = {
+                headers: { Authorization: 'Bearer validToken' },
+                methodArn: 'arn:aws:execute-api:us-east-1:123456789012:api-id/stage/method/resourcepath'
+            } as any;
+            mockedDecode.mockReturnValue({ header: { kid: 'testKid' } } as any);
+            mockedVerify.mockReturnValue({ sub: 'testUser' } as any);
+            mockedJwkToPem.mockReturnValue('testPem');
 
-//         const result = await handler(mockEvent, {} as Context, {} as Callback) as APIGatewayAuthorizerResult;
+            const result = await handler(event, {} as any, {} as any);
 
-//         expect(result.policyDocument.Statement[0].Effect).toBe('Allow');
-//         expect(result.context).toEqual(mockClaims);
-//     });
-
-    test('throws error for missing Authorization header', async () => {
-        const mockEvent: APIGatewayRequestAuthorizerEvent = {
-            type: 'REQUEST',
-            methodArn: 'arn:aws:execute-api:region:account:api-id/stage/method/resource-path',
-            headers: {},
-        } as any;
-
-        await expect(handler(mockEvent, {} as Context, {} as Callback)).rejects.toThrow('Missing Authorization header');
+            expect(result).toEqual({
+                policyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [
+                        {
+                            Action: 'execute-api:Invoke',
+                            Effect: 'Allow',
+                            Resource: event.methodArn,
+                        },
+                    ],
+                },
+                principalId: 'user',
+                context: { sub: 'testUser' }
+            });
+        });
     });
 
-    test('throws error for invalid bearer token', async () => {
-        const mockEvent: APIGatewayRequestAuthorizerEvent = {
-            type: 'REQUEST',
-            methodArn: 'arn:aws:execute-api:region:account:api-id/stage/method/resource-path',
-            headers: { Authorization: 'Invalid token' },
-        } as any;
+    describe('verifyClaims', () => {
+        it('should return null if token decoding fails', async () => {
+            mockedDecode.mockReturnValue(null);
+            const result = await verifyClaims('invalidToken');
+            expect(result).toBeNull();
+        });
 
-        await expect(handler(mockEvent, {} as Context, {} as Callback)).rejects.toThrow('Authorization header must be a valid bearer token');
+        it('should throw an error if kid is not found in public keys', async () => {
+            mockedDecode.mockReturnValue({ header: { kid: 'unknownKid' } } as any);
+            await expect(verifyClaims('validToken')).rejects.toThrow('Public key ID "unknownKid" not found');
+        });
+
+        it('should return verified claims if token is valid', async () => {
+            mockedDecode.mockReturnValue({ header: { kid: 'testKid' } } as any);
+            mockedVerify.mockReturnValue({ sub: 'testUser' } as any);
+            mockedJwkToPem.mockReturnValue('testPem');
+
+            const result = await verifyClaims('validToken');
+            expect(result).toEqual({ sub: 'testUser' });
+        });
     });
-
-//     test('throws error for unauthorized token', async () => {
-//         const mockToken = 'invalid.jwt.token';
-//         const mockEvent: APIGatewayRequestAuthorizerEvent = {
-//             type: 'REQUEST',
-//             methodArn: 'arn:aws:execute-api:region:account:api-id/stage/method/resource-path',
-//             headers: { Authorization: `Bearer ${mockToken}` },
-//         } as any;
-
-//         (jwt.decode as jest.Mock).mockReturnValue(null);
-
-//         await expect(handler(mockEvent, {} as Context, {} as Callback)).rejects.toThrow('Unauthorized');
-//     });
 });
-
-// describe('Integration Test', () => {
-//     beforeAll(() => {
-//         jest.resetAllMocks();
-//     });
-
-//     test('integration test', async () => {
-//         const mockToken = 'valid.integration.token';
-//         const mockEvent: APIGatewayRequestAuthorizerEvent = {
-//             type: 'REQUEST',
-//             methodArn: 'arn:aws:execute-api:region:account:api-id/stage/method/resource-path',
-//             headers: { Authorization: `Bearer ${mockToken}` },
-//         } as any;
-
-//         (global.fetch as jest.Mock).mockResolvedValue({
-//             json: () => Promise.resolve({
-//                 keys: [{ kid: 'test-kid', kty: 'RSA', n: 'test-n', e: 'test-e' }]
-//             }),
-//         } as Response);
-
-//         await handler(mockEvent, {} as Context, {} as Callback);
-//     });
-// });
