@@ -60,7 +60,8 @@ cat > ${policy_document} << EOF
         "lambda:CreateEventSourceMapping",
         "lambda:DeleteEventSourceMapping",
         "lambda:GetLayerVersion",
-        "s3:CreateBucket"
+        "s3:CreateBucket",
+        "cognito-idp:ListUserPools"
       ],
       "Resource": "*"
     },
