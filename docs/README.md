@@ -6,14 +6,12 @@ In real world scenario all the projects would probably be managed as separate re
 
 # 🏙️ Architecture
 
-![Architecture Diagram](assets/link-shortener.phase8.drawio.svg)
+![Architecture Diagram](link-shortener.phase8.drawio.svg)
 
 # 🌳 Repository structure
 
 ```sh
-.
-├── README.md
-├── assets # Image files included in the README file
+├── docs
 ├── jest.config.js
 ├── package.json # Configuration for npm workspaces
 ├── requests # Prepared requests to test the whole solution, see /.vscode/settings.json
