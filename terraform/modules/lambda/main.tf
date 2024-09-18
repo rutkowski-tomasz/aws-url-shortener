@@ -57,9 +57,12 @@ resource "null_resource" "package_deployment" {
         echo "Detected TypeScript project"
         mv ../../package.json ../../temp-package-no-workspaces.json
         echo "Installing node_modules"
+        rm -rf node_modules
         npm i
         echo "Building TypeScript project"
+        cp ../../tsconfig.json ./tsconfig.json
         npm run build
+        rm tsconfig.json
         echo "Packing dist folder"
         cd dist && zip -qr ../deployment-package.zip . && cd ..
         rm -rf dist
@@ -74,6 +77,7 @@ resource "null_resource" "package_deployment" {
         if [ "${var.pack_dependencies}" = "true" ]; then
           echo "Installing node_modules"
           mv ../../package.json ../../temp-package-no-workspaces.json
+          rm -rf node_modules
           npm i
           echo "Packing node_modules"
           zip -qr deployment-package.zip node_modules/
