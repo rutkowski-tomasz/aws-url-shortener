@@ -15,7 +15,6 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/aws-lambda": "^8.10.145",
-    "@types/aws-sdk": "^2.7.0",
     "@types/jest": "^29.5.13",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/jwk-to-pem": "^2.0.3",

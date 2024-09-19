@@ -1,11 +1,9 @@
 {
   "name": "dynamodb-stream-lambda",
-  "scripts": {
-  },
+  "scripts": {},
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/aws-lambda": "^8.10.145",
-    "@types/aws-sdk": "^2.7.0",
     "@types/jest": "^29.5.13",
     "@types/node": "^22.5.5",
     "aws-sdk-client-mock": "^4.0.0",
