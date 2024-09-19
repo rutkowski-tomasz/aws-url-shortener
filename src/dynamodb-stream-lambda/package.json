@@ -1,17 +1,7 @@
 {
   "name": "dynamodb-stream-lambda",
-  "version": "1.0.0",
-  "description": "Lambda handling DynamoDB stream events",
-  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "test": "jest --transform='{\"^.+ts$\": \"ts-jest\"}'",
-    "deploy": "terraform apply -auto-approve",
-    "test:unit": "jest -t 'Unit Test' --transform='{\"^.+ts$\": \"ts-jest\"}'",
-    "test:integration": "jest -t 'Integration Test' --transform='{\"^.+ts$\": \"ts-jest\"}'"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/aws-lambda": "^8.10.145",
