@@ -28,11 +28,11 @@ echo "Installing build dependencies..."
 npm ci
 
 echo "Building TypeScript projects..."
-npm run build --workspace=$project_dir
+npm run build
 
 echo "Installing project dependencies..."
 rm -rf "$project_dir/node_modules"
-npm ci --prefix "$project_dir" --omit=dev
+npm i --prefix "$project_dir" --omit=dev
 
 echo "Copying source files to package directory..."
 package_dir=`mktemp -d -p dist`
@@ -63,24 +63,24 @@ else
         "$project_dir/node_modules" "$package_dir/"
 fi
 
-package_file="$project_name.zip"
+# package_file="$project_name.zip"
 
-echo "Creating zip package..."
-(cd $package_dir && zip -qr "../../$package_file" .)
+# echo "Creating zip package..."
+# (cd $package_dir && zip -qr "../../$package_file" .)
 
-echo "Created package: $(du -hs $package_file)"
+# echo "Created package: $(du -hs $package_file)"
 
-lambda_name="us-$env-$project_name"
-echo "Updating $lambda_name lambda code..."
-aws lambda update-function-code \
-    --no-cli-pager \
-    --function-name "$lambda_name" \
-    --zip-file "fileb://$package_file"
+# lambda_name="us-$env-$project_name"
+# echo "Updating $lambda_name lambda code..."
+# aws lambda update-function-code \
+#     --no-cli-pager \
+#     --function-name "$lambda_name" \
+#     --zip-file "fileb://$package_file"
 
-package_size=$(du -hs "$package_file" | awk '{print $1}')
+# package_size=$(du -hs "$package_file" | awk '{print $1}')
 
-echo "Cleaning up..."
-rm $package_file
-rm -rf $package_dir
+# echo "Cleaning up..."
+# rm $package_file
+# rm -rf $package_dir
 
-echo "Deployed $project_dir to $lambda_name (size=$package_size)."
+# echo "Deployed $project_dir to $lambda_name (size=$package_size)."

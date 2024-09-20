@@ -1,21 +1,8 @@
 {
   "name": "generate-preview-lambda",
-  "version": "1.0.0",
-  "description": "Lambda generating URL preview",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest",
-    "deploy": "terraform apply -auto-approve",
-    "test:unit": "jest -t 'Unit Test'",
-    "test:integration": "jest -t 'Integration Test'"
-  },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.645.0",
-    "@sparticuz/chromium": "^127.0.0",
-    "aws-sdk-client-mock": "^4.0.0",
-    "jest": "^29.7.0"
+    "@sparticuz/chromium": "^127.0.0"
   },
   "dependencies": {
     "puppeteer-core": "^23.1.0"
