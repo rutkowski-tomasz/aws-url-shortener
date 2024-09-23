@@ -26,12 +26,6 @@ jobs:
   python-tests:
     name: Run Tests
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project: [get-url-lambda]
-    defaults:
-      run:
-        working-directory: src/${{ matrix.project }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,12 +49,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          for req_file in $(find ./src -name "requirements-dev.txt"); do
+            echo "Installing dependencies from $req_file"
+            pip install -r "$req_file"
+          done
 
       - name: Run tests
-        run: python -m unittest discover -v -s ./ -p "*_test.py"
+        run: python -m unittest discover -v -s ./src -p "*_test.py"
 
   terraform-plan-dev:
+    name: Terraform
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: terraform/shared-infrastructure
@@ -69,6 +67,7 @@ jobs:
     secrets: inherit
 
   terraform-plan-prd:
+    name: Terraform
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: terraform/shared-infrastructure
@@ -111,6 +110,7 @@ jobs:
           path: ${{ matrix.project }}.zip
 
   terraform-apply-dev:
+    name: Terraform
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     needs: package-source-code
     uses: ./.github/workflows/workflow-terraform.yml
@@ -146,6 +146,7 @@ jobs:
         run: npm test
 
   terraform-apply-prd:
+    name: Terraform
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     needs: terraform-apply-dev
     uses: ./.github/workflows/workflow-terraform.yml

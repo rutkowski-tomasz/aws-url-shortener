@@ -16,7 +16,7 @@ on:
 
 jobs:
   terraform:
-    name: Terraform ${{ inputs.action }}
+    name: ${{ inputs.action }} ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.action == 'apply' && inputs.environment || '' }}
     defaults:
