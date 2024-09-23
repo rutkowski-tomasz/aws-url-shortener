@@ -86,14 +86,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: [dynamodb-stream-lambda, generate-preview-lambda, websocket-authorizer-lambda]
+        project: [
+          dynamodb-stream-lambda,
+          generate-preview-lambda,
+          get-preview-url-lambda,
+          get-url-lambda,
+          push-notification-lambda,
+          shorten-url-lambda,
+          websocket-authorizer-lambda,
+          websocket-manager-lambda
+        ]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run tests
-        run: ./deploy.sh ${{ matrix.project }} local
+      - name: Create package
+        run: ./deploy.sh ${{ matrix.project }} pack
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.project }}.zip
+          path: ${{ matrix.project }}.zip
 
   terraform-apply-dev:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
@@ -132,7 +147,7 @@ jobs:
 
   terraform-apply-prd:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
-    needs: dev-system-test
+    needs: terraform-apply-dev
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       working-directory: terraform/shared-infrastructure
