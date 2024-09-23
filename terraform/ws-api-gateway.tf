@@ -1,6 +1,6 @@
 resource "aws_apigatewayv2_api" "websocket_api" {
-  name          = "${local.prefix}websocket-api"
-  protocol_type = "WEBSOCKET"
+  name                       = "${local.prefix}websocket-api"
+  protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 }
 

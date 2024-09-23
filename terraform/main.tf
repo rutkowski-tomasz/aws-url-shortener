@@ -25,7 +25,7 @@ provider "aws" {
   }
 }
 
-data "aws_region" "current" { }
+data "aws_region" "current" {}
 
 locals {
   is_valid_workspace = contains(["dev", "prd"], terraform.workspace)

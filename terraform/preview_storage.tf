@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "preview_storage" {
 }
 
 resource "aws_sns_topic" "preview_generated" {
-  name = "${local.prefix}preview-generated"
+  name   = "${local.prefix}preview-generated"
   policy = <<POLICY
   {
     "Version":"2012-10-17",
@@ -27,7 +27,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.preview_storage.id
 
   topic {
-    topic_arn     = aws_sns_topic.preview_generated.arn
-    events        = ["s3:ObjectCreated:*"]
+    topic_arn = aws_sns_topic.preview_generated.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 }

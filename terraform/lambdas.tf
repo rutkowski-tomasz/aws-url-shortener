@@ -5,6 +5,7 @@ module "dynamodb_stream_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
 
+  depends_on = [ aws_dynamodb_table.url_shortener ]
   custom_policy_statements = [
     {
       Action   = ["sns:Publish"],
@@ -30,16 +31,18 @@ module "generate_stream_lambda" {
   lambda_runtime       = "nodejs20.x"
   lambda_memory_size   = 1024
   lambda_timeout       = 30
-  pack_dependencies    = true
+
   # Layer: https://github.com/shelfio/chrome-aws-lambda-layer
   lambda_layers = ["arn:aws:lambda:eu-central-1:764866452798:layer:chrome-aws-lambda:47"]
+
+  depends_on = [aws_sns_topic.dynamodb_stream_topic]
   custom_policy_statements = [
     {
       Action   = "s3:PutObject",
       Resource = "${aws_s3_bucket.preview_storage.arn}/*"
     }
   ]
-  sns_topic_name = "${local.prefix}url-created"
+  sns_topic_name = aws_sns_topic.dynamodb_stream_topic.name
 }
 
 module "get_preview_url_lambda" {
@@ -50,6 +53,8 @@ module "get_preview_url_lambda" {
   lambda_runtime            = "nodejs20.x"
   api_gateway_http_method   = "GET"
   api_gateway_resource_path = "get-preview-url"
+
+  depends_on                = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
     {
       Action   = "s3:GetObject",
@@ -59,13 +64,16 @@ module "get_preview_url_lambda" {
 }
 
 module "get_url_lambda" {
-  source                          = "./modules/lambda"
-  environment                     = local.environment
-  lambda_function_name            = "get-url-lambda"
-  lambda_handler                  = "handler.handle"
-  lambda_runtime                  = "python3.12"
-  api_gateway_http_method         = "GET"
-  api_gateway_resource_path       = "get-url"
+  source               = "./modules/lambda"
+  environment          = local.environment
+  lambda_function_name = "get-url-lambda"
+  lambda_handler       = "handler.handle"
+  lambda_runtime       = "python3.12"
+
+  depends_on                = [aws_api_gateway_rest_api.api_gateway]
+  api_gateway_http_method   = "GET"
+  api_gateway_resource_path = "get-url"
+
   custom_policy_statements = [
     {
       Action   = "dynamodb:GetItem",
@@ -75,26 +83,27 @@ module "get_url_lambda" {
 }
 
 module "push_notification_lambda" {
-  depends_on = [ aws_sns_topic.preview_generated ]
   source               = "./modules/lambda"
   environment          = local.environment
   lambda_function_name = "push-notification-lambda"
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
-  sns_topic_name       = aws_sns_topic.preview_generated.name
+
+  depends_on     = [aws_sns_topic.preview_generated]
+  sns_topic_name = aws_sns_topic.preview_generated.name
 
   custom_policy_statements = [
     {
-      Action = "dynamodb:GetItem",
+      Action   = "dynamodb:GetItem",
       Resource = "${aws_dynamodb_table.url_shortener.arn}"
     },
     {
-      Action = "dynamodb:Query",
+      Action   = "dynamodb:Query",
       Resource = "${aws_dynamodb_table.websocket_connections.arn}/index/UserIdIndex"
     },
     {
-      Action: "execute-api:ManageConnections",
-      Resource: "arn:aws:execute-api:*:*:${aws_s3_bucket.preview_storage.id}/*/*/@connections/*"
+      Action : "execute-api:ManageConnections",
+      Resource : "arn:aws:execute-api:*:*:${aws_s3_bucket.preview_storage.id}/*/*/@connections/*"
     }
   ]
 
@@ -104,14 +113,17 @@ module "push_notification_lambda" {
 }
 
 module "shorten_url_lambda" {
-  source                             = "./modules/lambda"
-  environment                        = local.environment
-  lambda_function_name               = "shorten-url-lambda"
-  lambda_handler                     = "index.handler"
-  lambda_runtime                     = "nodejs20.x"
+  source               = "./modules/lambda"
+  environment          = local.environment
+  lambda_function_name = "shorten-url-lambda"
+  lambda_handler       = "index.handler"
+  lambda_runtime       = "nodejs20.x"
+
+  depends_on                         = [aws_api_gateway_rest_api.api_gateway]
   api_gateway_http_method            = "POST"
   api_gateway_resource_path          = "shorten-url"
   api_gateway_requires_authorization = true
+
   custom_policy_statements = [
     {
       Action   = "dynamodb:PutItem",
@@ -121,12 +133,12 @@ module "shorten_url_lambda" {
 }
 
 module "websocket_authorizer_lambda" {
+  depends_on           = [aws_api_gateway_rest_api.api_gateway]
   source               = "./modules/lambda"
   environment          = local.environment
   lambda_function_name = "websocket-authorizer-lambda"
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
-  pack_dependencies    = true
 
   environment_variables = {
     USER_POOL_ID = aws_cognito_user_pool.user_pool.id
@@ -140,6 +152,7 @@ module "websocket_manager_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
 
+  depends_on                = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
     {
       Action = [
