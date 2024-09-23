@@ -24,7 +24,7 @@ jobs:
         run: npm run test:unit
 
   python-tests:
-    name: Run Tests
+    name: Python tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -61,7 +61,6 @@ jobs:
     name: Terraform
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: terraform/shared-infrastructure
       environment: dev
       action: plan
     secrets: inherit
@@ -70,7 +69,6 @@ jobs:
     name: Terraform
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: terraform/shared-infrastructure
       environment: prd
       action: plan
     secrets: inherit
@@ -115,7 +113,6 @@ jobs:
     needs: package-source-code
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: terraform/shared-infrastructure
       environment: dev
       action: apply
     secrets: inherit
@@ -151,7 +148,6 @@ jobs:
     needs: terraform-apply-dev
     uses: ./.github/workflows/workflow-terraform.yml
     with:
-      working-directory: terraform/shared-infrastructure
       environment: prd
       action: apply
     secrets: inherit
