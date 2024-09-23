@@ -27,6 +27,8 @@ fi
 is_node=$(test -f "$project_dir/index.js" && echo 1 || echo 0)
 is_typescript=$(test -f "$project_dir/index.ts" && echo 1 || echo 0)
 is_python=$(test -f "$project_dir/handler.py" && echo 1 || echo 0)
+
+mkdir -p dist
 package_dir=$(mktemp -d -p dist)
 
 if [[ $is_node -eq 1 || $is_typescript -eq 1 ]]; then
