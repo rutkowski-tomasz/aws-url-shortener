@@ -1,0 +1,179 @@
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  javascript-tests:
+    name: Javascript tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test:unit
+
+  python-tests:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check architecture
+        id: check_arch
+        run: echo "is_aarch64=$(if [ $(uname -m) = 'aarch64' ]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
+
+      - name: Setup Python (x86_64)
+        if: steps.check_arch.outputs.is_aarch64 == 'false'
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Setup Python (ARM)
+        if: steps.check_arch.outputs.is_aarch64 == 'true'
+        uses: deadsnakes/action@v3.2.0
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          for req_file in $(find ./src -name "requirements-dev.txt"); do
+            echo "Installing dependencies from $req_file"
+            pip install -r "$req_file"
+          done
+
+      - name: Run tests
+        run: python -m unittest discover -v -s ./src -p "*_test.py"
+
+  terraform-plan-dev:
+    name: Terraform plan
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      environment: dev
+      action: plan
+    secrets: inherit
+
+  terraform-plan-prd:
+    name: Terraform plan
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      environment: prd
+      action: plan
+    secrets: inherit
+
+  package-source-code:
+    name: Package
+    needs: [
+      javascript-tests,
+      python-tests,
+      terraform-plan-dev,
+      terraform-plan-prd
+    ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [
+          dynamodb-stream-lambda,
+          generate-preview-lambda,
+          get-preview-url-lambda,
+          get-url-lambda,
+          push-notification-lambda,
+          shorten-url-lambda,
+          websocket-authorizer-lambda,
+          websocket-manager-lambda
+        ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create package
+        run: ./deploy.sh ${{ matrix.project }} pack
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.project }}.zip
+          path: ${{ matrix.project }}.zip
+
+  terraform-apply-dev:
+    name: Terraform apply
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
+    needs: package-source-code
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      environment: dev
+      action: apply
+    secrets: inherit
+
+  dev-system-test:
+    needs: terraform-apply-dev
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
+    name: System tests (dev)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: system-tests
+    env:
+      environment: dev
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  terraform-apply-prd:
+    name: Terraform apply
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
+    needs: terraform-apply-dev
+    uses: ./.github/workflows/workflow-terraform.yml
+    with:
+      environment: prd
+      action: apply
+    secrets: inherit
+
+  prd-system-test:
+    needs: terraform-apply-prd
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
+    name: System tests (prd)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: system-tests
+    env:
+      environment: prd
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test

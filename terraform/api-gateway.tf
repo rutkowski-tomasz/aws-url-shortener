@@ -7,7 +7,6 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
   }
 }
 
-
 resource "aws_iam_role" "api_gateway_cloudwatch_role" {
   name = "${local.prefix}api_gateway_cloudwatch_role"
 
@@ -20,7 +19,7 @@ resource "aws_iam_role" "api_gateway_cloudwatch_role" {
           Service = "apigateway.amazonaws.com",
         },
         Effect = "Allow",
-        Sid = "",
+        Sid    = "",
       },
     ],
   })
@@ -41,7 +40,7 @@ resource "aws_iam_policy" "api_gateway_cloudwatch_policy" {
           "logs:DescribeLogStreams",
         ],
         Resource = "*",
-        Effect = "Allow",
+        Effect   = "Allow",
       },
     ],
   })

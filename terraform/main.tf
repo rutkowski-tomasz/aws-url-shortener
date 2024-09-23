@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "us-cicd"
-    key    = "terraform/shorten-url-lambda"
+    key    = "terraform/shared-infrastructure"
     region = "eu-central-1"
   }
 }
@@ -20,17 +20,17 @@ provider "aws" {
     tags = {
       environment       = local.environment
       application       = "aws-url-shortener"
-      project           = local.project
       terraform-managed = true
     }
   }
 }
 
+data "aws_region" "current" {}
+
 locals {
   is_valid_workspace = contains(["dev", "prd"], terraform.workspace)
   prefix             = "us-${local.environment}-"
   environment        = terraform.workspace
-  project            = "shorten-url-lambda"
 }
 
 resource "null_resource" "validate_workspace" {
@@ -40,19 +40,22 @@ resource "null_resource" "validate_workspace" {
   }
 }
 
-module "lambda" {
-  source                             = "../../terraform/modules/lambda"
-  environment                        = local.environment
-  lambda_function_name               = local.project
-  lambda_handler                     = "index.handler"
-  lambda_runtime                     = "nodejs20.x"
-  api_gateway_http_method            = "POST"
-  api_gateway_resource_path          = "shorten-url"
-  api_gateway_requires_authorization = true
-  custom_policy_statements = [
-    {
-      Action   = "dynamodb:PutItem",
-      Resource = "arn:aws:dynamodb:eu-central-1:024853653660:table/us-${local.environment}-shortened-urls"
-    }
-  ]
+output "cognito_user_pool_client_id" {
+  value = aws_cognito_user_pool_client.client.id
+}
+
+output "cognito_url" {
+  value = "https://cognito-idp.${data.aws_region.current.name}.amazonaws.com/"
+}
+
+output "api_gateway_health_url" {
+  value = "${aws_api_gateway_deployment.deployment.invoke_url}${local.environment}/health"
+}
+
+output "ws_api_gateway_connect_url" {
+  value = aws_apigatewayv2_stage.stage.invoke_url
+}
+
+output "ws_api_gateway_api_id" {
+  value = aws_apigatewayv2_api.websocket_api.id
 }

@@ -20,6 +20,7 @@ terraform.rc
 
 # node lambdas
 node_modules
+src/**/package-lock.json
 
 # Python
 

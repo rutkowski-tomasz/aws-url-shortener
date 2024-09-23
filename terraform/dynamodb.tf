@@ -1,7 +1,3 @@
-resource "aws_s3_bucket" "url_shortener_preview_storage" {
-  bucket = "${local.prefix}shortened-urls-previews"
-}
-
 resource "aws_dynamodb_table" "url_shortener" {
   name         = "${local.prefix}shortened-urls"
   billing_mode = "PAY_PER_REQUEST"
@@ -32,8 +28,18 @@ resource "aws_dynamodb_table" "websocket_connections" {
   }
 
   global_secondary_index {
-    name               = "UserIdIndex"
-    hash_key           = "userId"
-    projection_type    = "ALL"
+    name            = "UserIdIndex"
+    hash_key        = "userId"
+    projection_type = "ALL"
   }
+}
+
+resource "aws_lambda_event_source_mapping" "dynamodb_trigger" {
+  event_source_arn  = aws_dynamodb_table.url_shortener.stream_arn
+  function_name     = module.dynamodb_stream_lambda.lambda_function_arn
+  starting_position = "LATEST"
+}
+
+resource "aws_sns_topic" "dynamodb_stream_topic" {
+  name = "${local.prefix}url-created"
 }

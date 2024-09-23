@@ -64,12 +64,6 @@ variable "custom_policy_statements" {
   }
 }
 
-variable "pack_dependencies" {
-  description = "Whether to pack dependencies (node_modules) into the deployment package"
-  type        = bool
-  default     = false
-}
-
 variable "api_gateway_resource_path" {
   description = "The path part for the API Gateway resource"
   type        = string

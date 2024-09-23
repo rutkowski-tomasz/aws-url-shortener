@@ -46,64 +46,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
 
-resource "null_resource" "package_deployment" {
-  triggers = {
-    always_run : timestamp()
-  }
-
-  provisioner "local-exec" {
-    command     = <<-EOT
-      if [ -f "index.ts" ]; then
-        echo "Detected TypeScript project"
-        mv ../../package.json ../../temp-package-no-workspaces.json
-        echo "Installing node_modules"
-        rm -rf node_modules
-        npm i
-        echo "Building TypeScript project"
-        cp ../../tsconfig.json ./tsconfig.json
-        npm run build
-        rm tsconfig.json
-        echo "Packing dist folder"
-        cd dist && zip -qr ../deployment-package.zip . && cd ..
-        rm -rf dist
-        if [ "${var.pack_dependencies}" = "true" ]; then
-          echo "Packing node_modules"
-          zip -qr deployment-package.zip node_modules/
-        fi
-        mv ../../temp-package-no-workspaces.json ../../package.json
-      elif [ -f "package.json" ]; then
-        echo "Detected Node.js project"
-        zip -qr deployment-package.zip index.js
-        if [ "${var.pack_dependencies}" = "true" ]; then
-          echo "Installing node_modules"
-          mv ../../package.json ../../temp-package-no-workspaces.json
-          rm -rf node_modules
-          npm i
-          echo "Packing node_modules"
-          zip -qr deployment-package.zip node_modules/
-          mv ../../temp-package-no-workspaces.json ../../package.json
-        fi
-      elif [ -f "requirements.txt" ]; then
-        echo "Detected Python project"
-        zip -qr deployment-package.zip handler.py
-        if [ "${var.pack_dependencies}" = "true" ]; then
-          echo "Installing Python dependencies"
-          pip3 install -r requirements.txt -t ./package
-          echo "Packing Python dependencies"
-          cd package && zip -qr ../deployment-package.zip . && cd ..
-          rm -rf package
-        fi
-      fi
-
-      aws s3 cp deployment-package.zip s3://us-cicd/${var.lambda_function_name}/deployment_package.zip
-      rm deployment-package.zip
-    EOT
-    working_dir = path.root
-  }
-}
-
 resource "aws_lambda_function" "lambda" {
-  depends_on    = [null_resource.package_deployment]
   function_name = "${local.prefix}${var.lambda_function_name}"
   handler       = var.lambda_handler
   role          = aws_iam_role.lambda_execution_role.arn
@@ -121,9 +64,5 @@ resource "aws_lambda_function" "lambda" {
       },
       var.environment_variables
     )
-  }
-
-  lifecycle {
-    replace_triggered_by = [null_resource.package_deployment]
   }
 }

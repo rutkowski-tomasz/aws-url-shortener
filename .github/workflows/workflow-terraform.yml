@@ -3,9 +3,6 @@ name: "- Terraform Workflow"
 on:
   workflow_call:
     inputs:
-      working-directory:
-        required: true
-        type: string
       environment:
         required: true
         type: string
@@ -16,12 +13,12 @@ on:
 
 jobs:
   terraform:
-    name: Terraform ${{ inputs.action }}
+    name: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.action == 'apply' && inputs.environment || '' }}
     defaults:
       run:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: terraform
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -1,30 +1,8 @@
 {
   "name": "push-notification-lambda",
-  "version": "1.0.0",
-  "description": "Lambda pushing websocket notification to users",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc",
-    "test": "jest --transform='{\"^.+ts$\": \"ts-jest\"}'",
-    "deploy": "terraform apply -auto-approve",
-    "test:unit": "jest -t 'Unit Test' --transform='{\"^.+ts$\": \"ts-jest\"}'",
-    "test:integration": "jest -t 'Integration Test' --transform='{\"^.+ts$\": \"ts-jest\"}'"
-  },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.651.1",
     "@aws-sdk/lib-dynamodb": "^3.651.1",
-    "@jest/globals": "^29.7.0",
-    "@types/aws-lambda": "^8.10.145",
-    "@types/jest": "^29.5.13",
-    "@types/node": "^22.5.5",
-    "aws-sdk-client-mock": "^4.0.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
-    "typescript": "^5.6.2"
-  },
-  "dependencies": {
     "@aws-sdk/util-dynamodb": "^3.632.0"
   }
 }

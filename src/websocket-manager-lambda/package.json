@@ -1,27 +1,7 @@
 {
   "name": "websocket-manager-lambda",
-  "version": "1.0.0",
-  "description": "Lambda handling websocket connections",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc",
-    "test": "jest --transform='{\"^.+ts$\": \"ts-jest\"}'",
-    "deploy": "terraform apply -auto-approve",
-    "test:unit": "jest -t 'Unit Test' --transform='{\"^.+ts$\": \"ts-jest\"}'",
-    "test:integration": "jest -t 'Integration Test' --transform='{\"^.+ts$\": \"ts-jest\"}'"
-  },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.540.0",
-    "@aws-sdk/lib-dynamodb": "^3.540.0",
-    "@jest/globals": "^29.7.0",
-    "@types/aws-lambda": "^8.10.145",
-    "@types/jest": "^29.5.13",
-    "@types/node": "^22.5.5",
-    "aws-sdk-client-mock": "^4.0.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
-    "typescript": "^5.6.2"
+    "@aws-sdk/lib-dynamodb": "^3.540.0"
   }
 }
