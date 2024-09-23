@@ -74,6 +74,7 @@ jobs:
     secrets: inherit
 
   package-source-code:
+    name: Package
     needs: [
       javascript-tests,
       python-tests,
