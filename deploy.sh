@@ -27,7 +27,7 @@ fi
 is_node=$(test -f "$project_dir/index.js" && echo 1 || echo 0)
 is_typescript=$(test -f "$project_dir/index.ts" && echo 1 || echo 0)
 is_python=$(test -f "$project_dir/handler.py" && echo 1 || echo 0)
-package_dir=mktemp -d -p dist
+package_dir=$(mktemp -d -p dist)
 
 if [[ $is_node -eq 1 || $is_typescript -eq 1 ]]; then
     echo "Installing build dependencies..."
@@ -45,14 +45,34 @@ if [[ $is_node -eq 1 || $is_typescript -eq 1 ]]; then
         echo "Found $count_dependecies dependencies - copying..."
 
         rsync -qav \
-            --exclude='.' \
-            --exclude='.md' \
-            --exclude='.ts' \
-            --exclude='.map' \
+            --exclude='.*' \
+            --exclude='*.md' \
+            --exclude='*.ts' \
+            --exclude='*.map' \
+            --exclude='*.test.js' \
+            --exclude='*.spec.js' \
             --exclude='test' \
             --exclude='tests' \
-            --exclude='tests' \
+            --exclude='__tests__' \
+            --exclude='__mocks__' \
+            --exclude='coverage' \
+            --exclude='docs' \
+            --exclude='example' \
+            --exclude='examples' \
             --exclude='LICENSE' \
+            --exclude='*.md' \
+            --exclude='yarn.lock' \
+            --exclude='jest.config.js' \
+            --exclude='webpack.config.js' \
+            --exclude='rollup.config.js' \
+            --exclude='gulpfile.js' \
+            --exclude='Gruntfile.js' \
+            --exclude='*.tgz' \
+            --exclude='*.log' \
+            --exclude='*.d.ts' \
+            --exclude='*.json' \
+            --exclude='bin' \
+            --exclude='obj' \
             "$project_dir/node_modules" "$package_dir/"
     fi
 fi
@@ -63,8 +83,8 @@ if [[ $is_typescript -eq 1 ]]; then
 
     echo "Copying built files to package directory..."
     rsync -av \
-        --exclude='.test.js' \
-        --exclude='.map' \
+        --exclude='*.test.js' \
+        --exclude='*.map' \
         $build_dir/* $package_dir
 fi
 
@@ -75,8 +95,8 @@ if [[ $is_node -eq 1 ]]; then
         --exclude='node_modules' \
         --exclude='.terraform' \
         --exclude='.terraform.lock.hcl' \
-        --exclude='.test.js' \
-        --exclude='.tf' \
+        --exclude='*.test.js' \
+        --exclude='*.tf' \
         --exclude='package-lock.json' \
         --exclude='package.json' \
         $project_dir/* $package_dir
@@ -88,8 +108,8 @@ if [[ $is_python -eq 1 ]]; then
     rsync -av \
         --exclude='.terraform' \
         --exclude='.terraform.lock.hcl' \
-        --exclude='_test.py' \
-        --exclude='.tf' \
+        --exclude='*_test.py' \
+        --exclude='*.tf' \
         --exclude='requirements-dev.txt' \
         --exclude='requirements.txt' \
         $project_dir/* $package_dir
@@ -107,16 +127,19 @@ if [[ $is_python -eq 1 ]]; then
 fi
 
 package_file="$project_name.zip"
-package_size=$(du -hs "$package_file" | awk '{print $1}')
 
 echo "Creating zip package..."
+rm -f $package_file
 (cd $package_dir && zip -qr "../../$package_file" .)
+package_size=$(du -hs "$package_file" | awk '{print $1}')
 
 if [[ $env == "pack" ]]; then
     echo "Cleaning up..."
     rm -rf $package_dir
 
-    echo "Packed $project_dir into $package_dir (size=$package_size)."
+    unzip -l $package_file
+
+    echo "Packed $project_dir into $package_file (size=$package_size)."
 else
     lambda_name="us-$env-$project_name"
     echo "Updating $lambda_name lambda code..."
