@@ -58,7 +58,7 @@ jobs:
         run: python -m unittest discover -v -s ./src -p "*_test.py"
 
   terraform-plan-dev:
-    name: Terraform
+    name: Terraform plan
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       environment: dev
@@ -66,7 +66,7 @@ jobs:
     secrets: inherit
 
   terraform-plan-prd:
-    name: Terraform
+    name: Terraform plan
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       environment: prd
@@ -108,7 +108,7 @@ jobs:
           path: ${{ matrix.project }}.zip
 
   terraform-apply-dev:
-    name: Terraform
+    name: Terraform apply
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     needs: package-source-code
     uses: ./.github/workflows/workflow-terraform.yml
@@ -143,7 +143,7 @@ jobs:
         run: npm test
 
   terraform-apply-prd:
-    name: Terraform
+    name: Terraform apply
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
     needs: terraform-apply-dev
     uses: ./.github/workflows/workflow-terraform.yml

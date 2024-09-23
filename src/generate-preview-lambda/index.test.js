@@ -1,11 +1,19 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { mockClient } = require("aws-sdk-client-mock");
+
+jest.mock('puppeteer-core', () => ({
+  launch: jest.fn(),
+}));
+
+jest.mock('@sparticuz/chromium', () => ({
+  args: [],
+  executablePath: jest.fn().mockResolvedValue('/path/to/chrome'),
+  headless: true,
+  setHeadlessMode: jest.fn(),
+  setGraphicsMode: jest.fn(),
+}));
+
 const puppeteer = require("puppeteer-core");
-const chromium = require('@sparticuz/chromium');
-
-jest.mock('puppeteer-core');
-jest.mock('@sparticuz/chromium');
-
 const { handler } = require("./index");
 
 process.env.ENVIRONMENT = "dev";
@@ -17,7 +25,7 @@ const sampleEvent = {
     {
       body: JSON.stringify({
         Message: JSON.stringify({
-          url: "https://example.com",
+          longUrl: "https://example.com",
           code: "abc123"
         })
       })
@@ -29,7 +37,6 @@ beforeEach(() => {
   s3Mock.reset();
   jest.clearAllMocks();
   
-  chromium.executablePath.mockResolvedValue('/path/to/chrome');
   puppeteer.launch.mockResolvedValue({
     newPage: jest.fn().mockResolvedValue({
       goto: jest.fn().mockResolvedValue(),
@@ -87,8 +94,16 @@ describe('Integration Test', () => {
   });
 
   afterAll(() => {
-    jest.mock('puppeteer-core');
-    jest.mock('@sparticuz/chromium');
+    jest.mock('puppeteer-core', () => ({
+      launch: jest.fn(),
+    }));
+    jest.mock('@sparticuz/chromium', () => ({
+      args: [],
+      executablePath: jest.fn().mockResolvedValue('/path/to/chrome'),
+      headless: true,
+      setHeadlessMode: jest.fn(),
+      setGraphicsMode: jest.fn(),
+    }));
   });
 
   test('integration test', async () => {
@@ -96,7 +111,7 @@ describe('Integration Test', () => {
       Records: [{
         body: JSON.stringify({
           Message: JSON.stringify({
-            url: "https://example.com",
+            longUrl: "https://example.com",
             code: "123abcd"
           })
         })
