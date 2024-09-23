@@ -7,7 +7,6 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
   }
 }
 
-
 resource "aws_iam_role" "api_gateway_cloudwatch_role" {
   name = "${local.prefix}api_gateway_cloudwatch_role"
 

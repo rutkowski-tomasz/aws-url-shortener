@@ -20,7 +20,6 @@ provider "aws" {
     tags = {
       environment       = local.environment
       application       = "aws-url-shortener"
-      project           = local.project
       terraform-managed = true
     }
   }
@@ -32,7 +31,6 @@ locals {
   is_valid_workspace = contains(["dev", "prd"], terraform.workspace)
   prefix             = "us-${local.environment}-"
   environment        = terraform.workspace
-  project            = "shared-infrastructure"
 }
 
 resource "null_resource" "validate_workspace" {
