@@ -12,7 +12,7 @@ exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
     const env = process.env.ENVIRONMENT;
-    const bucketName = `us-${env}-shortened-urls-previews`;
+    const bucketName = `us-${env}-preview-storage`;
 
     console.debug('Publishing to bucket:', bucketName);
 

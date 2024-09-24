@@ -1,13 +1,14 @@
-const axios = require('axios');
-const WebSocket = require('ws');
+import axios from 'axios';
+import WebSocket from 'ws';
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 
 let config = {
-  urlShortenerBaseUrl: 'https://09fh8d9q9j.execute-api.eu-central-1.amazonaws.com/dev',
+  urlShortenerBaseUrl: 'https://gxksidybci.execute-api.eu-central-1.amazonaws.com/dev',
   cognitoUrl: 'https://cognito-idp.eu-central-1.amazonaws.com',
-  clientId: '1kirlbqnjpertctpamfatsfolc',
+  clientId: '5cl15o1k9f08cdr05800abf08n',
   username: 'system-tests@example.com',
   password: 'SecurePassword123!',
-  webSocketApiUrl: 'wss://d7enlocx23.execute-api.eu-central-1.amazonaws.com/dev/',
+  webSocketApiUrl: 'wss://n5qi08a4gg.execute-api.eu-central-1.amazonaws.com/dev/',
   webSocketTimeout: 30000,
 };
 

@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, Context, Callback, APIGatewayProxyResult } from 'aws-lambda';
 import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBDocumentClient, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
-import { beforeEach, describe, test, expect, jest } from '@jest/globals';
+import { beforeEach, describe, test, expect } from '@jest/globals';
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 

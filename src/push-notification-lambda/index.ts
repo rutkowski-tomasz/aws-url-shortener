@@ -88,7 +88,7 @@ const getUserConnections = async (userId: string) => {
     return result;
 };
 
-const postToConnection = async (connectionId: string, data: {}) => {
+const postToConnection = async (connectionId: string, data: any) => {
     const command = new PostToConnectionCommand({
         ConnectionId: connectionId,
         Data: JSON.stringify(data),

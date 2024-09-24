@@ -1,5 +1,6 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { mockClient } = require("aws-sdk-client-mock");
+const { beforeEach, describe, test, expect, beforeAll, afterAll } = require('@jest/globals');
 
 jest.mock('puppeteer-core', () => ({
   launch: jest.fn(),
@@ -64,12 +65,12 @@ describe('Unit Tests', () => {
     
     const putObjectCalls = s3Mock.calls(PutObjectCommand);
     expect(putObjectCalls[0].args[0].input).toEqual(expect.objectContaining({
-      Bucket: 'us-dev-shortened-urls-previews',
+      Bucket: 'us-dev-preview-storage',
       Key: 'abc123/desktop.png',
       ContentType: 'image/png'
     }));
     expect(putObjectCalls[1].args[0].input).toEqual(expect.objectContaining({
-      Bucket: 'us-dev-shortened-urls-previews',
+      Bucket: 'us-dev-preview-storage',
       Key: 'abc123/mobile.png',
       ContentType: 'image/png'
     }));

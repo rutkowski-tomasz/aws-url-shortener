@@ -103,7 +103,7 @@ module "push_notification_lambda" {
     },
     {
       Action : "execute-api:ManageConnections",
-      Resource : "arn:aws:execute-api:*:*:${aws_s3_bucket.preview_storage.id}/*/*/@connections/*"
+      Resource : "arn:aws:execute-api:${data.aws_region.current.name}:*:${aws_apigatewayv2_api.websocket_api.id}/${local.environment}/*/@connections/*"
     }
   ]
 
