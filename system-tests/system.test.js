@@ -1,6 +1,5 @@
-import axios from 'axios';
-import WebSocket from 'ws';
-import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+const axios = require('axios');
+const WebSocket = require('ws');
 
 let config = {
   urlShortenerBaseUrl: 'https://gxksidybci.execute-api.eu-central-1.amazonaws.com/dev',
