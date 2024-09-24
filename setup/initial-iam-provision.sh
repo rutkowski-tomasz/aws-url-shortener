@@ -101,7 +101,9 @@ cat > ${policy_document} << EOF
         "iam:AttachRolePolicy",
         "iam:DetachRolePolicy",
         "iam:PassRole",
-        "iam:UpdateAssumeRolePolicy"
+        "iam:UpdateAssumeRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:PutRolePolicy"
       ],
       "Resource": [
         "arn:aws:iam::${account_id}:policy/us-*",

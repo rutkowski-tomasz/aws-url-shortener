@@ -85,7 +85,6 @@ for project_name in "$@"; do
                 --exclude='*.tgz' \
                 --exclude='*.log' \
                 --exclude='*.d.ts' \
-                --exclude='*.json' \
                 --exclude='bin' \
                 --exclude='obj' \
                 "$project_dir/node_modules" "$package_dir/"
@@ -149,18 +148,16 @@ for project_name in "$@"; do
     build_time=$((end_time - start_time))
     package_size=$(du -hs "$package_file" | awk '{print $1}')
 
-    if [[ $env == "pack" ]]; then
-        echo "Packed $project_dir into $package_file (size=$package_size, time=${build_time}s)."
-        echo "📦 $project_name → 🏋🏻 $package_size, ⏱️ ${build_time}s" >> $GITHUB_STEP_SUMMARY
-    else
+    echo "Packed $project_dir into $package_file (size=$package_size, time=${build_time}s)."
+    echo "📦 $project_name → 🏋🏻 $package_size, ⏱️ ${build_time}s" >> $GITHUB_STEP_SUMMARY
+
+    if [[ $env != "pack" ]]; then
         lambda_name="us-$env-$project_name"
         echo "Updating $lambda_name lambda code..."
         aws lambda update-function-code \
             --no-cli-pager \
             --function-name "$lambda_name" \
             --zip-file "fileb://$package_file"
-
-        rm $package_file
 
         echo "Deployed $project_dir to $lambda_name (size=$package_size, time=${build_time}s)."
     fi

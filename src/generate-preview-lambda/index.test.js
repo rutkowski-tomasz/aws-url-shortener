@@ -64,12 +64,12 @@ describe('Unit Tests', () => {
     
     const putObjectCalls = s3Mock.calls(PutObjectCommand);
     expect(putObjectCalls[0].args[0].input).toEqual(expect.objectContaining({
-      Bucket: 'us-dev-shortened-urls-previews',
+      Bucket: 'us-dev-preview-storage',
       Key: 'abc123/desktop.png',
       ContentType: 'image/png'
     }));
     expect(putObjectCalls[1].args[0].input).toEqual(expect.objectContaining({
-      Bucket: 'us-dev-shortened-urls-previews',
+      Bucket: 'us-dev-preview-storage',
       Key: 'abc123/mobile.png',
       ContentType: 'image/png'
     }));

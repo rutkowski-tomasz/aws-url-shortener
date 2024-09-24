@@ -11,10 +11,12 @@ In real world scenario all the projects would probably be managed as separate re
 # 🌳 Repository structure
 
 ```sh
+├── deploy.sh
 ├── docs
 ├── jest.config.js
+├── package-lock.json
 ├── package.json # Configuration for npm workspaces
-├── requests # Prepared requests to test the whole solution, see /.vscode/settings.json
+├── requests # Prepared requests to test the whole solution, configuration at .vscode/settings.json
 ├── setup # Scripts required for setup first IAM role
 ├── src
 │   ├── dynamodb-stream-lambda # Handling streams from DynamoDB, dispatching to SNS topics (TS)
@@ -26,10 +28,8 @@ In real world scenario all the projects would probably be managed as separate re
 │   ├── websocket-authorizer-lambda # Authorizing Websocket API connections (TS)
 │   └── websocket-manager-lambda # Managing connect and disconnect Websocket API connections (TS)
 ├── system-tests # Tests veryfing if the application works all together
-└── terraform
-    ├── modules # Shared TF modules between projects
-    │   └── lambda # Reused by all lambdas
-    └── shared-infrastructure # Resources managed outside of projects life-cycle
+├── terraform # IaC
+└── tsconfig.json
 ```
 
 # 🛣️ Roadmap
@@ -60,20 +60,33 @@ The development of this solution is iterative, with the roadmap subject to chang
 
 ## CI/CD user permissions update
 ```sh
-./setup/initial-iam-provision.sh
+./setup/initial-iam-provision.sh # creates ci-cd user that will be used in GitHub Actions
 ```
 
 ## Local apply terraform
-
 ```sh
-cd shared-infrastructure
-terraform workspace select dev # 'dev' or 'prd'
-terraform apply -auto-approve
+terraform -chdir=terraform workspace select -or-create dev # or 'prd'
+terraform -chdir=terraform apply -auto-approve
+```
+
+## Local deploy lambda
+```sh
+# Deploy one or many projects at once
+./deploy.sh dev get-url-lambda shorten-url-lambda
+# Or just create packages without deploying
+./deploy.sh pack websocket-authorizer-lambda
 ```
 
 ## Run tests
 ```sh
-# JS or TS lambdas
+# System tests
+npm run system-tests
+# All JS & TS projects
+npm test
+npm test:unit # only unit tests
+npm test:integration # only integration tests
+npm open:coverage # open coverage HTML
+# Single project tests
 npm test -w shorten-url-lambda
 # Python lambdas
 cd get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
@@ -81,6 +94,6 @@ cd get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
 
 ## Connect to WS API Gateway
 ```sh
-wscat -c wss://os6c0elcng.execute-api.eu-central-1.amazonaws.com/dev/ \
+wscat -c wss://n5qi08a4gg.execute-api.eu-central-1.amazonaws.com/dev \
 -H 'Authorization: Bearer eyJraWQiOiJSWmhsT...'
 ```

@@ -4,8 +4,8 @@
             "cognitoUrl": "https://cognito-idp.eu-central-1.amazonaws.com"
         },
         "dev": {
-            "baseUrl": "https://09fh8d9q9j.execute-api.eu-central-1.amazonaws.com/dev",
-            "cognitoClientId": "1kirlbqnjpertctpamfatsfolc"
+            "baseUrl": "https://gxksidybci.execute-api.eu-central-1.amazonaws.com/dev",
+            "cognitoClientId": "5cl15o1k9f08cdr05800abf08n"
         },
         "prd": {
             "baseUrl": "https://qwhu76v9pd.execute-api.eu-central-1.amazonaws.com/prd"
