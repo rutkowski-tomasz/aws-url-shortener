@@ -42,6 +42,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
+      - name: Create placeholders for deployment packages
+        if: inputs.action == 'plan'
+        run: |
+          mkdir -p ../dist
+          for dir in $(find ../src -maxdepth 1 -mindepth 1 -type d); do
+            touch ../dist/$(basename $dir).zip
+          done
+
+      - name: Download deployment packages
+        if: inputs.action == 'apply'
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          name: deployment-packages
+
+      - name: List deployment packages
+        run: ls -l ../dist
+
       - name: Terraform init
         run: terraform init
 

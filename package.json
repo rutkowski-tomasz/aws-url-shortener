@@ -8,7 +8,7 @@
     "build": "tsc",
     "test": "jest --transform='{\"^.+ts$\": \"ts-jest\"}'",
     "open:coverage": "open .coverage/lcov-report/index.html",
-    "test:unit": "jest -t 'Unit Test' --transform='{\"^.+ts$\": \"ts-jest\"}'",
+    "test:unit": "jest -t 'Unit Test' --transform='{\"^.+ts$\": \"ts-jest\"}' --coverageReporters='json-summary'",
     "test:integration": "jest -t 'Integration Test' --transform='{\"^.+ts$\": \"ts-jest\"}'"
   },
   "devDependencies": {

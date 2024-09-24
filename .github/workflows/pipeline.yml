@@ -75,43 +75,33 @@ jobs:
 
   package-source-code:
     name: Package
-    needs: [
-      javascript-tests,
-      python-tests,
-      terraform-plan-dev,
-      terraform-plan-prd
-    ]
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project: [
-          dynamodb-stream-lambda,
-          generate-preview-lambda,
-          get-preview-url-lambda,
-          get-url-lambda,
-          push-notification-lambda,
-          shorten-url-lambda,
-          websocket-authorizer-lambda,
-          websocket-manager-lambda
-        ]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create package
-        run: ./deploy.sh ${{ matrix.project }} pack
+      - name: Find and package all projects
+        run: |
+          projects=$(find ./src -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
+          ./deploy.sh pack $projects
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.project }}.zip
-          path: ${{ matrix.project }}.zip
+          name: deployment-packages
+          path: dist/*.zip
 
   terraform-apply-dev:
     name: Terraform apply
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'release'
-    needs: package-source-code
+    needs: [
+      javascript-tests,
+      python-tests,
+      terraform-plan-dev,
+      terraform-plan-prd,
+      package-source-code
+    ]
     uses: ./.github/workflows/workflow-terraform.yml
     with:
       environment: dev

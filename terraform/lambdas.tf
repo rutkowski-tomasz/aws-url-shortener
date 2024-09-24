@@ -23,10 +23,10 @@ module "dynamodb_stream_lambda" {
   ]
 }
 
-module "generate_stream_lambda" {
+module "generate_preview_lambda" {
   source               = "./modules/lambda"
   environment          = local.environment
-  lambda_function_name = "generate-stream-lambda"
+  lambda_function_name = "generate-preview-lambda"
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
   lambda_memory_size   = 1024
