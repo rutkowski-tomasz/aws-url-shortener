@@ -14,9 +14,13 @@ export default [
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-require-imports": "off",
+      "no-undef": "off",
     },
   },
   {
-    ignores: ["dist/"],
+    ignores: [
+      "dist/",
+      ".coverage/"
+    ],
   }
 ];

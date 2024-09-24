@@ -1,6 +1,6 @@
 const { S3Client } = require("@aws-sdk/client-s3");
 const { mockClient } = require("aws-sdk-client-mock");
-const { beforeEach, describe, test, expect, beforeAll, jest } = require('@jest/globals');
+const { beforeEach, describe, test, expect, beforeAll } = require('@jest/globals');
 
 jest.mock("@aws-sdk/s3-request-presigner", () => ({
   getSignedUrl: jest.fn()
