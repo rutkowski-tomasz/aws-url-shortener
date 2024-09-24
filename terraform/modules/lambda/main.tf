@@ -54,8 +54,8 @@ resource "aws_lambda_function" "lambda" {
   memory_size   = var.lambda_memory_size
   timeout       = var.lambda_timeout
   layers        = var.lambda_layers
-  s3_bucket     = "us-cicd"
-  s3_key        = "${var.lambda_function_name}/deployment_package.zip"
+  filename      = "../dist/${var.lambda_function_name}.zip"
+  source_code_hash = filebase64sha256("../dist/${var.lambda_function_name}.zip")
 
   environment {
     variables = merge(
