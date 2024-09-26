@@ -65,4 +65,8 @@ resource "aws_lambda_function" "lambda" {
       var.environment_variables
     )
   }
+
+  tracing_config {
+    mode = "Active"
+  }
 }
