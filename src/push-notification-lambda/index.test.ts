@@ -1,10 +1,11 @@
 import { S3Event } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
-import { DynamoDBDocumentClient, GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk/client-apigatewaymanagementapi";
 import { handler } from './index';
 
-const ddbMock = mockClient(DynamoDBDocumentClient);
+const ddbMock = mockClient(DynamoDBClient);
 const apiGatewayMock = mockClient(ApiGatewayManagementApiClient);
 
 jest.mock('@aws-sdk/client-apigatewaymanagementapi');
