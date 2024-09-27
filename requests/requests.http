@@ -100,3 +100,8 @@ Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
 GET {{ baseUrl }}/get-preview-url?code={{shortenUrl.response.body.result.code}}
 Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
 
+###
+
+# @name getMyUrls
+GET {{baseUrl}}/get-my-urls
+Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
