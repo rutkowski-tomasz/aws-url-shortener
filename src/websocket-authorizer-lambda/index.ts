@@ -1,7 +1,9 @@
 import { APIGatewayAuthorizerResult, APIGatewayAuthorizerResultContext, APIGatewayRequestAuthorizerEvent, APIGatewayRequestAuthorizerHandler } from 'aws-lambda';
 import { decode, verify } from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
+import { Tracer } from '@aws-lambda-powertools/tracer';
 
+const tracer = new Tracer();
 const { AWS_REGION, USER_POOL_ID } = process.env;
 
 let pemEncodedPublicKeys: { [kid: string]: string };
@@ -9,6 +11,9 @@ let pemEncodedPublicKeys: { [kid: string]: string };
 export const handler: APIGatewayRequestAuthorizerHandler = async (
     event: APIGatewayRequestAuthorizerEvent
 ): Promise<APIGatewayAuthorizerResult> => {
+
+    const handlerSegment = tracer.getSegment()!.addNewSubsegment(`## ${process.env._HANDLER}`);
+    tracer.setSegment(handlerSegment);
 
     console.log('event: %j', event);
 
@@ -31,9 +36,15 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (
         throw new Error('Unauthorized');
     }
 
+    tracer.putAnnotation('sub', claims.sub as string);
+    tracer.putAnnotation('email', claims.email as string);
+
     const policy = generatePolicy(event.methodArn, claims);
 
     console.log('policy: %j', policy);
+
+    handlerSegment?.close();
+    tracer.setSegment(handlerSegment?.parent);
 
     return policy;
 };
