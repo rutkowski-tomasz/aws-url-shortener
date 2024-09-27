@@ -115,7 +115,7 @@ resource "aws_api_gateway_deployment" "deployment" {
   }
 
   depends_on = [
-    aws_api_gateway_integration.get_my_links_integration,
+    aws_api_gateway_integration.get_my_urls_integration,
   ]
 
   lifecycle {

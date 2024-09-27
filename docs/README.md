@@ -56,7 +56,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 1. ✅ Push generated preview event to user
 1. ✅ X-Ray integration
 ![X-Ray Trace Map](xray.png)
-1. ✅ Create endpoint /get-my-links using direct API Gateway AWS direct integration with DynamoDb
+1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS direct integration with DynamoDb
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development

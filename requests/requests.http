@@ -102,6 +102,6 @@ Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}
 
 ###
 
-# @name getMyLinks
-GET {{baseUrl}}/get-my-links
+# @name getMyUrls
+GET {{baseUrl}}/get-my-urls
 Authorization: Bearer {{login.response.body.AuthenticationResult.IdToken}}

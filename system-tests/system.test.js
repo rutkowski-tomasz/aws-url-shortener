@@ -77,6 +77,22 @@ describe('Lambda function integration', () => {
     expect(response.data.result).toHaveProperty('mobilePreview');
   });
 
+  test('get-my-urls integrates with DynamoDB', async () => {
+    const response = await axios.get(`${config.urlShortenerBaseUrl}/get-my-urls`, {
+      headers: {
+        'Authorization': `Bearer ${idToken}`
+      }
+    });
+    expect(response.status).toBe(200);
+    expect(response.data).toHaveProperty('links');
+    expect(response.data.links.length).toBeGreaterThan(0);
+    const link = response.data.links.find(l => l.code === code);
+    expect(link).toBeDefined();
+    expect(link).toHaveProperty('code', code);
+    expect(link).toHaveProperty('longUrl', longUrl);
+    expect(link).toHaveProperty('createdAt');
+  });
+
   describe('PREVIEW_GENERATED event is pushed', () => {
     let ws;
     beforeAll(() => {
