@@ -12,18 +12,6 @@ cat > ${policy_document} << EOF
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "CloudFormationManagement",
-      "Effect": "Allow",
-      "Action": [
-        "cloudformation:GetResource",
-        "cloudformation:GetResourceRequestStatus",
-        "cloudformation:UpdateResource"
-      ],
-      "Resource": [
-        "arn:aws:cloudformation:${region}:${account_id}:resource/*"
-      ]
-    },
-    {
       "Sid": "SnsGlobalManagement",
       "Effect": "Allow",
       "Action": [
