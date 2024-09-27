@@ -1,9 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { Tracer } from '@aws-lambda-powertools/tracer';
 
-const dynamoDbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const tracer = new Tracer();
+const dynamoDbClient = tracer.captureAWSv3Client(new DynamoDBClient({}));
 
 const { ENVIRONMENT } = process.env;
 const TableName = `us-${ENVIRONMENT}-websocket-connections`;
@@ -11,6 +13,9 @@ const TableName = `us-${ENVIRONMENT}-websocket-connections`;
 export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+    const handlerSegment = tracer.getSegment()!.addNewSubsegment(`## ${process.env._HANDLER}`);
+    tracer.setSegment(handlerSegment);
+
     console.log('Event: %j', event);
 
     if (!event.requestContext.authorizer) {
@@ -25,6 +30,12 @@ export const handler: APIGatewayProxyHandler = async (
     const userId = event.requestContext.authorizer.sub;
     const connectionId = event.requestContext.connectionId;
 
+    tracer.putAnnotation('routeKey', event.requestContext.routeKey || '');
+    tracer.putAnnotation('eventType', event.requestContext.eventType || '');
+    tracer.putAnnotation('connectionId', event.requestContext.connectionId);
+    tracer.putAnnotation('email', event.requestContext.authorizer.email);
+    tracer.putAnnotation('sub', event.requestContext.authorizer.sub);
+
     try {
 
         if (eventType === 'CONNECT') {
@@ -38,6 +49,9 @@ export const handler: APIGatewayProxyHandler = async (
         console.error('Error: %j', err);
         return { statusCode: 500, body: 'Internal server error' };
     }
+
+    handlerSegment?.close();
+    tracer.setSegment(handlerSegment?.parent);
 
     return { statusCode: 200, body: JSON.stringify({ connectionId: event.requestContext.connectionId }) };
 };

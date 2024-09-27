@@ -140,8 +140,6 @@ for project_name in "$@"; do
     echo "Creating zip package..."
     rm -f $package_file
     (cd $package_dir && zip -qr "../../$package_file" .)
-
-    echo "Cleaning up..."
     rm -rf $package_dir
 
     end_time=$(date +%s)

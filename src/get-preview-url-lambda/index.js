@@ -1,7 +1,8 @@
 const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-const s3Client = new S3Client({});
+const AWSXRay = require('aws-xray-sdk-core');
+const s3Client = AWSXRay.captureAWSv3Client(new S3Client());
 
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));

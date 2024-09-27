@@ -1,11 +1,12 @@
-const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { mockClient } = require("aws-sdk-client-mock");
 const { handler } = require("./index");
 const { beforeEach, describe, test, expect, beforeAll, afterAll } = require('@jest/globals');
 
 process.env.ENVIRONMENT = "dev";
 
-const ddbMock = mockClient(DynamoDBDocumentClient);
+const ddbMock = mockClient(DynamoDBClient);
 
 const sampleEvent = {
   "resource": "/shorten-url",
@@ -70,7 +71,7 @@ describe('Integration Test', () => {
   });
 
   afterAll(() => {
-    mockClient(DynamoDBDocumentClient);
+    mockClient(DynamoDBClient);
   });
 
   test('integration test', async () => {

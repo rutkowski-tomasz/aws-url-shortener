@@ -5,6 +5,7 @@
     "@types/jwk-to-pem": "^2.0.3"
   },
   "dependencies": {
+    "@aws-lambda-powertools/tracer": "^2.8.0",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.6"
   }

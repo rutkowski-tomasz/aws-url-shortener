@@ -4,5 +4,8 @@
     "@aws-sdk/client-apigatewaymanagementapi": "^3.651.1",
     "@aws-sdk/lib-dynamodb": "^3.651.1",
     "@aws-sdk/util-dynamodb": "^3.632.0"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/tracer": "^2.8.0"
   }
 }

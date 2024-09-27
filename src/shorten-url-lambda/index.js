@@ -1,7 +1,8 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { PutCommand, DynamoDBDocumentClient } = require("@aws-sdk/lib-dynamodb");
+const { PutCommand } = require("@aws-sdk/lib-dynamodb");
 
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const AWSXRay = require('aws-xray-sdk-core');
+const client = AWSXRay.captureAWSv3Client(new DynamoDBClient());
 
 exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));

@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent, Context, Callback, APIGatewayProxyResult } from 'aws-lambda';
 import { mockClient } from "aws-sdk-client-mock";
-import { DynamoDBDocumentClient, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { beforeEach, describe, test, expect } from '@jest/globals';
 
-const ddbMock = mockClient(DynamoDBDocumentClient);
+const ddbMock = mockClient(DynamoDBClient);
 
 process.env.ENVIRONMENT = 'dev';
 
@@ -100,7 +101,7 @@ describe('Integration Test', () => {
     });
 
     afterAll(() => {
-        mockClient(DynamoDBDocumentClient);
+        mockClient(DynamoDBClient);
     });
 
     test('connect test', async () => {

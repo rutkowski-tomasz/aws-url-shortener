@@ -5,6 +5,7 @@
     "@sparticuz/chromium": "^127.0.0"
   },
   "dependencies": {
+    "aws-xray-sdk-core": "^3.10.1",
     "puppeteer-core": "^23.1.0"
   }
 }

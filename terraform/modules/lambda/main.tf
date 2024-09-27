@@ -36,6 +36,16 @@ resource "aws_iam_policy" "lambda_policy" {
           Effect   = "Allow",
         }
       ],
+      [
+        {
+          Action = [
+            "xray:PutTraceSegments",
+            "xray:PutTelemetryRecords",
+          ],
+          Resource = "*",
+          Effect   = "Allow",
+        }
+      ],
       var.custom_policy_statements
     )
   })
@@ -64,5 +74,9 @@ resource "aws_lambda_function" "lambda" {
       },
       var.environment_variables
     )
+  }
+
+  tracing_config {
+    mode = "Active"
   }
 }
