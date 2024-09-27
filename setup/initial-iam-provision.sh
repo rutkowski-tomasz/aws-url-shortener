@@ -15,7 +15,9 @@ cat > ${policy_document} << EOF
       "Sid": "CloudFormationManagement",
       "Effect": "Allow",
       "Action": [
-        "cloudformation:GetResource"
+        "cloudformation:GetResource",
+        "cloudformation:GetResourceRequestStatus",
+        "cloudformation:UpdateResource"
       ],
       "Resource": [
         "arn:aws:cloudformation:${region}:${account_id}:resource/*"

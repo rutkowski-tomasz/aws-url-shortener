@@ -21,7 +21,7 @@ resource "awscc_xray_resource_policy" "xray_policy" {
               "aws:SourceAccount": data.aws_caller_identity.current.account_id
             },
             "StringLike": {
-              "aws:SourceArn": "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.prefix}*"
+              "aws:SourceArn": "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
             }
           }
         }
