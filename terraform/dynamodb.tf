@@ -42,4 +42,5 @@ resource "aws_lambda_event_source_mapping" "dynamodb_trigger" {
 
 resource "aws_sns_topic" "dynamodb_stream_topic" {
   name = "${local.prefix}url-created"
+  tracing_config = "Active"
 }
