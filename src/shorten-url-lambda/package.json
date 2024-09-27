@@ -2,6 +2,9 @@
   "name": "shorten-url-lambda",
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.540.0",
-    "@aws-sdk/lib-dynamodb": "^3.540.0"
+    "@aws-sdk/lib-dynamodb": "^3.658.1"
+  },
+  "dependencies": {
+    "aws-xray-sdk-core": "^3.10.1"
   }
 }

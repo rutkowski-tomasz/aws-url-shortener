@@ -5,7 +5,8 @@ const chromium = require('@sparticuz/chromium');
 chromium.setHeadlessMode = true;
 chromium.setGraphicsMode = false;
 
-const s3Client = new S3Client({});
+const AWSXRay = require('aws-xray-sdk-core');
+const s3Client = AWSXRay.captureAWSv3Client(new S3Client());
 
 
 exports.handler = async (event) => {
