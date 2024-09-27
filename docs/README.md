@@ -54,6 +54,9 @@ The development of this solution is iterative, with the roadmap subject to chang
 1. ✅ Get presigned URL to generated previews
 1. ✅ Create Websocket API (with custom lambda Cognito Authorizer)
 1. ✅ Push generated preview event to user
+1. <details><summary>✅ X-Ray integration</summary>
+![X-Ray Trace Map](xray.png)
+</details>
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
