@@ -79,6 +79,11 @@ Content-Type: application/x-amz-json-1.1
 
 ###
 
+# @name health
+GET {{baseUrl}}/health
+
+###
+
 # @name shortenUrl
 POST {{baseUrl}}/shorten-url
 Content-Type: application/json

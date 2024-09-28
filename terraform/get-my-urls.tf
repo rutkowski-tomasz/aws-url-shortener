@@ -48,9 +48,35 @@ resource "aws_api_gateway_method_response" "get_my_urls_response_200" {
   status_code = "200"
 
   response_models = {
-    "application/json" = "Empty"
+    "application/json" = aws_api_gateway_model.get_my_urls_response_model.name
   }
 }
+
+resource "aws_api_gateway_model" "get_my_urls_response_model" {
+  rest_api_id  = aws_api_gateway_rest_api.api_gateway.id
+  name         = "GetMyUrlsResponseModel"
+  description  = "API response for GET /get-my-urls"
+  content_type = "application/json"
+  schema = jsonencode({
+    "$schema" = "http://json-schema.org/draft-04/schema#"
+    title     = "GET /get-my-urls"
+    type      = "object"
+    properties = {
+      links = {
+        type = "array",
+        items = {
+          type = "object",
+          properties = {
+            code = { "type": "string" },
+            longUrl = { "type": "string" },
+            createdAt = { "type": "number" }
+          }
+        }
+      }
+    }
+  })
+}
+
 
 resource "aws_api_gateway_integration_response" "get_my_urls_integration_response_200" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
