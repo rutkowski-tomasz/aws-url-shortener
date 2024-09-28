@@ -2,12 +2,12 @@ const axios = require('axios');
 const WebSocket = require('ws');
 
 let config = {
-  urlShortenerBaseUrl: 'https://gxksidybci.execute-api.eu-central-1.amazonaws.com/dev',
+  urlShortenerBaseUrl: 'https://35o6amojr1.execute-api.eu-central-1.amazonaws.com/dev',
   cognitoUrl: 'https://cognito-idp.eu-central-1.amazonaws.com',
-  clientId: '5cl15o1k9f08cdr05800abf08n',
+  clientId: '5fnqfaub5lgsg36oukp82at78g',
   username: 'system-tests@example.com',
   password: 'SecurePassword123!',
-  webSocketApiUrl: 'wss://n5qi08a4gg.execute-api.eu-central-1.amazonaws.com/dev/',
+  webSocketApiUrl: 'wss://5si3qer1q4.execute-api.eu-central-1.amazonaws.com/dev',
   webSocketTimeout: 30000,
 };
 

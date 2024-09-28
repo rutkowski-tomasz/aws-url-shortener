@@ -122,3 +122,15 @@ resource "aws_api_gateway_deployment" "deployment" {
     create_before_destroy = true
   }
 }
+
+data "aws_api_gateway_export" "swagger_export" {
+  rest_api_id = aws_api_gateway_stage.stage.rest_api_id
+  stage_name  = aws_api_gateway_stage.stage.stage_name
+  export_type = "swagger"
+}
+
+resource "aws_s3_object" "swagger_upload" {
+  bucket = "us-cicd"
+  key    = "docs/swagger.json"
+  content = data.aws_api_gateway_export.swagger_export.body
+}

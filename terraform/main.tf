@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "us-cicd"
-    key    = "terraform/solution-infrastructure"
+    key    = "solution-infrastructure"
     region = "eu-central-1"
   }
 }
