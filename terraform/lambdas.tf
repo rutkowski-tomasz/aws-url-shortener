@@ -53,6 +53,22 @@ module "get_preview_url_lambda" {
   lambda_runtime            = "nodejs20.x"
   api_gateway_http_method   = "GET"
   api_gateway_resource_path = "get-preview-url"
+  api_gateway_model_schema = jsonencode({
+    "$schema" = "http://json-schema.org/draft-04/schema#"
+    title     = "GET /get-preview-url"
+    type      = "object"
+    properties = {
+      isSuccess = { type = "boolean" },
+      error = { type = "string" },
+      result = {
+        type = "object",
+        properties = {
+          desktopUrl = { type = "string" },
+          mobileUrl = { type = "string" }
+        }
+      }
+    }
+  })
 
   depends_on                = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
@@ -123,6 +139,24 @@ module "shorten_url_lambda" {
   api_gateway_http_method            = "POST"
   api_gateway_resource_path          = "shorten-url"
   api_gateway_requires_authorization = true
+  api_gateway_model_schema = jsonencode({
+    "$schema" = "http://json-schema.org/draft-04/schema#"
+    title     = "POST /shorten-url"
+    type      = "object"
+    properties = {
+      isSuccess = { type = "boolean" }
+      error = { type = "string" }
+      result = {
+        type = "object"
+        properties = {
+          code = { type = "string" },
+          longUrl = { type = "string" },
+          userId = { type = "string" },
+          createdAt = { type = "number" }
+        }
+      }
+    }
+  })
 
   custom_policy_statements = [
     {

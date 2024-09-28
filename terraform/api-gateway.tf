@@ -94,7 +94,29 @@ resource "aws_api_gateway_method_response" "health_response_200" {
   resource_id = aws_api_gateway_resource.health.id
   http_method = aws_api_gateway_method.health_get.http_method
   status_code = "200"
+
+  response_models = {
+    "application/json" = aws_api_gateway_model.response_model.name
+  }
 }
+
+resource "aws_api_gateway_model" "response_model" {
+  rest_api_id  = aws_api_gateway_rest_api.api_gateway.id
+  name         = "GetHealthResponseModel"
+  description  = "API response for GET /health"
+  content_type = "application/json"
+  schema = jsonencode({
+    "$schema" = "http://json-schema.org/draft-04/schema#"
+    title     = "GET /health"
+    type      = "object"
+    properties = {
+      status = {
+        type = "string"
+      }
+    }
+  })
+}
+
 resource "aws_api_gateway_integration_response" "health_integration_response" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   resource_id = aws_api_gateway_resource.health.id
@@ -121,4 +143,16 @@ resource "aws_api_gateway_deployment" "deployment" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+data "aws_api_gateway_export" "swagger_export" {
+  rest_api_id = aws_api_gateway_stage.stage.rest_api_id
+  stage_name  = aws_api_gateway_stage.stage.stage_name
+  export_type = "swagger"
+}
+
+resource "aws_s3_object" "swagger_upload" {
+  bucket = "us-cicd"
+  key    = "docs/swagger.json"
+  content = data.aws_api_gateway_export.swagger_export.body
 }

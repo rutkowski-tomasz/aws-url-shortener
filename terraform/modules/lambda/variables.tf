@@ -82,6 +82,12 @@ variable "api_gateway_requires_authorization" {
   default     = false
 }
 
+variable "api_gateway_model_schema" {
+  description = "The schema for the API Gateway model"
+  type        = string
+  default     = null
+}
+
 variable "sns_topic_name" {
   description = "The name of the SNS topic to subscribe to"
   type        = string
