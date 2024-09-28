@@ -3,9 +3,9 @@ resource "aws_s3_bucket" "preview_storage" {
 }
 
 resource "aws_sns_topic" "preview_generated" {
-  name   = "${local.prefix}preview-generated"
+  name           = "${local.prefix}preview-generated"
   tracing_config = "Active"
-  policy = <<POLICY
+  policy         = <<POLICY
   {
     "Version":"2012-10-17",
     "Statement":

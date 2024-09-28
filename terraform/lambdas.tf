@@ -5,7 +5,7 @@ module "dynamodb_stream_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
 
-  depends_on = [ aws_dynamodb_table.url_shortener ]
+  depends_on = [aws_dynamodb_table.url_shortener]
   custom_policy_statements = [
     {
       Action   = ["sns:Publish"],
@@ -59,18 +59,18 @@ module "get_preview_url_lambda" {
     type      = "object"
     properties = {
       isSuccess = { type = "boolean" },
-      error = { type = "string" },
+      error     = { type = "string" },
       result = {
         type = "object",
         properties = {
           desktopUrl = { type = "string" },
-          mobileUrl = { type = "string" }
+          mobileUrl  = { type = "string" }
         }
       }
     }
   })
 
-  depends_on                = [aws_api_gateway_rest_api.api_gateway]
+  depends_on = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
     {
       Action   = "s3:GetObject",
@@ -145,13 +145,13 @@ module "shorten_url_lambda" {
     type      = "object"
     properties = {
       isSuccess = { type = "boolean" }
-      error = { type = "string" }
+      error     = { type = "string" }
       result = {
         type = "object"
         properties = {
-          code = { type = "string" },
-          longUrl = { type = "string" },
-          userId = { type = "string" },
+          code      = { type = "string" },
+          longUrl   = { type = "string" },
+          userId    = { type = "string" },
           createdAt = { type = "number" }
         }
       }
@@ -186,7 +186,7 @@ module "websocket_manager_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
 
-  depends_on                = [aws_api_gateway_rest_api.api_gateway]
+  depends_on = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
     {
       Action = [

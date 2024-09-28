@@ -60,9 +60,9 @@ resource "aws_iam_role_policy_attachment" "attach_cloudwatch_to_api_gateway" {
 }
 
 resource "aws_api_gateway_stage" "stage" {
-  stage_name    = local.environment
-  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
-  deployment_id = aws_api_gateway_deployment.deployment.id
+  stage_name           = local.environment
+  rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
+  deployment_id        = aws_api_gateway_deployment.deployment.id
   xray_tracing_enabled = true
 }
 
@@ -152,7 +152,7 @@ data "aws_api_gateway_export" "swagger_export" {
 }
 
 resource "aws_s3_object" "swagger_upload" {
-  bucket = "us-cicd"
-  key    = "docs/swagger.json"
+  bucket  = "us-cicd"
+  key     = "docs/swagger.json"
   content = data.aws_api_gateway_export.swagger_export.body
 }

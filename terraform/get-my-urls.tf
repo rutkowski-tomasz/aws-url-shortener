@@ -67,9 +67,9 @@ resource "aws_api_gateway_model" "get_my_urls_response_model" {
         items = {
           type = "object",
           properties = {
-            code = { "type": "string" },
-            longUrl = { "type": "string" },
-            createdAt = { "type": "number" }
+            code      = { "type" : "string" },
+            longUrl   = { "type" : "string" },
+            createdAt = { "type" : "number" }
           }
         }
       }
@@ -130,12 +130,12 @@ resource "aws_iam_policy" "get_my_urls_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
+        Effect   = "Allow",
         Action   = "dynamodb:Query",
         Resource = "${aws_dynamodb_table.url_shortener.arn}/index/UserIdIndex"
       },
       {
-        Effect = "Allow",
+        Effect   = "Allow",
         Action   = "dynamodb:Query",
         Resource = "${aws_dynamodb_table.url_shortener.arn}"
       },
