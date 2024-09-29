@@ -72,7 +72,7 @@ const persist = async (code, longUrl, userId) => {
             code,
             longUrl,
             userId,
-            'createdAt': new Date().getTime(),
+            createdAt: new Date().getTime(),
         }
     });
 
