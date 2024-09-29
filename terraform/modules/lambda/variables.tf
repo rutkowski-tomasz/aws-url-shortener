@@ -99,3 +99,9 @@ variable "environment_variables" {
   type        = map(string)
   default     = {}
 }
+
+variable "reserved_concurrent_executions" {
+  description = "The number of concurrent executions for this lambda function."
+  type        = number
+  default     = 2
+}

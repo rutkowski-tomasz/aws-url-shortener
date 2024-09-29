@@ -30,7 +30,7 @@ module "generate_preview_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
   lambda_memory_size   = 1024
-  lambda_timeout       = 30
+  lambda_timeout       = 120
 
   # Layer: https://github.com/shelfio/chrome-aws-lambda-layer
   lambda_layers = ["arn:aws:lambda:eu-central-1:764866452798:layer:chrome-aws-lambda:47"]

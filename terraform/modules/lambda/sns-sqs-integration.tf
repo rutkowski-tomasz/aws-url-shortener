@@ -79,7 +79,11 @@ resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
   event_source_arn = aws_sqs_queue.queue[0].arn
   function_name    = aws_lambda_function.lambda.function_name
   enabled          = true
-  batch_size       = 10
+  maximum_batching_window_in_seconds = 5
+
+  scaling_config {
+    maximum_concurrency = var.reserved_concurrent_executions
+  }
 
   depends_on = [aws_iam_role_policy.lambda_sqs_policy]
 }
