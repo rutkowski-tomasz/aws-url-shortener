@@ -27,12 +27,18 @@ cat > ${policy_document} << EOF
       "Action": [
         "sns:*",
         "sqs:*",
-        "s3:*"
+        "s3:*",
+        "cloudwatch:*",
+        "events:*"
       ],
       "Resource": [
         "arn:aws:sns:${region}:${account_id}:us-*",
         "arn:aws:sqs:${region}:${account_id}:us-*",
-        "arn:aws:s3:::us-*"
+        "arn:aws:s3:::us-*",
+        "arn:aws:cloudwatch::${account_id}:dashboard/us-*",
+        "arn:aws:events:${region}:${account_id}:event-bus/us-*",
+        "arn:aws:events:${region}:${account_id}:rule/us-*",
+        "arn:aws:events:${region}:${account_id}:archive/us-*"
       ]
     },
     {
@@ -186,7 +192,11 @@ if [ "$versions_count" -eq 5 ]; then
   fi
 fi
 
-aws iam create-policy-version --policy-arn ${policy_arn} --policy-document file://${policy_document} --set-as-default
+aws iam create-policy-version \
+  --no-cli-pager \
+  --policy-arn ${policy_arn} \
+  --policy-document file://${policy_document} \
+  --set-as-default
 
 # Cleanup
 rm -f ${policy_document}
