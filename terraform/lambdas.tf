@@ -161,9 +161,22 @@ module "shorten_url_lambda" {
   custom_policy_statements = [
     {
       Action   = "dynamodb:PutItem",
-      Resource = "arn:aws:dynamodb:eu-central-1:024853653660:table/us-${local.environment}-shortened-urls"
+      Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/us-${local.environment}-shortened-urls"
+    },
+    {
+      Action   = "scheduler:CreateSchedule",
+      Resource = "arn:aws:scheduler:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:schedule/default/us-${local.environment}-delete-shortened-url-*"
+    },
+    {
+      Action = "iam:PassRole",
+      Resource = aws_iam_role.scheduler_role.arn
     }
   ]
+
+  environment_variables = {
+    EVENT_BUS_ARN = aws_cloudwatch_event_bus.url_shortener.arn
+    SCHEDULER_ROLE_ARN = aws_iam_role.scheduler_role.arn
+  }
 }
 
 module "websocket_authorizer_lambda" {
