@@ -1,43 +1,31 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { SchedulerClient, CreateScheduleCommand } = require("@aws-sdk/client-scheduler");
 
 const AWSXRay = require('aws-xray-sdk-core');
-const client = AWSXRay.captureAWSv3Client(new DynamoDBClient());
+const dynamoDbClient = AWSXRay.captureAWSv3Client(new DynamoDBClient());
+const schedulerClient = AWSXRay.captureAWSv3Client(new SchedulerClient());
+
+const { ENVIRONMENT, EVENT_BUS_ARN, SCHEDULER_ROLE_ARN } = process.env;
 
 exports.handler = async (event) => {
-    console.debug('Received event:', JSON.stringify(event, null, 2));
-
-    const env = process.env.ENVIRONMENT;
-    const tableName = `us-${env}-shortened-urls`;
-
-    const userId = event.requestContext.authorizer.claims.sub;
-    const body = JSON.parse(event.body);
-
-    const input = {
-        TableName: tableName,
-        Item: {
-            'code': generateCode(),
-            'longUrl': body.longUrl,
-            'userId': userId,
-            'createdAt': new Date().getTime(),
-        }
-    };
-    console.debug('Input: ', input);
-
-    const command = new PutCommand(input);
 
     try {
-        const result = await client.send(command);
-        console.debug('Result: ', result);
+        const body = JSON.parse(event.body);
+        const code = generateCode();
+        const userId = event.requestContext.authorizer.claims.sub;
 
-        if (result['$metadata'].httpStatusCode !== 200) {
-            throw new Error(`Failed to insert item into DynamoDB: ${JSON.stringify(result)}`);
-        }
+        await persist(code, body.longUrl, userId);
+        await scheduleDeletion(code, userId);
 
-        return buildResponse(true, input.Item);
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ code })
+        };
+
     } catch (err) {
         console.error('Error: ', err);
-        return buildResponse(false, err.toString());
+        return { statusCode: 500 };
     }
 };
 
@@ -53,14 +41,41 @@ const generateCode = (length = 8) => {
     return code;
 };
 
-const buildResponse = (isSuccess, content) => ({
-    statusCode: isSuccess ? 200 : 400,
-    body: JSON.stringify({
-        isSuccess,
-        error: !isSuccess ? content : null,
-        result: isSuccess ? content : null
-    }),
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+const scheduleDeletion = async (code, userId) => {
+    const minute = 60 * 1000;
+    const nowTime = new Date().getTime();
+    const scheduleDate = new Date(nowTime + 5 * minute).toISOString();
+    const scheduleExpression = `at(${scheduleDate.slice(0, -'.000Z'.length)})`;
+    console.debug('Scheduling deletion: ', scheduleExpression);
+
+    await schedulerClient.send(new CreateScheduleCommand({
+        Name: `us-${ENVIRONMENT}-delete-shortened-url-${code}`,
+        ScheduleExpression: scheduleExpression,
+        Target: {
+            Arn: EVENT_BUS_ARN,
+            RoleArn: SCHEDULER_ROLE_ARN,
+            Input: JSON.stringify({ code, userId }),
+        },
+        FlexibleTimeWindow: { Mode: "OFF" },
+        EventBridgeParameters: {
+            DetailType: "DeleteShortenedUrl",
+            Source: "url-shortener",
+        },
+        ActionAfterCompletion: "DELETE",
+    }));
+};
+
+const persist = async (code, longUrl, userId) => {
+    const command = new PutCommand({
+        TableName: `us-${ENVIRONMENT}-shortened-urls`,
+        Item: {
+            code,
+            longUrl,
+            userId,
+            'createdAt': new Date().getTime(),
+        }
+    });
+
+    const result = await dynamoDbClient.send(command);
+    console.debug('Result: ', result);
+};
