@@ -1,0 +1,8 @@
+{
+  "name": "delete-url-lambda",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/tracer": "^2.8.0"
+  }
+}

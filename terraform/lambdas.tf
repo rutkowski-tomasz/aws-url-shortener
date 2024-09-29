@@ -210,3 +210,24 @@ module "websocket_manager_lambda" {
     }
   ]
 }
+
+module "delete_url_lambda" {
+  source               = "./modules/lambda"
+  environment          = local.environment
+  lambda_function_name = "delete-url-lambda"
+  lambda_handler       = "index.handler"
+  lambda_runtime       = "nodejs20.x"
+  sqs_queue_name       = aws_sqs_queue.shortener_url_delete_command.name
+
+  depends_on = [
+    aws_api_gateway_rest_api.api_gateway,
+    aws_sqs_queue.shortener_url_delete_command
+  ]
+
+  custom_policy_statements = [
+    {
+      Action   = "dynamodb:DeleteItem",
+      Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/us-${local.environment}-shortened-urls"
+    }
+  ]
+}

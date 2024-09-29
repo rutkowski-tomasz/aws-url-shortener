@@ -19,6 +19,7 @@ In real world scenario all the projects would probably be managed as separate re
 ├── requests # Prepared requests to test the whole solution, configuration at .vscode/settings.json
 ├── setup # Scripts required for setup first IAM role
 ├── src
+│   ├── delete-url-lambda # Handles delayed deletion after 30 days (TS)
 │   ├── dynamodb-stream-lambda # Handling streams from DynamoDB, dispatching to SNS topics (TS)
 │   ├── generate-preview-lambda # Generating preview (screenshot) of URL (JS)
 │   ├── get-preview-url-lambda # Get signed URL of the generated previews (JS)
@@ -58,6 +59,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 ![X-Ray Trace Map](xray.png)
 1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS direct integration with DynamoDb
 1. ✅ Auto generated swagger documentation, TF defined CloudWatch dashboard
+1. ✅ EventBridge bus with scheduling delayed one-time delete command, Lambda handler
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development

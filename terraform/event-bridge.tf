@@ -64,3 +64,30 @@ resource "aws_cloudwatch_event_archive" "archive" {
     event_source_arn = aws_cloudwatch_event_bus.url_shortener.arn
     retention_days = 30
 }
+
+resource "aws_cloudwatch_event_rule" "shortener_url_delete_command" {
+    name = "${local.prefix}shortener-url-delete-command"
+    event_bus_name = aws_cloudwatch_event_bus.url_shortener.name
+    event_pattern = jsonencode({
+        detail_type = ["DeleteShortenedUrl"]
+        source = ["url-shortener"]
+    })
+}
+
+resource "aws_cloudwatch_event_target" "shortener_url_delete_command_target" {
+    rule = aws_cloudwatch_event_rule.shortener_url_delete_command.name
+    event_bus_name = aws_cloudwatch_event_bus.url_shortener.name
+    arn = aws_sqs_queue.shortener_url_delete_command.arn
+}
+
+resource "aws_sqs_queue" "shortener_url_delete_command" {
+    name = "${local.prefix}delete-url-command"
+    redrive_policy = jsonencode({
+        deadLetterTargetArn = aws_sqs_queue.dlq.arn,
+        maxReceiveCount     = 3
+    })
+}
+
+resource "aws_sqs_queue" "dlq" {
+    name = "${local.prefix}delete-url-command-dlq"
+}

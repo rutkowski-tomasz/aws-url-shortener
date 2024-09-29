@@ -18,6 +18,7 @@ resource "aws_cloudwatch_dashboard" "main" {
             ["...", "${local.prefix}get-url-lambda"],
             ["...", "${local.prefix}push-notification-lambda"],
             ["...", "${local.prefix}shorten-url-lambda"],
+            ["...", "${local.prefix}delete-url-lambda"],
             ["...", "${local.prefix}websocket-authorizer-lambda"],
             ["...", "${local.prefix}websocket-manager-lambda"]
           ]
@@ -43,6 +44,7 @@ resource "aws_cloudwatch_dashboard" "main" {
             ["...", "${local.prefix}get-url-lambda"],
             ["...", "${local.prefix}push-notification-lambda"],
             ["...", "${local.prefix}shorten-url-lambda"],
+            ["...", "${local.prefix}delete-url-lambda"],
             ["...", "${local.prefix}websocket-authorizer-lambda"],
             ["...", "${local.prefix}websocket-manager-lambda"]
           ]
@@ -68,6 +70,7 @@ resource "aws_cloudwatch_dashboard" "main" {
             ["...", "${local.prefix}get-url-lambda"],
             ["...", "${local.prefix}push-notification-lambda"],
             ["...", "${local.prefix}shorten-url-lambda"],
+            ["...", "${local.prefix}delete-url-lambda"],
             ["...", "${local.prefix}websocket-authorizer-lambda"],
             ["...", "${local.prefix}websocket-manager-lambda"]
           ]
