@@ -146,9 +146,6 @@ for project_name in "$@"; do
     build_time=$((end_time - start_time))
     package_size=$(du -hs "$package_file" | awk '{print $1}')
 
-    echo "Packed $project_dir into $package_file (size=$package_size, time=${build_time}s)."
-    echo "📦 $project_name → 🏋🏻 $package_size, ⏱️ ${build_time}s" >> $GITHUB_STEP_SUMMARY
-
     if [[ $env != "pack" ]]; then
         lambda_name="us-$env-$project_name"
         echo "Updating $lambda_name lambda code..."
@@ -156,7 +153,14 @@ for project_name in "$@"; do
             --no-cli-pager \
             --function-name "$lambda_name" \
             --zip-file "fileb://$package_file"
+    fi
 
-        echo "Deployed $project_dir to $lambda_name (size=$package_size, time=${build_time}s)."
+    echo "Packed $project_dir into $package_file (size=$package_size, time=${build_time}s)."
+    if [[ $GITHUB_ACTIONS ]]; then
+        echo "📦 $project_name → 🏋🏻 $package_size, ⏱️ ${build_time}s" >> $GITHUB_STEP_SUMMARY
+    fi
+
+    if [[ $env != "pack" ]]; then
+        echo "Deployed to $lambda_name (size=$package_size, time=${build_time}s)."
     fi
 done
