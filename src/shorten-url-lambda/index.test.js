@@ -69,10 +69,10 @@ describe('Unit Tests', () => {
     expect(createScheduleCommandCall.input.EventBridgeParameters.Source).toEqual("url-shortener");
     expect(createScheduleCommandCall.input.ActionAfterCompletion).toEqual("DELETE");
 
-    const detail = JSON.parse(createScheduleCommandCall.input.EventBridgeParameters.Detail);
-    expect(detail).toHaveProperty('code');
-    expect(detail).toHaveProperty('userId');
-    expect(detail.userId).toEqual(sampleEvent.requestContext.authorizer.claims.sub);
+    const payload = JSON.parse(createScheduleCommandCall.input.Target.Input);
+    expect(payload).toHaveProperty('code');
+    expect(payload).toHaveProperty('userId');
+    expect(payload.userId).toEqual(sampleEvent.requestContext.authorizer.claims.sub);
   });
 
   test('handles DynamoDB insertion error', async () => {
