@@ -226,7 +226,7 @@ module "delete_url_lambda" {
 
   custom_policy_statements = [
     {
-      Action   = "dynamodb:DeleteItem",
+      Action   = "dynamodb:UpdateItem",
       Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/us-${local.environment}-shortened-urls"
     },
     {

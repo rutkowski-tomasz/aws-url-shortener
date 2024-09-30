@@ -1,4 +1,4 @@
-import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { S3Client, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { Tracer } from '@aws-lambda-powertools/tracer';
 import { EventBridgeEvent, SQSHandler } from "aws-lambda";
@@ -25,7 +25,7 @@ export const handler: SQSHandler = async (event) => {
 
         console.log('Deleting URL: %s', code);
 
-        const dynamoDbResult = await deleteUrl(code);
+        const dynamoDbResult = await archiveUrl(code);
         console.log('DynamoDb Result: %j', dynamoDbResult);
 
         const s3Result = await deletePreviews(code);
@@ -39,12 +39,16 @@ export const handler: SQSHandler = async (event) => {
     tracer.setSegment(handlerSegment?.parent);
 };
 
-const deleteUrl = async (code: string) => {
-    const command = new DeleteItemCommand({
+const archiveUrl = async (code: string) => {
+    const command = new UpdateItemCommand({
         TableName: `us-${ENVIRONMENT}-shortened-urls`,
         Key: {
             code: { S: code },
         },
+        UpdateExpression: "set archivedAt = :now",
+        ExpressionAttributeValues: {
+            ":now": { N: new Date().getTime().toString() }
+        }
     });
 
     return await dynamoDbClient.send(command);

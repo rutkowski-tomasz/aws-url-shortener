@@ -15,26 +15,11 @@ def handle(event, context):
         code = event['queryStringParameters']['code']
 
         response = table.get_item(Key={'code': code})
-        
-        if 'Item' in response:
-            return build_response(302, '', response['Item']['longUrl'])
-        else:
-            return build_response(404, 'URL not found')
+
+        if 'Item' not in response or response['Item']['archivedAt'] is not None:
+            return { 'statusCode': 404 }
+
+        return { 'statusCode': 302, 'headers': { 'Location': response['Item']['longUrl'] } }
     except ClientError as e:
         print('Error: ', e)
-        return build_response(500, 'Internal server error')
-
-
-def build_response(status_code, body, location=None):
-    response = {
-        'isBase64Encoded': False,
-        'statusCode': status_code,
-        'body': body
-    }
-
-    if location:
-        response['headers'] = {
-            'Location': location
-        }
-
-    return response
+        return { 'statusCode': 500 }

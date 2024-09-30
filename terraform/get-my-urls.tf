@@ -62,6 +62,9 @@ resource "aws_api_gateway_model" "get_my_urls_response_model" {
     title     = "GET /get-my-urls"
     type      = "object"
     properties = {
+      count = {
+        type = "number"
+      }
       links = {
         type = "array",
         items = {
@@ -70,6 +73,7 @@ resource "aws_api_gateway_model" "get_my_urls_response_model" {
             code      = { "type" : "string" },
             longUrl   = { "type" : "string" },
             createdAt = { "type" : "number" }
+            archivedAt = { "type" : "number" }
           }
         }
       }
@@ -92,12 +96,14 @@ resource "aws_api_gateway_integration_response" "get_my_urls_integration_respons
     "application/json" = <<EOF
 #set($inputRoot = $input.path('$'))
 {
+  "count": $inputRoot.Count,
   "links": [
   #foreach($item in $inputRoot.Items)
     {
       "code": "$item.code.S",
       "longUrl": "$item.longUrl.S",
       "createdAt": "$item.createdAt.N"
+      "archivedAt": "$item.archivedAt.N"
     }#if($foreach.hasNext),#end
   #end
   ]
