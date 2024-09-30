@@ -1,7 +1,9 @@
 import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { S3Client, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { Tracer } from '@aws-lambda-powertools/tracer';
-import { EventBridgeEvent, SQSHandler } from "aws-lambda";
+import { SQSHandler } from "aws-lambda";
+import { DeleteShortenedUrl } from "./schema/url_shortener/deleteshortenedurl/DeleteShortenedUrl";
+import { AWSEvent } from "./schema/url_shortener/deleteshortenedurl/AWSEvent";
 
 const tracer = new Tracer();
 const dynamoDbClient = tracer.captureAWSv3Client(new DynamoDBClient({}));
@@ -19,7 +21,7 @@ export const handler: SQSHandler = async (event) => {
         const subSegment = handlerSegment.addNewSubsegment('### Record');
         tracer.setSegment(subSegment);
 
-        const payload = JSON.parse(record.body) as EventBridgeEvent<"DeleteShortenedUrl", { code: string, userId: string }>;
+        const payload = JSON.parse(record.body) as AWSEvent<DeleteShortenedUrl>;
         const code = payload.detail.code;
         tracer.putAnnotation('code', code);
 

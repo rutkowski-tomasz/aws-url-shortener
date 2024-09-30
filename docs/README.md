@@ -60,6 +60,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS service direct integration with DynamoDb
 1. ✅ Auto generated swagger documentation, TF defined CloudWatch dashboard
 1. ✅ EventBridge bus and rules with scheduling delayed one-time off delete command, Lambda handler
+1. ✅ EventBridge schema discovery, event schema generation using AWS Toolkit for VSC
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
