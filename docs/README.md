@@ -6,7 +6,7 @@ In real world scenario all the projects would probably be managed as separate re
 
 # 🏙️ Architecture
 
-![Architecture Diagram](link-shortener.phase8.drawio.svg)
+![Architecture Diagram](link-shortener.phase9.drawio.svg)
 
 # 🌳 Repository structure
 
@@ -57,9 +57,9 @@ The development of this solution is iterative, with the roadmap subject to chang
 1. ✅ Push generated preview event to user
 1. ✅ X-Ray integration
 ![X-Ray Trace Map](xray.png)
-1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS direct integration with DynamoDb
+1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS service direct integration with DynamoDb
 1. ✅ Auto generated swagger documentation, TF defined CloudWatch dashboard
-1. ✅ EventBridge bus with scheduling delayed one-time delete command, Lambda handler
+1. ✅ EventBridge bus and rules with scheduling delayed one-time off delete command, Lambda handler
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
