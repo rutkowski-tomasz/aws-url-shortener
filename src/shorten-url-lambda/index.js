@@ -44,7 +44,7 @@ const generateCode = (length = 8) => {
 const scheduleDeletion = async (code, userId) => {
     const minute = 60 * 1000;
     const nowTime = new Date().getTime();
-    const scheduleDate = new Date(nowTime + 5 * minute).toISOString();
+    const scheduleDate = new Date(nowTime + 30 * minute).toISOString();
     const scheduleExpression = `at(${scheduleDate.slice(0, -'.000Z'.length)})`;
     console.debug('Scheduling deletion: ', scheduleExpression);
 
@@ -54,13 +54,13 @@ const scheduleDeletion = async (code, userId) => {
         Target: {
             Arn: EVENT_BUS_ARN,
             RoleArn: SCHEDULER_ROLE_ARN,
+            EventBridgeParameters: {
+                DetailType: "DeleteShortenedUrl",
+                Source: "url-shortener",
+            },
             Input: JSON.stringify({ code, userId }),
         },
         FlexibleTimeWindow: { Mode: "OFF" },
-        EventBridgeParameters: {
-            DetailType: "DeleteShortenedUrl",
-            Source: "url-shortener",
-        },
         ActionAfterCompletion: "DELETE",
     }));
 };

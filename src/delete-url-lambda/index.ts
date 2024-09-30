@@ -1,6 +1,6 @@
 import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import { Tracer } from '@aws-lambda-powertools/tracer';
-import { SQSHandler } from "aws-lambda";
+import { EventBridgeEvent, SQSHandler } from "aws-lambda";
 
 const tracer = new Tracer();
 const dynamoDbClient = tracer.captureAWSv3Client(new DynamoDBClient({}));
@@ -8,7 +8,6 @@ const dynamoDbClient = tracer.captureAWSv3Client(new DynamoDBClient({}));
 const { ENVIRONMENT } = process.env;
 
 export const handler: SQSHandler = async (event) => {
-    console.log('Event: %j', event);
 
     const handlerSegment = tracer.getSegment()!.addNewSubsegment(`## ${process.env._HANDLER}`);
     tracer.setSegment(handlerSegment);
@@ -18,12 +17,13 @@ export const handler: SQSHandler = async (event) => {
         const subSegment = handlerSegment.addNewSubsegment('### Record');
         tracer.setSegment(subSegment);
 
-        const payload = JSON.parse(record.body);
-        const code = payload.code;
+        const payload = JSON.parse(record.body) as EventBridgeEvent<"DeleteShortenedUrl", { code: string, userId: string }>;
+        const code = payload.detail.code;
         tracer.putAnnotation('code', code);
 
         console.log('Deleting URL: %s', code);
-        await deleteUrl(code);
+        const result = await deleteUrl(code);
+        console.log('Result: %j', result);
 
         subSegment?.close();
         tracer.setSegment(subSegment?.parent);

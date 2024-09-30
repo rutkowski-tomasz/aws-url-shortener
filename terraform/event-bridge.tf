@@ -69,7 +69,7 @@ resource "aws_cloudwatch_event_rule" "shortener_url_delete_command" {
     name = "${local.prefix}shortener-url-delete-command"
     event_bus_name = aws_cloudwatch_event_bus.url_shortener.name
     event_pattern = jsonencode({
-        detail_type = ["DeleteShortenedUrl"]
+        detail-type = ["DeleteShortenedUrl"]
         source = ["url-shortener"]
     })
 }
@@ -78,6 +78,25 @@ resource "aws_cloudwatch_event_target" "shortener_url_delete_command_target" {
     rule = aws_cloudwatch_event_rule.shortener_url_delete_command.name
     event_bus_name = aws_cloudwatch_event_bus.url_shortener.name
     arn = aws_sqs_queue.shortener_url_delete_command.arn
+}
+
+resource "aws_sqs_queue_policy" "queue_policy" {
+    queue_url = aws_sqs_queue.shortener_url_delete_command.id
+
+    policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Sid    = "AllowEventBridgeToSendMessage"
+                Effect = "Allow"
+                Principal = {
+                    Service = "events.amazonaws.com"
+                }
+                Action   = "sqs:SendMessage"
+                Resource = aws_sqs_queue.shortener_url_delete_command.arn
+            }
+        ]
+    })
 }
 
 resource "aws_sqs_queue" "shortener_url_delete_command" {
