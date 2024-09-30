@@ -3,9 +3,9 @@ resource "aws_s3_bucket" "preview_storage" {
 }
 
 resource "aws_sns_topic" "preview_generated" {
-  name   = "${local.prefix}preview-generated"
+  name           = "${local.prefix}preview-generated"
   tracing_config = "Active"
-  policy = <<POLICY
+  policy         = <<POLICY
   {
     "Version":"2012-10-17",
     "Statement":
@@ -29,6 +29,6 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
   topic {
     topic_arn = aws_sns_topic.preview_generated.arn
-    events    = ["s3:ObjectCreated:*"]
+    events    = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
   }
 }

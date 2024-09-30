@@ -20,7 +20,8 @@ export default [
   {
     ignores: [
       "dist/",
-      ".coverage/"
+      ".coverage/",
+      "src/*/schema/**"
     ],
   }
 ];

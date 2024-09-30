@@ -66,6 +66,7 @@ resource "aws_lambda_function" "lambda" {
   layers        = var.lambda_layers
   filename      = "../dist/${var.lambda_function_name}.zip"
   source_code_hash = filebase64sha256("../dist/${var.lambda_function_name}.zip")
+  reserved_concurrent_executions = var.reserved_concurrent_executions
 
   environment {
     variables = merge(

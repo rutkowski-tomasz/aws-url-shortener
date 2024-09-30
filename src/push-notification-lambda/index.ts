@@ -69,12 +69,20 @@ export const handler = async (event: SQSEvent) => {
                 const subSegment = handlerSegment.addNewSubsegment('### Record');
                 tracer.setSegment(subSegment);
 
+                let eventType = 'UNKNOWN';
+                if (s3Record.eventName === 'ObjectCreated:Put') {
+                    eventType = 'PREVIEW_GENERATED';
+                } else if (s3Record.eventName === 'ObjectRemoved:Delete') {
+                    eventType = 'PREVIEW_DELETED';
+                }
+
                 const objectKey = s3Record.s3.object.key;
                 const [code, file] = objectKey.split('/');
                 tracer.putAnnotation('code', code);
                 tracer.putAnnotation('file', file);
+                tracer.putAnnotation('eventType', eventType);
 
-                console.log('Received %s creation of %s', code, file);
+                console.log('Received %s event for %s of %s', eventType, code, file);
 
                 try {
                     const shortenedUrl = await getShortenedUrl(code);
@@ -93,7 +101,7 @@ export const handler = async (event: SQSEvent) => {
 
                     for (const connection of userConnections.Items) {
                         const data = {
-                            eventType: 'PREVIEW_GENERATED',
+                            eventType,
                             code,
                             file
                         };

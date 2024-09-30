@@ -6,7 +6,7 @@ In real world scenario all the projects would probably be managed as separate re
 
 # 🏙️ Architecture
 
-![Architecture Diagram](link-shortener.phase8.drawio.svg)
+![Architecture Diagram](link-shortener.phase9.drawio.svg)
 
 # 🌳 Repository structure
 
@@ -19,6 +19,7 @@ In real world scenario all the projects would probably be managed as separate re
 ├── requests # Prepared requests to test the whole solution, configuration at .vscode/settings.json
 ├── setup # Scripts required for setup first IAM role
 ├── src
+│   ├── delete-url-lambda # Handles delayed deletion after 30 days (TS)
 │   ├── dynamodb-stream-lambda # Handling streams from DynamoDB, dispatching to SNS topics (TS)
 │   ├── generate-preview-lambda # Generating preview (screenshot) of URL (JS)
 │   ├── get-preview-url-lambda # Get signed URL of the generated previews (JS)
@@ -56,8 +57,11 @@ The development of this solution is iterative, with the roadmap subject to chang
 1. ✅ Push generated preview event to user
 1. ✅ X-Ray integration
 ![X-Ray Trace Map](xray.png)
-1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS direct integration with DynamoDb
-1. ✅ Auto generated swagger documentation
+1. ✅ Create endpoint /get-my-urls using direct API Gateway AWS service direct integration with DynamoDb
+1. ✅ Auto generated swagger documentation, TF defined CloudWatch dashboard
+1. ✅ EventBridge bus and rules with scheduling delayed one-time off delete command, Lambda handler
+1. ✅ EventBridge schema discovery, event schema generation using AWS Toolkit for VSC
+1. ✅ [Powertune](https://docs.aws.amazon.com/lambda/latest/operatorguide/profile-functions.html) lambdas, for example: [shorten-url-lambda](https://lambda-power-tuning.show/#gAAAAQACAAQABsAL;q6rWP7y7zz+x5L8/oNPGP4JOzz/UBs4/;l0+QMZdPEDKXT5Ayl08QM2N3WDPm9NMz), [generate-preview-lambda](https://lambda-power-tuning.show/#AAQABsAL;fWX9RYo0u0XUs2dF;y90OOVNVHjnz4D85)
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
@@ -93,7 +97,7 @@ npm open:coverage # open coverage HTML
 # Single project tests
 npm test -w shorten-url-lambda
 # Python lambdas
-cd get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
+cd src/get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
 ```
 
 ## Connect to WS API Gateway

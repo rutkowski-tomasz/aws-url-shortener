@@ -5,7 +5,7 @@ module "dynamodb_stream_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
 
-  depends_on = [ aws_dynamodb_table.url_shortener ]
+  depends_on = [aws_dynamodb_table.url_shortener]
   custom_policy_statements = [
     {
       Action   = ["sns:Publish"],
@@ -30,7 +30,7 @@ module "generate_preview_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
   lambda_memory_size   = 1024
-  lambda_timeout       = 30
+  lambda_timeout       = 120
 
   # Layer: https://github.com/shelfio/chrome-aws-lambda-layer
   lambda_layers = ["arn:aws:lambda:eu-central-1:764866452798:layer:chrome-aws-lambda:47"]
@@ -59,18 +59,18 @@ module "get_preview_url_lambda" {
     type      = "object"
     properties = {
       isSuccess = { type = "boolean" },
-      error = { type = "string" },
+      error     = { type = "string" },
       result = {
         type = "object",
         properties = {
           desktopUrl = { type = "string" },
-          mobileUrl = { type = "string" }
+          mobileUrl  = { type = "string" }
         }
       }
     }
   })
 
-  depends_on                = [aws_api_gateway_rest_api.api_gateway]
+  depends_on = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
     {
       Action   = "s3:GetObject",
@@ -145,13 +145,13 @@ module "shorten_url_lambda" {
     type      = "object"
     properties = {
       isSuccess = { type = "boolean" }
-      error = { type = "string" }
+      error     = { type = "string" }
       result = {
         type = "object"
         properties = {
-          code = { type = "string" },
-          longUrl = { type = "string" },
-          userId = { type = "string" },
+          code      = { type = "string" },
+          longUrl   = { type = "string" },
+          userId    = { type = "string" },
           createdAt = { type = "number" }
         }
       }
@@ -161,9 +161,22 @@ module "shorten_url_lambda" {
   custom_policy_statements = [
     {
       Action   = "dynamodb:PutItem",
-      Resource = "arn:aws:dynamodb:eu-central-1:024853653660:table/us-${local.environment}-shortened-urls"
+      Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/us-${local.environment}-shortened-urls"
+    },
+    {
+      Action   = "scheduler:CreateSchedule",
+      Resource = "arn:aws:scheduler:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:schedule/default/us-${local.environment}-delete-shortened-url-*"
+    },
+    {
+      Action = "iam:PassRole",
+      Resource = aws_iam_role.scheduler_role.arn
     }
   ]
+
+  environment_variables = {
+    EVENT_BUS_ARN = aws_cloudwatch_event_bus.url_shortener.arn
+    SCHEDULER_ROLE_ARN = aws_iam_role.scheduler_role.arn
+  }
 }
 
 module "websocket_authorizer_lambda" {
@@ -186,7 +199,7 @@ module "websocket_manager_lambda" {
   lambda_handler       = "index.handler"
   lambda_runtime       = "nodejs20.x"
 
-  depends_on                = [aws_api_gateway_rest_api.api_gateway]
+  depends_on = [aws_api_gateway_rest_api.api_gateway]
   custom_policy_statements = [
     {
       Action = [
@@ -194,6 +207,31 @@ module "websocket_manager_lambda" {
         "dynamodb:DeleteItem"
       ],
       Resource = aws_dynamodb_table.websocket_connections.arn
+    }
+  ]
+}
+
+module "delete_url_lambda" {
+  source               = "./modules/lambda"
+  environment          = local.environment
+  lambda_function_name = "delete-url-lambda"
+  lambda_handler       = "index.handler"
+  lambda_runtime       = "nodejs20.x"
+  sqs_queue_name       = aws_sqs_queue.shortener_url_delete_command.name
+
+  depends_on = [
+    aws_api_gateway_rest_api.api_gateway,
+    aws_sqs_queue.shortener_url_delete_command
+  ]
+
+  custom_policy_statements = [
+    {
+      Action   = "dynamodb:UpdateItem",
+      Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/us-${local.environment}-shortened-urls"
+    },
+    {
+      Action   = "s3:DeleteObject",
+      Resource = "${aws_s3_bucket.preview_storage.arn}/*"
     }
   ]
 }

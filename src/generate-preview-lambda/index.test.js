@@ -15,9 +15,9 @@ jest.mock('@sparticuz/chromium', () => ({
 }));
 
 const puppeteer = require("puppeteer-core");
-const { handler } = require("./index");
 
 process.env.ENVIRONMENT = "dev";
+const { handler } = require("./index");
 
 const s3Mock = mockClient(S3Client);
 
@@ -40,6 +40,7 @@ beforeEach(() => {
   
   puppeteer.launch.mockResolvedValue({
     newPage: jest.fn().mockResolvedValue({
+      setViewport: jest.fn().mockResolvedValue(),
       goto: jest.fn().mockResolvedValue(),
       screenshot: jest.fn().mockResolvedValue(Buffer.from('fake-screenshot')),
       close: jest.fn().mockResolvedValue()
@@ -52,14 +53,9 @@ describe('Unit Tests', () => {
   test('successfully generates and stores previews', async () => {
     s3Mock.on(PutObjectCommand).resolves({});
 
-    const response = await handler(sampleEvent);
+    await handler(sampleEvent);
 
-    expect(response.statusCode).toEqual(200);
-    const responseBody = JSON.parse(response.body);
-    expect(responseBody.isSuccess).toBeTruthy();
-    expect(responseBody.result).toEqual('Previews generated and stored successfully');
-
-    expect(puppeteer.launch).toHaveBeenCalledTimes(2);
+    expect(puppeteer.launch).toHaveBeenCalledTimes(1);
     
     expect(s3Mock.calls(PutObjectCommand)).toHaveLength(2);
     
@@ -79,12 +75,7 @@ describe('Unit Tests', () => {
   test('handles errors correctly', async () => {
     puppeteer.launch.mockRejectedValue(new Error('Failed to launch browser'));
 
-    const response = await handler(sampleEvent);
-
-    expect(response.statusCode).toEqual(400);
-    const responseBody = JSON.parse(response.body);
-    expect(responseBody.isSuccess).toBeFalsy();
-    expect(responseBody.error).toContain('Failed to launch browser');
+    await expect(handler(sampleEvent)).rejects.toThrow('Failed to launch browser');
   });
 });
 
@@ -119,11 +110,6 @@ describe('Integration Test', () => {
       }]
     };
 
-    const result = await handler(event);
-    expect(result.statusCode).toBe(200);
-
-    const body = JSON.parse(result.body);
-    expect(body.isSuccess).toBe(true);
-    expect(body.result).toBe('Previews generated and stored successfully');
+    await handler(event);
   });
 });

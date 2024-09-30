@@ -94,8 +94,20 @@ variable "sns_topic_name" {
   default     = null
 }
 
+variable "sqs_queue_name" {
+  description = "The name of the SQS queue to subscribe to"
+  type        = string
+  default     = null
+}
+
 variable "environment_variables" {
   description = "Map of additional environment variables to be added to the Lambda function."
   type        = map(string)
   default     = {}
+}
+
+variable "reserved_concurrent_executions" {
+  description = "The number of concurrent executions for this lambda function."
+  type        = number
+  default     = 2
 }
