@@ -110,3 +110,8 @@ resource "aws_sqs_queue" "shortener_url_delete_command" {
 resource "aws_sqs_queue" "dlq" {
     name = "${local.prefix}delete-url-command-dlq"
 }
+
+# Schema discovery
+resource "aws_schemas_discoverer" "discoverer" {
+    source_arn = aws_cloudwatch_event_bus.url_shortener.arn
+}
