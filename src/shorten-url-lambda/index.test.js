@@ -65,8 +65,8 @@ describe('Unit Tests', () => {
     expect(createScheduleCommandCall.input.Target.Arn).toEqual(process.env.EVENT_BUS_ARN);
     expect(createScheduleCommandCall.input.Target.RoleArn).toEqual(process.env.SCHEDULER_ROLE_ARN);
     expect(createScheduleCommandCall.input.FlexibleTimeWindow).toEqual({ Mode: "OFF" });
-    expect(createScheduleCommandCall.input.EventBridgeParameters.DetailType).toEqual("DeleteShortenedUrl");
-    expect(createScheduleCommandCall.input.EventBridgeParameters.Source).toEqual("url-shortener");
+    expect(createScheduleCommandCall.input.Target.EventBridgeParameters.DetailType).toEqual("DeleteShortenedUrl");
+    expect(createScheduleCommandCall.input.Target.EventBridgeParameters.Source).toEqual("url-shortener");
     expect(createScheduleCommandCall.input.ActionAfterCompletion).toEqual("DELETE");
 
     const payload = JSON.parse(createScheduleCommandCall.input.Target.Input);
