@@ -228,6 +228,10 @@ module "delete_url_lambda" {
     {
       Action   = "dynamodb:DeleteItem",
       Resource = "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/us-${local.environment}-shortened-urls"
+    },
+    {
+      Action   = "s3:DeleteObject",
+      Resource = "${aws_s3_bucket.preview_storage.arn}/*"
     }
   ]
 }

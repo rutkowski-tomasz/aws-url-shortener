@@ -7,6 +7,7 @@ const dynamoDbClient = AWSXRay.captureAWSv3Client(new DynamoDBClient());
 const schedulerClient = AWSXRay.captureAWSv3Client(new SchedulerClient());
 
 const { ENVIRONMENT, EVENT_BUS_ARN, SCHEDULER_ROLE_ARN } = process.env;
+const TTL = 60;
 
 exports.handler = async (event) => {
 
@@ -20,7 +21,7 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ code })
+            body: JSON.stringify({ code, ttl: TTL })
         };
 
     } catch (err) {
@@ -42,9 +43,8 @@ const generateCode = (length = 8) => {
 };
 
 const scheduleDeletion = async (code, userId) => {
-    const minute = 60 * 1000;
     const nowTime = new Date().getTime();
-    const scheduleDate = new Date(nowTime + 30 * minute).toISOString();
+    const scheduleDate = new Date(nowTime + TTL * 1000).toISOString();
     const scheduleExpression = `at(${scheduleDate.slice(0, -'.000Z'.length)})`;
     console.debug('Scheduling deletion: ', scheduleExpression);
 
