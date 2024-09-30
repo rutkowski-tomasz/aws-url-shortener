@@ -97,7 +97,7 @@ npm open:coverage # open coverage HTML
 # Single project tests
 npm test -w shorten-url-lambda
 # Python lambdas
-cd get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
+cd src/get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
 ```
 
 ## Connect to WS API Gateway

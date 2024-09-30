@@ -29,7 +29,8 @@ cat > ${policy_document} << EOF
         "sqs:*",
         "s3:*",
         "cloudwatch:*",
-        "events:*"
+        "events:*",
+        "schemas:*"
       ],
       "Resource": [
         "arn:aws:sns:${region}:${account_id}:us-*",
@@ -38,7 +39,8 @@ cat > ${policy_document} << EOF
         "arn:aws:cloudwatch::${account_id}:dashboard/us-*",
         "arn:aws:events:${region}:${account_id}:event-bus/us-*",
         "arn:aws:events:${region}:${account_id}:rule/us-*",
-        "arn:aws:events:${region}:${account_id}:archive/us-*"
+        "arn:aws:events:${region}:${account_id}:archive/us-*",
+        "arn:aws:schemas:${region}:${account_id}:discoverer/*"
       ]
     },
     {
