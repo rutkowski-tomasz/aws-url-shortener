@@ -1,7 +1,6 @@
 const API_BASE_URL = 'https://35o6amojr1.execute-api.eu-central-1.amazonaws.com/dev';
 const COGNITO_URL = 'https://cognito-idp.eu-central-1.amazonaws.com';
 const CLIENT_ID = '5fnqfaub5lgsg36oukp82at78g';
-const WS_URL = 'wss://5si3qer1q4.execute-api.eu-central-1.amazonaws.com/dev';
 
 let idToken = localStorage.getItem('idToken');
 let refreshToken = localStorage.getItem('refreshToken');

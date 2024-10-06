@@ -41,11 +41,11 @@ describe('Unit Tests', () => {
     
     const getSignedUrlCalls = getSignedUrl.mock.calls;
     expect(getSignedUrlCalls[0][1].input).toEqual(expect.objectContaining({
-      Bucket: 'us-dev-shortened-urls-previews',
+      Bucket: 'us-dev-preview-storage',
       Key: 'abc123/desktop.png'
     }));
     expect(getSignedUrlCalls[1][1].input).toEqual(expect.objectContaining({
-      Bucket: 'us-dev-shortened-urls-previews',
+      Bucket: 'us-dev-preview-storage',
       Key: 'abc123/mobile.png'
     }));
   });

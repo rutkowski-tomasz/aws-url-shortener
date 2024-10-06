@@ -40,7 +40,8 @@ cat > ${policy_document} << EOF
         "arn:aws:events:${region}:${account_id}:event-bus/us-*",
         "arn:aws:events:${region}:${account_id}:rule/us-*",
         "arn:aws:events:${region}:${account_id}:archive/us-*",
-        "arn:aws:schemas:${region}:${account_id}:discoverer/*"
+        "arn:aws:schemas:${region}:${account_id}:discoverer/*",
+        "arn:aws:cloudwatch:${region}:${account_id}:alarm:us-*"
       ]
     },
     {
