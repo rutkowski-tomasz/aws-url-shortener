@@ -76,7 +76,7 @@ async function shortenUrl() {
         });
 
         const data = await response.json();
-        resultDiv.innerHTML = `Short URL: <a href="${API_BASE_URL}/get-url?code=${data.result.code}" target="_blank" class="text-blue-500">${API_BASE_URL}/get-url?code=${data.result.code}</a>`;
+        resultDiv.innerHTML = `Short URL: <a href="${API_BASE_URL}/get-url?code=${data.code}" target="_blank" class="text-blue-500">${API_BASE_URL}/get-url?code=${data.code}</a>`;
         getMyUrls();
     } catch (error) {
         console.error('Error shortening URL:', error);
