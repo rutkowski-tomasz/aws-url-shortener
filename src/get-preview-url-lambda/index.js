@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     console.debug('Received event:', JSON.stringify(event, null, 2));
 
     const env = process.env.ENVIRONMENT;
-    const bucketName = `us-${env}-shortened-urls-previews`;
+    const bucketName = `us-${env}-preview-storage`;
 
     console.debug('Getting from bucket:', bucketName);
 
@@ -31,10 +31,10 @@ exports.handler = async (event) => {
     }
 };
 
-const generateSignedUrl = (bucketName, code, type, expirationSeconds = 60) => {
+const generateSignedUrl = async (bucketName, code, type, expirationSeconds = 60) => {
     const key = `${code}/${type}.png`;
     const command = new GetObjectCommand({ Bucket: bucketName, Key: key });
-    const signedUrl = getSignedUrl(s3Client, command, { expiresIn: expirationSeconds });
+    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: expirationSeconds });
     console.debug('Signed url: ', signedUrl);
     return signedUrl;
 };
@@ -48,5 +48,8 @@ const buildResponse = (isSuccess, content) => ({
     }),
     headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS,POST,PUT',
+        'Access-Control-Allow-Origin': '*'
     },
 });

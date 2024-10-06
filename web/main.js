@@ -4,7 +4,7 @@ const CLIENT_ID = '5fnqfaub5lgsg36oukp82at78g';
 const WS_URL = 'wss://5si3qer1q4.execute-api.eu-central-1.amazonaws.com/dev';
 
 let idToken = localStorage.getItem('idToken');
-let ws = null;
+let refreshToken = localStorage.getItem('refreshToken');
 
 const loginBtn = document.getElementById('login-btn');
 const shortenBtn = document.getElementById('shorten-btn');
@@ -20,8 +20,45 @@ shortenBtn.addEventListener('click', shortenUrl);
 document.addEventListener('DOMContentLoaded', () => {
     if (idToken) {
         showLoggedInState();
+    } else {
+        showLoggedOutState();
     }
 });
+
+function clearTokens() {
+    localStorage.removeItem('idToken');
+    localStorage.removeItem('refreshToken');
+    idToken = null;
+    refreshToken = null;
+}
+
+async function refreshIdToken() {
+    try {
+        const response = await fetch(COGNITO_URL, {
+            method: 'POST',
+            headers: {
+                'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth',
+                'Content-Type': 'application/x-amz-json-1.1'
+            },
+            body: JSON.stringify({
+                ClientId: CLIENT_ID,
+                AuthFlow: 'REFRESH_TOKEN_AUTH',
+                AuthParameters: {
+                    REFRESH_TOKEN: refreshToken
+                }
+            })
+        });
+        const data = await response.json();
+        idToken = data.AuthenticationResult.IdToken;
+        localStorage.setItem('idToken', idToken);
+        return idToken;
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        clearTokens();
+        showLoggedOutState();
+        throw error;
+    }
+}
 
 async function login() {
     const email = document.getElementById('email').value;
@@ -46,7 +83,9 @@ async function login() {
 
         const data = await response.json();
         idToken = data.AuthenticationResult.IdToken;
+        refreshToken = data.AuthenticationResult.RefreshToken;
         localStorage.setItem('idToken', idToken);
+        localStorage.setItem('refreshToken', refreshToken);
         showLoggedInState();
     } catch (error) {
         console.error('Login error:', error);
@@ -59,7 +98,12 @@ function showLoggedInState() {
     urlShortenerSection.classList.remove('hidden');
     myUrlsSection.classList.remove('hidden');
     getMyUrls();
-    connectWebSocket();
+}
+
+function showLoggedOutState() {
+    authSection.classList.remove('hidden');
+    urlShortenerSection.classList.add('hidden');
+    myUrlsSection.classList.add('hidden');
 }
 
 async function shortenUrl() {
@@ -92,44 +136,58 @@ async function getMyUrls() {
             }
         });
 
+        if (response.status === 401) {
+            await refreshIdToken();
+            return getMyUrls();
+        }
+
         const data = await response.json();
         myUrlsList.innerHTML = '';
         data.links.forEach(link => {
             const li = document.createElement('li');
             li.className = 'mb-2';
+            li.dataset.code = link.code;
             li.innerHTML = `
-                <a href="${API_BASE_URL}/get-url?code=${link.code}" target="_blank" class="text-blue-500">${API_BASE_URL}/get-url?code=${link.code}</a>
+                <a href="${API_BASE_URL}/get-url?code=${link.code}" target="_blank" class="text-blue-500">${link.code}</a>
                 <span class="ml-2 text-gray-600">${link.longUrl}</span>
             `;
             myUrlsList.appendChild(li);
+            getPreviewUrls(link.code);
         });
     } catch (error) {
         console.error('Error fetching URLs:', error);
+        if (error.response && error.response.status === 401) {
+            clearTokens();
+            showLoggedOutState();
+        }
     }
 }
 
-function connectWebSocket() {
-    ws = new WebSocket(WS_URL);
-
-    ws.onopen = () => {
-        console.log('WebSocket connected');
-        ws.send(JSON.stringify({ action: 'authorize', token: idToken }));
-    };
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.eventType === 'PREVIEW_GENERATED') {
-            alert(`Preview generated for code: ${data.code}`);
-            getMyUrls();
+async function getPreviewUrls(code) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/get-preview-url?code=${code}`, {
+            headers: {
+                'Authorization': `Bearer ${idToken}`
+            }
+        });
+        const data = await response.json();
+        if (data.isSuccess) {
+            updatePreviewImages(code, data.result.desktopPreview, data.result.mobilePreview);
         }
-    };
+    } catch (error) {
+        console.error('Error fetching preview URLs:', error);
+    }
+}
 
-    ws.onclose = () => {
-        console.log('WebSocket disconnected');
-        setTimeout(connectWebSocket, 5000);
-    };
-
-    ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
+function updatePreviewImages(code, desktopPreview, mobilePreview) {
+    const linkElement = document.querySelector(`#my-urls-list li[data-code="${code}"]`);
+    if (linkElement) {
+        const previewContainer = linkElement.querySelector('.preview-container') || document.createElement('div');
+        previewContainer.className = 'preview-container mt-2 flex space-x-2';
+        previewContainer.innerHTML = `
+            <img src="${desktopPreview}" alt="Desktop Preview" class="w-24 h-auto">
+            <img src="${mobilePreview}" alt="Mobile Preview" class="w-12 h-auto">
+        `;
+        linkElement.appendChild(previewContainer);
+    }
 }
