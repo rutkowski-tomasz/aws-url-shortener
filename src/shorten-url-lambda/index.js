@@ -21,7 +21,12 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ code, ttl: TTL })
+            body: JSON.stringify({ code, ttl: TTL }),
+            headers: {
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS,POST,PUT',
+                'Access-Control-Allow-Origin': '*'
+            },
         };
 
     } catch (err) {

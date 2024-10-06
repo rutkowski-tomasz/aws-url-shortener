@@ -27,6 +27,7 @@ resource "aws_api_gateway_integration" "get_my_urls_integration" {
   "TableName": "${local.prefix}shortened-urls",
   "IndexName": "UserIdIndex",
   "KeyConditionExpression": "userId = :userId",
+  "FilterExpression": "attribute_not_exists(archivedAt)",
   "ExpressionAttributeValues": {
     ":userId": {
       "S": "$context.authorizer.claims.sub"
@@ -49,6 +50,98 @@ resource "aws_api_gateway_method_response" "get_my_urls_response_200" {
 
   response_models = {
     "application/json" = aws_api_gateway_model.get_my_urls_response_model.name
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "get_my_urls_integration_response_200" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.get_my_urls.id
+  http_method = aws_api_gateway_method.get_my_urls_get.http_method
+  status_code = aws_api_gateway_method_response.get_my_urls_response_200.status_code
+
+  depends_on = [
+    aws_api_gateway_integration.get_my_urls_integration
+  ]
+
+  response_templates = {
+    "application/json" = <<EOF
+#set($inputRoot = $input.path('$'))
+{
+  "count": $inputRoot.Count,
+  "links": [
+  #foreach($item in $inputRoot.Items)
+    {
+      "code": "$item.code.S",
+      "longUrl": "$item.longUrl.S",
+      "createdAt": "$item.createdAt.N"
+      "archivedAt": "$item.archivedAt.N"
+    }#if($foreach.hasNext),#end
+  #end
+  ]
+}
+EOF
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+  }
+}
+
+resource "aws_api_gateway_method" "get_my_urls_options" {
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+  resource_id   = aws_api_gateway_resource.get_my_urls.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "get_my_urls_options_integration" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.get_my_urls.id
+  http_method = aws_api_gateway_method.get_my_urls_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = jsonencode({
+      statusCode = 200
+    })
+  }
+}
+
+resource "aws_api_gateway_method_response" "get_my_urls_options_response_200" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.get_my_urls.id
+  http_method = aws_api_gateway_method.get_my_urls_options.http_method
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "get_my_urls_options_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.get_my_urls.id
+  http_method = aws_api_gateway_method.get_my_urls_options.http_method
+  status_code = aws_api_gateway_method_response.get_my_urls_options_response_200.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -79,37 +172,6 @@ resource "aws_api_gateway_model" "get_my_urls_response_model" {
       }
     }
   })
-}
-
-
-resource "aws_api_gateway_integration_response" "get_my_urls_integration_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  resource_id = aws_api_gateway_resource.get_my_urls.id
-  http_method = aws_api_gateway_method.get_my_urls_get.http_method
-  status_code = aws_api_gateway_method_response.get_my_urls_response_200.status_code
-
-  depends_on = [
-    aws_api_gateway_integration.get_my_urls_integration
-  ]
-
-  response_templates = {
-    "application/json" = <<EOF
-#set($inputRoot = $input.path('$'))
-{
-  "count": $inputRoot.Count,
-  "links": [
-  #foreach($item in $inputRoot.Items)
-    {
-      "code": "$item.code.S",
-      "longUrl": "$item.longUrl.S",
-      "createdAt": "$item.createdAt.N"
-      "archivedAt": "$item.archivedAt.N"
-    }#if($foreach.hasNext),#end
-  #end
-  ]
-}
-EOF
-  }
 }
 
 resource "aws_iam_role" "get_my_urls_role" {
