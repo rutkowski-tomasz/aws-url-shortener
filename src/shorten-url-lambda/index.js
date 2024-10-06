@@ -7,7 +7,7 @@ const dynamoDbClient = AWSXRay.captureAWSv3Client(new DynamoDBClient());
 const schedulerClient = AWSXRay.captureAWSv3Client(new SchedulerClient());
 
 const { ENVIRONMENT, EVENT_BUS_ARN, SCHEDULER_ROLE_ARN } = process.env;
-const TTL = 60;
+const TTL = 3600;
 
 exports.handler = async (event) => {
 
@@ -21,12 +21,24 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ code, ttl: TTL })
+            body: JSON.stringify({ code, ttl: TTL }),
+            headers: {
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS,POST,PUT',
+                'Access-Control-Allow-Origin': '*'
+            },
         };
 
     } catch (err) {
         console.error('Error: ', err);
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS,POST,PUT',
+                'Access-Control-Allow-Origin': '*'
+            },
+        };
     }
 };
 
@@ -73,7 +85,6 @@ const persist = async (code, longUrl, userId) => {
             longUrl,
             userId,
             createdAt: new Date().getTime(),
-            archivedAt: null
         }
     });
 

@@ -42,14 +42,20 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 }
 
 resource "aws_api_gateway_method_response" "success_response" {
-  count         = var.api_gateway_model_schema != null ? 1 : 0
+  count         = local.api_gateway_integration_count
   rest_api_id   = data.aws_api_gateway_rest_api.api_gateway.id
   resource_id   = aws_api_gateway_resource.lambda_resource[0].id
   http_method   = aws_api_gateway_method.lambda_method[0].http_method
   status_code   = "200"
 
   response_models = {
-    "application/json" = aws_api_gateway_model.response_model[0].name
+    "application/json" = var.api_gateway_model_schema != null ? aws_api_gateway_model.response_model[0].name : "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
   }
 }
 
@@ -80,7 +86,6 @@ resource "aws_api_gateway_deployment" "deployment" {
     aws_api_gateway_integration.lambda_integration,
     aws_api_gateway_method.lambda_method,
     aws_api_gateway_resource.lambda_resource,
-    # aws_api_gateway_method_response.success_response,
   ]
 
   triggers = {
@@ -88,7 +93,61 @@ resource "aws_api_gateway_deployment" "deployment" {
       aws_api_gateway_resource.lambda_resource,
       aws_api_gateway_method.lambda_method,
       aws_api_gateway_integration.lambda_integration,
-      # aws_api_gateway_method_response.success_response,
     ]))
+  }
+}
+
+# CORS
+resource "aws_api_gateway_method" "options" {
+  count         = local.api_gateway_integration_count
+  rest_api_id   = data.aws_api_gateway_rest_api.api_gateway.id
+  resource_id   = aws_api_gateway_resource.lambda_resource[0].id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "options" {
+  count       = local.api_gateway_integration_count
+  rest_api_id = data.aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.lambda_resource[0].id
+  http_method = aws_api_gateway_method.options[0].http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = jsonencode({
+      statusCode = 200
+    })
+  }
+}
+
+resource "aws_api_gateway_method_response" "options" {
+  count       = local.api_gateway_integration_count
+  rest_api_id = data.aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.lambda_resource[0].id
+  http_method = aws_api_gateway_method.options[0].http_method
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options" {
+  count       = local.api_gateway_integration_count
+  rest_api_id = data.aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.lambda_resource[0].id
+  http_method = aws_api_gateway_method.options[0].http_method
+  status_code = aws_api_gateway_method_response.options[0].status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
