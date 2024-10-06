@@ -85,7 +85,6 @@ const persist = async (code, longUrl, userId) => {
             longUrl,
             userId,
             createdAt: new Date().getTime(),
-            archivedAt: null
         }
     });
 

@@ -27,13 +27,10 @@ resource "aws_api_gateway_integration" "get_my_urls_integration" {
   "TableName": "${local.prefix}shortened-urls",
   "IndexName": "UserIdIndex",
   "KeyConditionExpression": "userId = :userId",
-  "FilterExpression": "attribute_not_exists(archivedAt) OR archivedAt = :nullValue",
+  "FilterExpression": "attribute_not_exists(archivedAt)",
   "ExpressionAttributeValues": {
     ":userId": {
       "S": "$context.authorizer.claims.sub"
-    },
-    ":nullValue": {
-      "N": "0"
     }
   }
 }
@@ -82,9 +79,9 @@ resource "aws_api_gateway_integration_response" "get_my_urls_integration_respons
     {
       "code": "$item.code.S",
       "longUrl": "$item.longUrl.S",
-      "createdAt": "$item.createdAt.N"
-      "archivedAt": "$item.archivedAt.N"
+      "createdAt": $item.createdAt.N
     }#if($foreach.hasNext),#end
+
   #end
   ]
 }
