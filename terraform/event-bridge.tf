@@ -115,3 +115,30 @@ resource "aws_sqs_queue" "dlq" {
 resource "aws_schemas_discoverer" "discoverer" {
     source_arn = aws_cloudwatch_event_bus.url_shortener.arn
 }
+
+resource "aws_cloudwatch_metric_alarm" "dlq_not_empty" {
+    alarm_name          = "${local.prefix}delete-url-command-dlq-not-empty"
+    comparison_operator = "GreaterThanThreshold"
+    evaluation_periods  = 1
+    metric_name         = "ApproximateNumberOfMessagesVisible"
+    namespace           = "AWS/SQS"
+    period              = 300
+    statistic           = "Maximum"
+    threshold           = 0
+    alarm_description   = "This alarm triggers when the DLQ is not empty for 5 minutes"
+    alarm_actions       = [aws_sns_topic.alarms_topic.arn]
+
+    dimensions = {
+        QueueName = aws_sqs_queue.dlq.name
+    }
+}
+
+resource "aws_sns_topic" "alarms_topic" {
+    name = "${local.prefix}alarms"
+}
+
+resource "aws_sns_topic_subscription" "alarms_subscription" {
+    topic_arn = aws_sns_topic.alarms_topic.arn
+    protocol  = "email"
+    endpoint  = "rutkowski.tomasz.3@gmail.com"
+}
