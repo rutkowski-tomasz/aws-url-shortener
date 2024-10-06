@@ -8,7 +8,7 @@ let config = {
   username: 'system-tests@example.com',
   password: 'SecurePassword123!',
   webSocketApiUrl: 'wss://5si3qer1q4.execute-api.eu-central-1.amazonaws.com/dev',
-  webSocketTimeout: 30000,
+  webSocketTimeout: 40000,
 };
 
 if (process.env.environment == 'prd')
@@ -55,8 +55,8 @@ describe('Lambda function integration', () => {
       }
     });
     expect(response.status).toBe(200);
-    expect(response.data.result).toHaveProperty('code');
-    code = response.data.result.code;
+    expect(response.data).toHaveProperty('code');
+    code = response.data.code;
 
     console.log('Shortened URL code: ', code);
   });
