@@ -21,7 +21,8 @@ export default [
     ignores: [
       "dist/",
       ".coverage/",
-      "src/*/schema/**"
+      "src/*/schema/**",
+      "web/**"
     ],
   }
 ];
