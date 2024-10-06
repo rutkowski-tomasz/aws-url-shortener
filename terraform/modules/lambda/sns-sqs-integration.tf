@@ -88,4 +88,25 @@ resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
   depends_on = [aws_iam_role_policy.lambda_sqs_policy]
 }
 
+resource "aws_cloudwatch_metric_alarm" "dlq_not_empty" {
+    count            = local.sns_sqs_integration_count
+    alarm_name          = "${var.sns_topic_name}-${var.lambda_function_name}-dlq-not-empty"
+    comparison_operator = "GreaterThanThreshold"
+    evaluation_periods  = 1
+    metric_name         = "ApproximateNumberOfMessagesVisible"
+    namespace           = "AWS/SQS"
+    period              = 300
+    statistic           = "Maximum"
+    threshold           = 0
+    alarm_description   = "This alarm triggers when the DLQ is not empty for 5 minutes"
+    alarm_actions       = [data.aws_sns_topic.alarms_topic[0].arn]
 
+    dimensions = {
+        QueueName = aws_sqs_queue.dlq[0].name
+    }
+}
+
+data "aws_sns_topic" "alarms_topic" {
+  count            = local.sns_sqs_integration_count
+  name = "${local.prefix}alarms"
+}
