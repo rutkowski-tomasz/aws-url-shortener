@@ -27,10 +27,13 @@ resource "aws_api_gateway_integration" "get_my_urls_integration" {
   "TableName": "${local.prefix}shortened-urls",
   "IndexName": "UserIdIndex",
   "KeyConditionExpression": "userId = :userId",
-  "FilterExpression": "attribute_not_exists(archivedAt)",
+  "FilterExpression": "attribute_not_exists(archivedAt) OR archivedAt = :nullValue",
   "ExpressionAttributeValues": {
     ":userId": {
       "S": "$context.authorizer.claims.sub"
+    },
+    ":nullValue": {
+      "N": "0"
     }
   }
 }
