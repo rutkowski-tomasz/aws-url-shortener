@@ -184,9 +184,23 @@ function updatePreviewImages(code, desktopPreview, mobilePreview) {
         const previewContainer = linkElement.querySelector('.preview-container') || document.createElement('div');
         previewContainer.className = 'preview-container mt-2 flex space-x-2';
         previewContainer.innerHTML = `
-            <img src="${desktopPreview}" alt="Desktop Preview" class="w-24 h-auto">
-            <img src="${mobilePreview}" alt="Mobile Preview" class="w-12 h-auto">
+            <img src="${desktopPreview}" alt="Desktop Preview" class="w-24 h-auto cursor-pointer" onclick="openImageDialog('${desktopPreview}')">
+            <img src="${mobilePreview}" alt="Mobile Preview" class="w-12 h-auto cursor-pointer" onclick="openImageDialog('${mobilePreview}')">
         `;
         linkElement.appendChild(previewContainer);
+    }
+}
+
+function openImageDialog(imageSrc) {
+    const dialog = document.createElement('div');
+    dialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    dialog.innerHTML = `<img src="${imageSrc}" alt="Full size preview" class="max-w-full max-h-full">`;
+    dialog.onclick = closeImageDialog;
+    document.body.appendChild(dialog);
+}
+
+function closeImageDialog(event) {
+    if (event.target === event.currentTarget) {
+        event.target.remove();
     }
 }
