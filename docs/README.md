@@ -62,6 +62,7 @@ The development of this solution is iterative, with the roadmap subject to chang
 1. ✅ EventBridge bus and rules with scheduling delayed one-time off delete command, Lambda handler
 1. ✅ EventBridge schema discovery, event schema generation using AWS Toolkit for VSC
 1. ✅ [Powertune](https://docs.aws.amazon.com/lambda/latest/operatorguide/profile-functions.html) lambdas, for example: [shorten-url-lambda](https://lambda-power-tuning.show/#gAAAAQACAAQABsAL;q6rWP7y7zz+x5L8/oNPGP4JOzz/UBs4/;l0+QMZdPEDKXT5Ayl08QM2N3WDPm9NMz), [generate-preview-lambda](https://lambda-power-tuning.show/#AAQABsAL;fWX9RYo0u0XUs2dF;y90OOVNVHjnz4D85)
+1. ✅ Performance testing using k6, especially breakpoint-point type
 1. Utilize more AWS services...
 
 # 👨🏻‍💻 Development
@@ -98,6 +99,8 @@ npm open:coverage # open coverage HTML
 npm test -w shorten-url-lambda
 # Python lambdas
 cd src/get-url-lambda && python3 -m unittest discover -v -s ./ -p "*_test.py"
+# Performance tests - requires k6 installed
+k6 run performance-tests/breaking-point.js
 ```
 
 ## Connect to WS API Gateway
