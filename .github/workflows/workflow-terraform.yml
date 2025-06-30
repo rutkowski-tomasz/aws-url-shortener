@@ -42,8 +42,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
+      - name: Check if S3 backend bucket exists
+        id: check_backend
+        run: |
+          if aws s3 ls s3://us-cicd --region eu-central-1 2>/dev/null; then
+            echo "backend_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ S3 backend bucket 'us-cicd' exists"
+          else
+            echo "backend_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️  S3 backend bucket 'us-cicd' does not exist"
+            echo "This is expected for new deployments. Please create the bucket manually or deploy for the first time."
+          fi
+
       - name: Create placeholders for deployment packages
-        if: inputs.action == 'plan'
+        if: inputs.action == 'plan' && steps.check_backend.outputs.backend_exists == 'true'
         run: |
           mkdir -p ../dist
           for dir in $(find ../src -maxdepth 1 -mindepth 1 -type d); do
@@ -51,25 +63,40 @@ jobs:
           done
 
       - name: Download deployment packages
-        if: inputs.action == 'apply'
+        if: inputs.action == 'apply' && steps.check_backend.outputs.backend_exists == 'true'
         uses: actions/download-artifact@v4
         with:
           path: dist
           name: deployment-packages
 
       - name: List deployment packages
+        if: steps.check_backend.outputs.backend_exists == 'true'
         run: ls -l ../dist
 
       - name: Terraform init
+        if: steps.check_backend.outputs.backend_exists == 'true'
         run: terraform init
 
       - name: Terraform select '${{ inputs.environment }}' workspace
+        if: steps.check_backend.outputs.backend_exists == 'true'
         run: terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
 
       - name: Terraform plan
-        if: inputs.action == 'plan'
+        if: inputs.action == 'plan' && steps.check_backend.outputs.backend_exists == 'true'
         run: terraform plan
 
       - name: Terraform apply
-        if: inputs.action == 'apply'
+        if: inputs.action == 'apply' && steps.check_backend.outputs.backend_exists == 'true'
         run: terraform apply -auto-approve
+
+      - name: Skip Terraform operations
+        if: steps.check_backend.outputs.backend_exists == 'false'
+        run: |
+          echo "🚫 Skipping Terraform ${{ inputs.action }} for ${{ inputs.environment }} environment"
+          echo "Reason: S3 backend bucket 'us-cicd' does not exist"
+          echo ""
+          echo "To deploy this project for the first time:"
+          echo "1. Create the S3 bucket 'us-cicd' in eu-central-1 region"
+          echo "2. Run the pipeline again or deploy manually"
+          echo ""
+          echo "This is expected behavior for new projects."
